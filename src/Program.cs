@@ -44,21 +44,37 @@ namespace Win10BloatRemover
          */
         private static void ProcessMenuEntry(MenuEntry entry)
         {
-            switch (entry)
+            try
             {
-                case MenuEntry.Quit:
-                    exit = true;
-                    break;
-                case MenuEntry.RemoveUWPApps:
-                case MenuEntry.RemoveWinDefender:
-                case MenuEntry.RemoveMSEdge:
-                case MenuEntry.RemoveOneDrive:
-                case MenuEntry.DisableAutoUpdates:
-                case MenuEntry.DisableCortana:
-                case MenuEntry.DisableScheduledTasks:
-                default:
-                    Console.WriteLine($"Unimplemented function: {entry.ToString()}");
-                    break;
+                switch (entry)
+                {
+                    case MenuEntry.DisableAutoUpdates:
+                        Console.WriteLine("-- Disabling automatic updates --");
+                        Utils.DisableAutomaticUpdates();
+                        break;
+                    case MenuEntry.DisableCortana:
+                        Console.WriteLine("-- Disabling Cortana --");
+                        Utils.DisableCortana();
+                        Console.WriteLine("A system reboot is recommended.");
+                        break;
+                    case MenuEntry.Quit:
+                        exit = true;
+                        break;
+                    case MenuEntry.RemoveUWPApps:
+                    case MenuEntry.RemoveWinDefender:
+                    case MenuEntry.RemoveMSEdge:
+                    case MenuEntry.RemoveOneDrive:
+                    case MenuEntry.DisableScheduledTasks:
+                    default:
+                        Console.WriteLine($"Unimplemented function: {entry.ToString()}");
+                        break;
+                }
+
+                Console.WriteLine("Done!");
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"An error occurred: {exc.Message}");
             }
 
             if (entry != MenuEntry.Quit)

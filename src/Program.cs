@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Security.Principal;
 
 namespace Win10BloatRemover
@@ -9,9 +10,24 @@ namespace Win10BloatRemover
 
         static void Main()
         {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en");
+            Console.Title = "Windows 10 Bloat Remover";
+
             if (!Program.HasAdministratorRights())
             {
                 Console.WriteLine("This application needs to be run with administrator rights!");
+                Console.ReadKey();
+                Environment.Exit(-1);
+            }
+
+            try
+            {
+                Utils.ExtractInstallWimTweak();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"Unable to extract install_wim_tweak tool to your temporary directory: {exc.Message}");
+                Console.WriteLine("The application will exit.");
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
@@ -37,6 +53,15 @@ namespace Win10BloatRemover
                 Console.Clear();
                 ProcessMenuEntry(chosenEntry.Value);
             }
+
+            try
+            {
+                Utils.DeleteTempInstallWimTweak();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"Unable to perform exit cleanup: {exc.Message}");
+            }
         }
 
         /**
@@ -60,17 +85,26 @@ namespace Win10BloatRemover
                     case MenuEntry.Quit:
                         exit = true;
                         break;
-                    case MenuEntry.RemoveUWPApps:
                     case MenuEntry.RemoveWinDefender:
-                    case MenuEntry.RemoveMSEdge:
-                    case MenuEntry.RemoveOneDrive:
+                        Console.WriteLine("-- Removing Windows Defender --");
+                        Utils.RemoveWindowsDefender();
+                        break;
                     case MenuEntry.DisableScheduledTasks:
+                        Console.WriteLine("-- Disabling useless scheduled tasks --");
+                        Utils.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
+                        break;
+                    case MenuEntry.RemoveMSEdge:
+                        Console.WriteLine("-- Removing Microsoft Edge --");
+                        Utils.RemoveMicrosoftEdge();
+                        break;
+                    case MenuEntry.RemoveUWPApps:
+                    case MenuEntry.RemoveOneDrive:
                     default:
                         Console.WriteLine($"Unimplemented function: {entry.ToString()}");
                         break;
                 }
 
-                Console.WriteLine("Done!");
+                Console.Write("Done! ");
             }
             catch (Exception exc)
             {

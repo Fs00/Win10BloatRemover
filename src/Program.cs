@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
+using System.Resources;
 using System.Security.Principal;
 
 namespace Win10BloatRemover
@@ -19,10 +21,17 @@ namespace Win10BloatRemover
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
+            
+            if (SystemUtils.GetWindowsReleaseId() != "1809")
+            {
+                Console.WriteLine("This application is compatible only with Windows 10 October 2018 Update!");
+                Console.ReadKey();
+                Environment.Exit(-1);
+            }
 
             try
             {
-                Utils.ExtractInstallWimTweak();
+                ExtractInstallWimTweak();
             }
             catch (Exception exc)
             {
@@ -45,7 +54,7 @@ namespace Win10BloatRemover
                     Console.Write("Select an entry: ");
                     chosenEntry = MenuUtils.ProcessUserInput();
                     if (chosenEntry == null)
-                        Console.WriteLine("\nIncorrect input.");
+                        Console.WriteLine("Incorrect input.");
                     else
                         userInputIsCorrect = true;
                 }
@@ -56,7 +65,7 @@ namespace Win10BloatRemover
 
             try
             {
-                Utils.DeleteTempInstallWimTweak();
+                DeleteTempInstallWimTweak();
             }
             catch (Exception exc)
             {
@@ -75,11 +84,11 @@ namespace Win10BloatRemover
                 {
                     case MenuEntry.DisableAutoUpdates:
                         Console.WriteLine("-- Disabling automatic updates --");
-                        Utils.DisableAutomaticUpdates();
+                        Operations.DisableAutomaticUpdates();
                         break;
                     case MenuEntry.DisableCortana:
                         Console.WriteLine("-- Disabling Cortana --");
-                        Utils.DisableCortana();
+                        Operations.DisableCortana();
                         Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.Quit:
@@ -87,18 +96,25 @@ namespace Win10BloatRemover
                         break;
                     case MenuEntry.RemoveWinDefender:
                         Console.WriteLine("-- Removing Windows Defender --");
-                        Utils.RemoveWindowsDefender();
+                        Operations.RemoveWindowsDefender();
                         break;
                     case MenuEntry.DisableScheduledTasks:
                         Console.WriteLine("-- Disabling useless scheduled tasks --");
-                        Utils.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
+                        Operations.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
+                        Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.RemoveMSEdge:
                         Console.WriteLine("-- Removing Microsoft Edge --");
-                        Utils.RemoveMicrosoftEdge();
+                        Operations.RemoveMicrosoftEdge();
+                        Console.WriteLine("A system reboot is recommended.");
                         break;
-                    case MenuEntry.RemoveUWPApps:
                     case MenuEntry.RemoveOneDrive:
+                        Console.WriteLine("-- Removing OneDrive --");
+                        Operations.RemoveOneDrive();
+                        Console.WriteLine("Some folders may not exist, it's normal.");
+                        break;
+                    case MenuEntry.RemoveServices:
+                    case MenuEntry.RemoveUWPApps:
                     default:
                         Console.WriteLine($"Unimplemented function: {entry.ToString()}");
                         break;
@@ -108,7 +124,9 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"An error occurred: {exc.Message}");
+                Console.ResetColor();
             }
 
             if (entry != MenuEntry.Quit)
@@ -122,6 +140,18 @@ namespace Win10BloatRemover
         {
             var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        public static void ExtractInstallWimTweak()
+        {
+            ResourceManager binResources = new ResourceManager("Win10BloatRemover.resources.Binaries", typeof(Operations).Assembly);
+            File.WriteAllBytes(Configuration.InstallWimTweakPath, (byte[])binResources.GetObject("install_wim_tweak"));
+        }
+
+        public static void DeleteTempInstallWimTweak()
+        {
+            if (File.Exists(Configuration.InstallWimTweakPath))
+                File.Delete(Configuration.InstallWimTweakPath);
         }
     }
 }

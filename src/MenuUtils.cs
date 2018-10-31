@@ -8,6 +8,7 @@ namespace Win10BloatRemover
         RemoveWinDefender,
         RemoveMSEdge,
         RemoveOneDrive,
+        RemoveServices,
         DisableAutoUpdates,
         DisableCortana,
         DisableScheduledTasks,
@@ -44,9 +45,9 @@ namespace Win10BloatRemover
          */
         public static MenuEntry? ProcessUserInput()
         {
-            int userInputNumber = Console.ReadKey().KeyChar - 48;
-            if (Enum.IsDefined(typeof(MenuEntry), userInputNumber))
-                return (MenuEntry)userInputNumber;
+            bool inputIsNumeric = int.TryParse(Console.ReadLine(), out int userInputNumber);
+            if (inputIsNumeric && Enum.IsDefined(typeof(MenuEntry), userInputNumber))
+                return (MenuEntry) userInputNumber;
             else
                 return null;
         }
@@ -79,6 +80,9 @@ namespace Win10BloatRemover
                     break;
                 case MenuEntry.DisableScheduledTasks:
                     description = "Disable useless scheduled tasks";
+                    break;
+                case MenuEntry.RemoveServices:
+                    description = "Remove diagnostic services";
                     break;
                 case MenuEntry.Quit:
                     description = "Exit the application";

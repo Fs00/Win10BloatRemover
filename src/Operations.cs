@@ -1,70 +1,22 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Resources;
 using Microsoft.Win32;
 
 namespace Win10BloatRemover
 {
     /**
-     *  Utils
+     *  Operations
      *  Contains functions that perform tasks which don't belong to a particular category
      */
-    static class Utils
+    static class Operations
     {
-        public static void ExtractInstallWimTweak()
+        private static int RunInstallWimTweak(string arguments)
         {
-            ResourceManager binResources = new ResourceManager("Win10BloatRemover.resources.Binaries", typeof(Utils).Assembly);
-            File.WriteAllBytes(Configuration.InstallWimTweakPath, (byte[]) binResources.GetObject("install_wim_tweak"));
-        }
-
-        public static Process RunInstallWimTweak(string arguments)
-        {
-            var installWimTweakProcess = new Process();
-            installWimTweakProcess.StartInfo = new ProcessStartInfo {
-                FileName = Configuration.InstallWimTweakPath,
-                Arguments = arguments,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-            installWimTweakProcess.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);
-            installWimTweakProcess.ErrorDataReceived += (s, e) => {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e.Data);
-                Console.ResetColor();
-            };
-            installWimTweakProcess.Start();
+            var installWimTweakProcess = SystemUtils.RunProcess(Configuration.InstallWimTweakPath, arguments, true);
             installWimTweakProcess.BeginOutputReadLine();
             installWimTweakProcess.BeginErrorReadLine();
-            return installWimTweakProcess;
-        }
-
-        public static void DeleteTempInstallWimTweak()
-        {
-            if (File.Exists(Configuration.InstallWimTweakPath))
-                File.Delete(Configuration.InstallWimTweakPath);
-        }
-
-        public static void ExecuteWindowsCommand(string command)
-        {
-            var cmdProcess = new Process();
-            cmdProcess.StartInfo = new ProcessStartInfo
-            {
-                FileName = "cmd.exe",
-                Arguments = $"/c {command}",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-            cmdProcess.Start();
-            Console.Write(cmdProcess.StandardOutput.ReadToEnd());
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write(cmdProcess.StandardError.ReadToEnd());
-            Console.ResetColor();
-            cmdProcess.WaitForExit();
+            installWimTweakProcess.WaitForExit();
+            return installWimTweakProcess.ExitCode;
         }
 
         public static void DisableCortana()
@@ -131,9 +83,8 @@ namespace Win10BloatRemover
             Console.WriteLine("OK!");
             
             Console.WriteLine("Running install-wim-tweak...");
-            var installWimTweakProc = RunInstallWimTweak("/o /c Windows-Defender /r");
-            installWimTweakProc.WaitForExit();
-            if (installWimTweakProc.ExitCode == 0)
+            var installWimTweakExitCode = RunInstallWimTweak("/o /c Windows-Defender /r");
+            if (installWimTweakExitCode == 0)
                 Console.WriteLine("Install-wim-tweak executed successfully!");
             else
             {
@@ -150,9 +101,8 @@ namespace Win10BloatRemover
             Console.ReadKey();
 
             Console.WriteLine("Running install-wim-tweak...");
-            var installWimTweakProc = RunInstallWimTweak("/o /c Microsoft-Windows-Internet-Browser /r");
-            installWimTweakProc.WaitForExit();
-            if (installWimTweakProc.ExitCode == 0)
+            var installWimTweakExitCode = RunInstallWimTweak("/o /c Microsoft-Windows-Internet-Browser /r");
+            if (installWimTweakExitCode == 0)
                 Console.WriteLine("Install-wim-tweak executed successfully!");
             else
             {
@@ -162,13 +112,60 @@ namespace Win10BloatRemover
             }
         }
 
+        public static void RemoveOneDrive()
+        {
+            Console.WriteLine("Killing OneDrive process...");
+            SystemUtils.ExecuteWindowsCommand("taskkill /F /IM onedrive.exe");
+
+            Console.WriteLine("Executing OneDrive uninstaller...");
+            string oneDriveUninstaller = RetrieveOneDriveUninstallerPath();
+            var oneDriveSetupProc = SystemUtils.RunProcess(oneDriveUninstaller, "/uninstall");
+            oneDriveSetupProc.PrintOutputAndErrors();
+            oneDriveSetupProc.WaitForExit();
+
+            if (oneDriveSetupProc.ExitCode != 0)
+                throw new Exception("OneDrive uninstaller terminated with non-zero status.");
+            else
+            {
+                Console.WriteLine("Removing old files...");
+                SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
+                SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
+                SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
+                SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
+
+                try
+                {
+                    string oneDriveStandaloneUpdater = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive\OneDriveStandaloneUpdater.exe";
+                    if (File.Exists(oneDriveStandaloneUpdater))
+                        File.Delete(oneDriveStandaloneUpdater);
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine($"An error occurred while deleting OneDrive standalone updater: {exc.Message}");
+                }
+
+                Console.WriteLine("Deleting old registry keys...");
+                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"CLSID", true))
+                    key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Wow6432Node\CLSID", true))
+                    key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+            }
+        }
+
+        private static string RetrieveOneDriveUninstallerPath()
+        {
+            if (Environment.Is64BitOperatingSystem)
+                return $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe";
+            else
+                return $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\System32\OneDriveSetup.exe";
+        }
+
         public static void DisableScheduledTasks(string[] scheduledTasksList)
         {
             foreach (string task in scheduledTasksList)
-                ExecuteWindowsCommand($"schtasks /Change /TN \"{task}\" /disable");
+                SystemUtils.ExecuteWindowsCommand($"schtasks /Change /TN \"{task}\" /disable");
 
-            ExecuteWindowsCommand("del /F /Q \"C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\SettingSync\\*\"");
-            Console.WriteLine("Some commands may fail, it's normal.");
+            SystemUtils.ExecuteWindowsCommand("del /F /Q \"C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\SettingSync\\*\"");
         }
     }
 }

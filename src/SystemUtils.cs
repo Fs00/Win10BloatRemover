@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.ObjectModel;
+using System.Management.Automation;
 
 namespace Win10BloatRemover
 {
@@ -49,6 +51,33 @@ namespace Win10BloatRemover
 
             process.Start();
             return process;
+        }
+
+        public static void RunPowerShellScript(string script)
+        {
+            using (PowerShell psInstance = PowerShell.Create())
+            {
+                psInstance.AddScript(script);
+                psInstance.Streams.Information.DataAdded += (s, evtArgs) => Console.WriteLine(psInstance.Streams.Information[evtArgs.Index].ToString());
+                psInstance.Streams.Error.DataAdded += (s, evtArgs) => {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(psInstance.Streams.Error[evtArgs.Index].ToString());
+                    Console.ResetColor();
+                };
+                psInstance.Streams.Warning.DataAdded += (s, evtArgs) => {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine(psInstance.Streams.Warning[evtArgs.Index].ToString());
+                    Console.ResetColor();
+                };
+                psInstance.Streams.Progress.DataAdded += (s, evtArgs) => {
+                    var progressRecord = psInstance.Streams.Progress[evtArgs.Index];
+                    if (progressRecord.PercentComplete > 0)
+                        Console.WriteLine($"{progressRecord?.Activity}: {progressRecord.PercentComplete}%");
+                };
+
+                var asyncTask = psInstance.BeginInvoke();
+                asyncTask.AsyncWaitHandle.WaitOne();
+            }
         }
 
         /**

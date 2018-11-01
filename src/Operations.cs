@@ -191,15 +191,7 @@ namespace Win10BloatRemover
 
         public static void RemoveIE11()
         {
-            var dismProcess = SystemUtils.RunProcess("DISM.exe", "/online /Disable-Feature /FeatureName:Internet-Explorer-Optional-amd64", true);
-            dismProcess.BeginOutputReadLine();
-            dismProcess.BeginErrorReadLine();
-            // DISM remains stuck for no apparent reason, we need to kill it when the work is finished
-            while (!dismProcess.HasExited)
-            {
-                if (Console.ReadLine() == "ok")
-                    dismProcess.Kill();
-            }
+            SystemUtils.RunPowerShellScript("Disable-WindowsOptionalFeature -Online -Remove -NoRestart -FeatureName Internet-Explorer-Optional-amd64");
         }
     }
 }

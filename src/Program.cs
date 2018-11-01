@@ -115,9 +115,9 @@ namespace Win10BloatRemover
                         Operations.DisableWindowsTips();
                         break;
                     case MenuEntry.RemoveIE11:
-                        Console.WriteLine("When DISM has finished, write 'ok' and press Enter.");
+                        /*Console.WriteLine("When DISM has finished, write 'ok' and press Enter.");
                         Console.WriteLine("Press a key when you're ready.");
-                        Console.ReadKey();
+                        Console.ReadKey();*/
                         Operations.RemoveIE11();
                         break;
                     case MenuEntry.Credits:

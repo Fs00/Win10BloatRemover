@@ -60,5 +60,10 @@
   <ItemGroup>
     <None Include="resources\install_wim_tweak.exe" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Management.Automation.dll">
+      <Version>10.0.10586</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

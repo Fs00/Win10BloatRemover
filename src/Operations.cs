@@ -12,11 +12,13 @@ namespace Win10BloatRemover
     {
         private static int RunInstallWimTweak(string arguments)
         {
-            var installWimTweakProcess = SystemUtils.RunProcess(Configuration.InstallWimTweakPath, arguments, true);
-            installWimTweakProcess.BeginOutputReadLine();
-            installWimTweakProcess.BeginErrorReadLine();
-            installWimTweakProcess.WaitForExit();
-            return installWimTweakProcess.ExitCode;
+            using (var installWimTweakProcess = SystemUtils.RunProcess(Configuration.InstallWimTweakPath, arguments, true))
+            {
+                installWimTweakProcess.BeginOutputReadLine();
+                installWimTweakProcess.BeginErrorReadLine();
+                installWimTweakProcess.WaitForExit();
+                return installWimTweakProcess.ExitCode;
+            }
         }
 
         public static void DisableCortana()
@@ -166,6 +168,29 @@ namespace Win10BloatRemover
                 SystemUtils.ExecuteWindowsCommand($"schtasks /Change /TN \"{task}\" /disable");
 
             SystemUtils.ExecuteWindowsCommand("del /F /Q \"C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\SettingSync\\*\"");
+        }
+
+        public static void DisableWinErrorReporting()
+        {
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting"))
+                key.SetValue("Disabled", 1, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\Windows Error Reporting"))
+                key.SetValue("Disabled", 1, RegistryValueKind.DWord);
+        }
+
+        public static void DisableWindowsTips()
+        {
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\CloudContent"))
+            {
+                key.SetValue("DisableSoftLanding", 1, RegistryValueKind.DWord);
+                key.SetValue("DisableWindowsSpotlightFeatures", 1, RegistryValueKind.DWord);
+                key.SetValue("DisableWindowsConsumerFeatures", 1, RegistryValueKind.DWord);
+            }
+
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection"))
+                key.SetValue("DoNotShowFeedbackNotifications", 1, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsInkWorkspace"))
+                key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
         }
     }
 }

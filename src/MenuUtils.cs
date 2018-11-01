@@ -7,11 +7,16 @@ namespace Win10BloatRemover
         RemoveUWPApps,
         RemoveWinDefender,
         RemoveMSEdge,
+        RemoveIE11,
+        RemoveQuickAssist,
         RemoveOneDrive,
         RemoveServices,
         DisableAutoUpdates,
         DisableCortana,
         DisableScheduledTasks,
+        DisableErrorReporting,
+        DisableWindowsTips,
+        Credits,
         Quit
     }
 
@@ -23,10 +28,11 @@ namespace Win10BloatRemover
     {
         public static void PrintHeading()
         {
-            Console.WriteLine("--------------------------------------");
-            Console.WriteLine("|      Windows 10 Bloat Remover      |");
-            Console.WriteLine("|         Developed by Fs00          |");
-            Console.WriteLine("--------------------------------------");
+            Console.WriteLine("---------------------------------------------");
+            Console.WriteLine("|    Windows 10 Bloat Remover and Tweaker   |");
+            Console.WriteLine("|             for version 1809              |");
+            Console.WriteLine("---------------------------------------------");
+            Console.WriteLine();
         }
 
         /**
@@ -34,9 +40,17 @@ namespace Win10BloatRemover
          */
         public static void PrintMenu()
         {
-            Console.WriteLine("Menu:");
+            Console.WriteLine("-- MENU --");
             foreach (MenuEntry entry in Enum.GetValues(typeof(MenuEntry)))
                 Console.WriteLine($"{(int)entry}: {GetMenuEntryDescription(entry)}");
+            Console.WriteLine();
+        }
+
+        public static void PrintCredits()
+        {
+            Console.WriteLine("Developed by Fs00");
+            //Console.WriteLine("Official GitHub repository: github.com/Fs00/Win10BloatRemover");
+            Console.WriteLine("Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com");
         }
 
         /**
@@ -61,28 +75,40 @@ namespace Win10BloatRemover
             switch (entry)
             {
                 case MenuEntry.RemoveUWPApps:
-                    description = "Remove UWP apps";
+                    description = "UWP apps removal";
                     break;
                 case MenuEntry.RemoveWinDefender:
-                    description = "Remove Windows Defender";
+                    description = "Windows Defender removal";
                     break;
                 case MenuEntry.RemoveMSEdge:
-                    description = "Remove Microsoft Edge";
+                    description = "Microsoft Edge removal";
                     break;
                 case MenuEntry.RemoveOneDrive:
-                    description = "Remove OneDrive";
+                    description = "OneDrive removal";
+                    break;
+                case MenuEntry.RemoveIE11:
+                    description = "Internet Explorer 11 removal";
+                    break;
+                case MenuEntry.RemoveQuickAssist:
+                    description = "Microsoft Quick Assist removal";
                     break;
                 case MenuEntry.DisableAutoUpdates:
-                    description = "Disable automatic Windows updates";
+                    description = "Automatic Windows updates disabling";
                     break;
                 case MenuEntry.DisableCortana:
-                    description = "Disable Cortana";
-                    break;
-                case MenuEntry.DisableScheduledTasks:
-                    description = "Disable useless scheduled tasks";
+                    description = "Cortana disabling";
                     break;
                 case MenuEntry.RemoveServices:
-                    description = "Remove diagnostic services";
+                    description = "Diagnostic services removal";
+                    break;
+                case MenuEntry.DisableScheduledTasks:
+                    description = "Useless scheduled tasks disabling";
+                    break;
+                case MenuEntry.DisableErrorReporting:
+                    description = "Windows Error Reporting disabling";
+                    break;
+                case MenuEntry.DisableWindowsTips:
+                    description = "Windows Tips disabling";
                     break;
                 case MenuEntry.Quit:
                     description = "Exit the application";

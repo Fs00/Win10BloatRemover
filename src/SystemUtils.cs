@@ -57,9 +57,11 @@ namespace Win10BloatRemover
          */
         public static void ExecuteWindowsCommand(string command)
         {
-            var cmdProcess = RunProcess("cmd.exe", $"/c {command}");
-            cmdProcess.PrintOutputAndErrors();
-            cmdProcess.WaitForExit();
+            using (var cmdProcess = RunProcess("cmd.exe", $"/c {command}"))
+            {
+                cmdProcess.PrintOutputAndErrors();
+                cmdProcess.WaitForExit();
+            }
         }
 
         /**

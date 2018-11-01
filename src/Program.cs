@@ -13,7 +13,7 @@ namespace Win10BloatRemover
         static void Main()
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en");
-            Console.Title = "Windows 10 Bloat Remover";
+            Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
             if (!Program.HasAdministratorRights())
             {
@@ -51,7 +51,7 @@ namespace Win10BloatRemover
                 MenuEntry? chosenEntry = null;
                 while (!userInputIsCorrect)
                 {
-                    Console.Write("Select an entry: ");
+                    Console.Write("Choose an operation: ");
                     chosenEntry = MenuUtils.ProcessUserInput();
                     if (chosenEntry == null)
                         Console.WriteLine("Incorrect input.");
@@ -80,41 +80,43 @@ namespace Win10BloatRemover
         {
             try
             {
+                Console.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --");
                 switch (entry)
                 {
                     case MenuEntry.DisableAutoUpdates:
-                        Console.WriteLine("-- Disabling automatic updates --");
                         Operations.DisableAutomaticUpdates();
                         break;
                     case MenuEntry.DisableCortana:
-                        Console.WriteLine("-- Disabling Cortana --");
                         Operations.DisableCortana();
                         Console.WriteLine("A system reboot is recommended.");
                         break;
-                    case MenuEntry.Quit:
-                        exit = true;
-                        break;
                     case MenuEntry.RemoveWinDefender:
-                        Console.WriteLine("-- Removing Windows Defender --");
                         Operations.RemoveWindowsDefender();
                         break;
                     case MenuEntry.DisableScheduledTasks:
-                        Console.WriteLine("-- Disabling useless scheduled tasks --");
                         Operations.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.RemoveMSEdge:
-                        Console.WriteLine("-- Removing Microsoft Edge --");
                         Operations.RemoveMicrosoftEdge();
                         Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.RemoveOneDrive:
-                        Console.WriteLine("-- Removing OneDrive --");
                         Operations.RemoveOneDrive();
                         Console.WriteLine("Some folders may not exist, it's normal.");
                         break;
-                    case MenuEntry.RemoveServices:
-                    case MenuEntry.RemoveUWPApps:
+                    case MenuEntry.DisableErrorReporting:
+                        Operations.DisableWinErrorReporting();
+                        break;
+                    case MenuEntry.DisableWindowsTips:
+                        Operations.DisableWindowsTips();
+                        break;
+                    case MenuEntry.Credits:
+                        MenuUtils.PrintCredits();
+                        break;
+                    case MenuEntry.Quit:
+                        exit = true;
+                        break;
                     default:
                         Console.WriteLine($"Unimplemented function: {entry.ToString()}");
                         break;
@@ -125,7 +127,7 @@ namespace Win10BloatRemover
             catch (Exception exc)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"An error occurred: {exc.Message}");
+                Console.WriteLine($"Operation failed: {exc.Message}");
                 Console.ResetColor();
             }
 

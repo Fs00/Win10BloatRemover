@@ -98,6 +98,9 @@ namespace Win10BloatRemover
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.RemoveMSEdge:
+                        Console.WriteLine("Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!");
+                        Console.WriteLine("Press a key when you're ready.");
+                        Console.ReadKey();
                         Operations.RemoveMicrosoftEdge();
                         Console.WriteLine("A system reboot is recommended.");
                         break;
@@ -110,6 +113,12 @@ namespace Win10BloatRemover
                         break;
                     case MenuEntry.DisableWindowsTips:
                         Operations.DisableWindowsTips();
+                        break;
+                    case MenuEntry.RemoveIE11:
+                        Console.WriteLine("When DISM has finished, write 'ok' and press Enter.");
+                        Console.WriteLine("Press a key when you're ready.");
+                        Console.ReadKey();
+                        Operations.RemoveIE11();
                         break;
                     case MenuEntry.Credits:
                         MenuUtils.PrintCredits();

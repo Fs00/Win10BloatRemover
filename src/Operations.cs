@@ -98,10 +98,6 @@ namespace Win10BloatRemover
 
         public static void RemoveMicrosoftEdge()
         {
-            Console.WriteLine("Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!");
-            Console.WriteLine("Press a key when you're ready.");
-            Console.ReadKey();
-
             Console.WriteLine("Running install-wim-tweak...");
             var installWimTweakExitCode = RunInstallWimTweak("/o /c Microsoft-Windows-Internet-Browser /r");
             if (installWimTweakExitCode == 0)
@@ -191,6 +187,19 @@ namespace Win10BloatRemover
                 key.SetValue("DoNotShowFeedbackNotifications", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsInkWorkspace"))
                 key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
+        }
+
+        public static void RemoveIE11()
+        {
+            var dismProcess = SystemUtils.RunProcess("DISM.exe", "/online /Disable-Feature /FeatureName:Internet-Explorer-Optional-amd64", true);
+            dismProcess.BeginOutputReadLine();
+            dismProcess.BeginErrorReadLine();
+            // DISM remains stuck for no apparent reason, we need to kill it when the work is finished
+            while (!dismProcess.HasExited)
+            {
+                if (Console.ReadLine() == "ok")
+                    dismProcess.Kill();
+            }
         }
     }
 }

@@ -34,15 +34,21 @@ namespace Win10BloatRemover
                                            "if ($provisionedPackage) { Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName; } }";
 
                 Console.WriteLine($"Removing {appName} app...");
-                psInstance.RunScriptAndPrintOutput(appRemovalScript);   // FIXME: POWERSHELL READDS ERRORS FROM PREVIOUS SCRIPTS EXECUTIONS (unfixable?)
+                psInstance.RunScriptAndPrintOutput(appRemovalScript);
 
                 // Perform post-uninstall operations only if package removal was successful
-                if (psInstance.Streams.Error.Count == 0)
+                if (!psInstance.HadErrors)
                 {
                     Console.WriteLine($"Performing post-uninstall operations for app {appName}...");
                     PerformPostUninstallOperations(appName);
                 }
-                psInstance.Streams.Error.Clear();   // if we don't do it, we would check error count from previous uninstalls
+                else
+                {
+                    // This is a workaround to avoid previous errors being rewritten to the error stream
+                    // every time a script is executed (which is supposedly a PowerShell API bug)
+                    psInstance.Dispose();
+                    psInstance = PowerShell.Create();
+                }
             }
             psInstance.Dispose();
             removalPerformed = true;

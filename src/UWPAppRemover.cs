@@ -34,7 +34,7 @@ namespace Win10BloatRemover
                                            "if ($provisionedPackage) { Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName; } }";
 
                 Console.WriteLine($"Removing {appName} app...");
-                psInstance.RunScriptAndPrintOutput(appRemovalScript);
+                psInstance.RunScriptAndPrintOutput(appRemovalScript);   // FIXME: POWERSHELL READDS ERRORS FROM PREVIOUS SCRIPTS EXECUTIONS (unfixable?)
 
                 // Perform post-uninstall operations only if package removal was successful
                 if (psInstance.Streams.Error.Count == 0)

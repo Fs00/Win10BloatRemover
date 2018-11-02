@@ -23,7 +23,12 @@ namespace Win10BloatRemover
             "BingSports",
             "BingWeather",
             "BingNews",
-            "BingFinance"
+            "BingFinance",
+            "People_",
+            "PeopleExperienceHost",
+            "WindowsFeedback",
+            "Microsoft.Getstarted",
+            "OneConnect"
         };
 
         public static readonly string[] ScheduledTasksToDisable = {

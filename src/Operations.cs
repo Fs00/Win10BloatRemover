@@ -189,9 +189,13 @@ namespace Win10BloatRemover
                 key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
         }
 
-        public static void RemoveIE11()
+        public static void RemoveWindowsFeatures(string[] featuresToRemove)
         {
-            SystemUtils.RunPowerShellScript("Disable-WindowsOptionalFeature -Online -Remove -NoRestart -FeatureName Internet-Explorer-Optional-amd64");
+            string removalScript = "";
+            foreach (string feature in featuresToRemove)
+                removalScript += $"Remove-WindowsPackage -Online -NoRestart -PackageName (Get-WindowsPackage -Online -PackageName *{feature}*).PackageName;";
+
+            SystemUtils.RunPowerShellScript(removalScript);
         }
     }
 }

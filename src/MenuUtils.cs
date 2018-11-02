@@ -7,9 +7,8 @@ namespace Win10BloatRemover
         RemoveUWPApps,
         RemoveWinDefender,
         RemoveMSEdge,
-        RemoveIE11,
-        RemoveQuickAssist,
         RemoveOneDrive,
+        RemoveWindowsFeatures,
         RemoveServices,
         DisableAutoUpdates,
         DisableCortana,
@@ -86,11 +85,8 @@ namespace Win10BloatRemover
                 case MenuEntry.RemoveOneDrive:
                     description = "OneDrive removal";
                     break;
-                case MenuEntry.RemoveIE11:
-                    description = "Internet Explorer 11 removal";
-                    break;
-                case MenuEntry.RemoveQuickAssist:
-                    description = "Microsoft Quick Assist removal";
+                case MenuEntry.RemoveWindowsFeatures:
+                    description = "Useless Windows features removal";
                     break;
                 case MenuEntry.DisableAutoUpdates:
                     description = "Automatic Windows updates disabling";
@@ -118,6 +114,48 @@ namespace Win10BloatRemover
                     break;
             }
             return description;
+        }
+
+        public static string GetMenuEntryExplanation(MenuEntry entry)
+        {
+            string explanation;
+            switch (entry)
+            {
+                case MenuEntry.RemoveUWPApps:
+                    explanation = "The following UWP apps will be removed:\n";
+                    foreach (string app in Configuration.UwpAppsToRemove)
+                        explanation += $"  {app}\n";
+                    break;
+                case MenuEntry.RemoveWinDefender:
+                    explanation = "Windows Defender menu icon will remain there, but the program won't start anymore.";
+                    break;
+                case MenuEntry.RemoveMSEdge:
+                    explanation = "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!";
+                    break;
+                case MenuEntry.RemoveWindowsFeatures:
+                    explanation = "The following features will be removed:\n";
+                    foreach (string feature in Configuration.WindowsFeaturesToRemove)
+                        explanation += $"  {feature}\n";
+                    break;
+                case MenuEntry.DisableCortana:
+                    explanation = "This won't remove Cortana (otherwise the system would break), it will only be disabled using GP and blocked by the firewall.";
+                    break;
+                case MenuEntry.RemoveServices:
+                    explanation = "The following services will be removed:\n";
+                    break;
+                case MenuEntry.DisableScheduledTasks:
+                    explanation = "The following scheduled tasks will be disabled:\n";
+                    foreach (string task in Configuration.ScheduledTasksToDisable)
+                        explanation += $"  {task}\n";
+                    break;
+                case MenuEntry.Quit:
+                    explanation = "Are you sure?";
+                    break;
+                default:
+                    explanation = string.Empty;
+                    break;
+            }
+            return explanation;
         }
     }
 }

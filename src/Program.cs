@@ -81,6 +81,11 @@ namespace Win10BloatRemover
             try
             {
                 Console.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --");
+                Console.WriteLine(MenuUtils.GetMenuEntryExplanation(entry));
+                Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
+                if (Console.ReadKey().Key != ConsoleKey.Enter)
+                    return;
+
                 switch (entry)
                 {
                     case MenuEntry.DisableAutoUpdates:
@@ -98,9 +103,6 @@ namespace Win10BloatRemover
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.RemoveMSEdge:
-                        Console.WriteLine("Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!");
-                        Console.WriteLine("Press a key when you're ready.");
-                        Console.ReadKey();
                         Operations.RemoveMicrosoftEdge();
                         Console.WriteLine("A system reboot is recommended.");
                         break;
@@ -114,11 +116,9 @@ namespace Win10BloatRemover
                     case MenuEntry.DisableWindowsTips:
                         Operations.DisableWindowsTips();
                         break;
-                    case MenuEntry.RemoveIE11:
-                        /*Console.WriteLine("When DISM has finished, write 'ok' and press Enter.");
-                        Console.WriteLine("Press a key when you're ready.");
-                        Console.ReadKey();*/
-                        Operations.RemoveIE11();
+                    case MenuEntry.RemoveWindowsFeatures:
+                        Operations.RemoveWindowsFeatures(Configuration.WindowsFeaturesToRemove);
+                        Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.Credits:
                         MenuUtils.PrintCredits();

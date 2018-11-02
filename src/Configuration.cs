@@ -60,5 +60,11 @@ namespace Win10BloatRemover
             @"\Microsoft\Windows\Subscription\EnableLicenseAcquisition",
             @"\Microsoft\Windows\Subscription\LicenseAcquisition"
         };
+
+        public static readonly string[] WindowsFeaturesToRemove = {
+            "InternetExplorer-Optional-Package",
+            "Hello-Face-Package",
+            "QuickAssist-Package"
+        };
     }
 }

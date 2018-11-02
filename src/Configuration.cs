@@ -10,17 +10,20 @@ namespace Win10BloatRemover
     {
         public static readonly string InstallWimTweakPath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
 
-        public static readonly string[] UwpAppsToRemove = {
-            "zune",
+        public static readonly string[] UWPAppsToRemove = {
+            "ZuneMusic",
+            "ZuneVideo",
             "windowscommunicationsapps",
-            "mess",
-            "onenote",
-            "officehub",
-            "windowscamera",
-            "bing",
-            "maps",
-            "yourphone",
-            "GetHelp"
+            "OneNote",
+            "MicrosoftOfficeHub",
+            "WindowsCamera",
+            "WindowsMaps",
+            "YourPhone",
+            "GetHelp",
+            "BingSports",
+            "BingWeather",
+            "BingNews",
+            "BingFinance"
         };
 
         public static readonly string[] ScheduledTasksToDisable = {

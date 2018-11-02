@@ -88,6 +88,9 @@ namespace Win10BloatRemover
 
                 switch (entry)
                 {
+                    case MenuEntry.RemoveUWPApps:
+                        new UWPAppRemover(Configuration.UWPAppsToRemove).PerformRemoval();
+                        break;
                     case MenuEntry.DisableAutoUpdates:
                         Operations.DisableAutomaticUpdates();
                         break;
@@ -98,12 +101,12 @@ namespace Win10BloatRemover
                     case MenuEntry.RemoveWinDefender:
                         Operations.RemoveWindowsDefender();
                         break;
-                    case MenuEntry.DisableScheduledTasks:
-                        Operations.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
-                        Console.WriteLine("Some commands may fail, it's normal.");
+                    case MenuEntry.RemoveConnectApp:
+                        Operations.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");
+                        Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.RemoveMSEdge:
-                        Operations.RemoveMicrosoftEdge();
+                        Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Internet-Browser");
                         Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.RemoveOneDrive:
@@ -112,6 +115,10 @@ namespace Win10BloatRemover
                         break;
                     case MenuEntry.DisableErrorReporting:
                         Operations.DisableWinErrorReporting();
+                        break;
+                    case MenuEntry.DisableScheduledTasks:
+                        Operations.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
+                        Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.DisableWindowsTips:
                         Operations.DisableWindowsTips();

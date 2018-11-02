@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Win32;
+using System.Management.Automation;
 
 namespace Win10BloatRemover
 {
@@ -10,14 +11,27 @@ namespace Win10BloatRemover
      */
     static class Operations
     {
-        private static int RunInstallWimTweak(string arguments)
+        /**
+         *  Removes the specified component using install-wim-tweak synchronously
+         *  It also prints output messages according to its exit status
+         *  Messages from install-wim-tweak process are printed asynchronously (as soon as they are written to stdout/stderr)
+         */
+        public static void RemoveComponentUsingInstallWimTweak(string component)
         {
-            using (var installWimTweakProcess = SystemUtils.RunProcess(Configuration.InstallWimTweakPath, arguments, true))
+            Console.WriteLine("Running install-wim-tweak...");
+            using (var installWimTweakProcess = SystemUtils.RunProcess(Configuration.InstallWimTweakPath, $"/o /c {component} /r", true))
             {
                 installWimTweakProcess.BeginOutputReadLine();
                 installWimTweakProcess.BeginErrorReadLine();
                 installWimTweakProcess.WaitForExit();
-                return installWimTweakProcess.ExitCode;
+                if (installWimTweakProcess.ExitCode == 0)
+                    Console.WriteLine("Install-wim-tweak executed successfully!");
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"An error occurred during the removal of {component}: install-wim-tweak exited with a non-zero status.");
+                    Console.ResetColor();
+                }
             }
         }
 
@@ -81,33 +95,8 @@ namespace Win10BloatRemover
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
-
-            Console.WriteLine("OK!");
             
-            Console.WriteLine("Running install-wim-tweak...");
-            var installWimTweakExitCode = RunInstallWimTweak("/o /c Windows-Defender /r");
-            if (installWimTweakExitCode == 0)
-                Console.WriteLine("Install-wim-tweak executed successfully!");
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An error occurred during the execution of install-wim-tweak: non-zero exit status.");
-                Console.ResetColor();
-            }
-        }
-
-        public static void RemoveMicrosoftEdge()
-        {
-            Console.WriteLine("Running install-wim-tweak...");
-            var installWimTweakExitCode = RunInstallWimTweak("/o /c Microsoft-Windows-Internet-Browser /r");
-            if (installWimTweakExitCode == 0)
-                Console.WriteLine("Install-wim-tweak executed successfully!");
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An error occurred during the execution of install-wim-tweak: non-zero exit status.");
-                Console.ResetColor();
-            }
+            RemoveComponentUsingInstallWimTweak("Windows-Defender");
         }
 
         public static void RemoveOneDrive()
@@ -117,36 +106,38 @@ namespace Win10BloatRemover
 
             Console.WriteLine("Executing OneDrive uninstaller...");
             string oneDriveUninstaller = RetrieveOneDriveUninstallerPath();
-            var oneDriveSetupProc = SystemUtils.RunProcess(oneDriveUninstaller, "/uninstall");
-            oneDriveSetupProc.PrintOutputAndErrors();
-            oneDriveSetupProc.WaitForExit();
-
-            if (oneDriveSetupProc.ExitCode != 0)
-                throw new Exception("OneDrive uninstaller terminated with non-zero status.");
-            else
+            using (var oneDriveSetupProc = SystemUtils.RunProcess(oneDriveUninstaller, "/uninstall"))
             {
-                Console.WriteLine("Removing old files...");
-                SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
-                SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
-                SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
-                SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
+                oneDriveSetupProc.PrintOutputAndErrors();
+                oneDriveSetupProc.WaitForExit();
 
-                try
+                if (oneDriveSetupProc.ExitCode != 0)
+                    throw new Exception("OneDrive uninstaller terminated with non-zero status.");
+                else
                 {
-                    string oneDriveStandaloneUpdater = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive\OneDriveStandaloneUpdater.exe";
-                    if (File.Exists(oneDriveStandaloneUpdater))
-                        File.Delete(oneDriveStandaloneUpdater);
-                }
-                catch (Exception exc)
-                {
-                    Console.WriteLine($"An error occurred while deleting OneDrive standalone updater: {exc.Message}");
-                }
+                    Console.WriteLine("Removing old files...");
+                    SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
+                    SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
+                    SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
+                    SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
 
-                Console.WriteLine("Deleting old registry keys...");
-                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"CLSID", true))
-                    key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
-                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Wow6432Node\CLSID", true))
-                    key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+                    try
+                    {
+                        string oneDriveStandaloneUpdater = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive\OneDriveStandaloneUpdater.exe";
+                        if (File.Exists(oneDriveStandaloneUpdater))
+                            File.Delete(oneDriveStandaloneUpdater);
+                    }
+                    catch (Exception exc)
+                    {
+                        Console.WriteLine($"An error occurred while deleting OneDrive standalone updater: {exc.Message}");
+                    }
+
+                    Console.WriteLine("Deleting old registry keys...");
+                    using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"CLSID", true))
+                        key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+                    using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Wow6432Node\CLSID", true))
+                        key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+                }
             }
         }
 
@@ -193,9 +184,14 @@ namespace Win10BloatRemover
         {
             string removalScript = "";
             foreach (string feature in featuresToRemove)
+            {
                 removalScript += $"Remove-WindowsPackage -Online -NoRestart -PackageName (Get-WindowsPackage -Online -PackageName *{feature}*).PackageName;";
+                if (feature == "Hello-Face-Package")
+                    removalScript += "schtasks /Change /TN \"\\Microsoft\\Windows\\HelloFace\\FODCleanupTask\" /Disable;";
+            }
 
-            SystemUtils.RunPowerShellScript(removalScript);
+            using (PowerShell psInstance = PowerShell.Create())
+                psInstance.RunScriptAndPrintOutput(removalScript);
         }
     }
 }

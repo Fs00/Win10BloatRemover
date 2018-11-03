@@ -113,6 +113,12 @@ namespace Win10BloatRemover
                         Operations.RemoveOneDrive();
                         Console.WriteLine("Some folders may not exist, it's normal.");
                         break;
+                    case MenuEntry.RemoveServices:
+                        var serviceRemover = new ServiceRemover(Configuration.ServicesToRemove);
+                        Console.WriteLine("Backing up services...");
+                        serviceRemover.PerformBackup();
+                        // TODO REMOVAL
+                        break;
                     case MenuEntry.DisableErrorReporting:
                         Operations.DisableWinErrorReporting();
                         break;
@@ -120,7 +126,7 @@ namespace Win10BloatRemover
                         Operations.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
-                    case MenuEntry.DisableWindowsTips:
+                    case MenuEntry.DisableWindowsTipsAndFeedback:
                         Operations.DisableWindowsTips();
                         break;
                     case MenuEntry.RemoveWindowsFeatures:

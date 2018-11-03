@@ -40,11 +40,17 @@ namespace Win10BloatRemover
 
             if (asyncMessagePrinting)
             {
-                process.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);
+                process.OutputDataReceived += (s, e) => {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        Console.WriteLine(e.Data);
+                };
                 process.ErrorDataReceived += (s, e) => {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(e.Data);
-                    Console.ResetColor();
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(e.Data);
+                        Console.ResetColor();
+                    }
                 };
             }
 
@@ -83,13 +89,15 @@ namespace Win10BloatRemover
 
         /**
          *  Executes a CMD command synchronously
-         *  Output is printed after the command terminates its execution
+         *  Output and errors are printed asynchronously
          */
         public static void ExecuteWindowsCommand(string command)
         {
-            using (var cmdProcess = RunProcess("cmd.exe", $"/c {command}"))
+            Debug.WriteLine($"Command executed: {command}");
+            using (var cmdProcess = RunProcess("cmd.exe", $"/c \"{command}\"", true))
             {
-                cmdProcess.PrintOutputAndErrors();
+                cmdProcess.BeginOutputReadLine();
+                cmdProcess.BeginErrorReadLine();
                 cmdProcess.WaitForExit();
             }
         }

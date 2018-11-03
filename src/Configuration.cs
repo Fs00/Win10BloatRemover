@@ -10,6 +10,18 @@ namespace Win10BloatRemover
     {
         public static readonly string InstallWimTweakPath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
 
+        public static readonly string[] ServicesToRemove = {
+            "DiagTrack",
+            "diagsvc",
+            "diagnosticshub.standardcollector.service",
+            "dmwappushservice",
+            "WerSvc",
+            "wercplsupport",
+            "PcaSvc",           // Program Compatibility Assistant
+            "wisvc",            // Windows Insider
+            "RetailDemo"
+        };
+
         public static readonly string[] UWPAppsToRemove = {
             "ZuneMusic",
             "ZuneVideo",

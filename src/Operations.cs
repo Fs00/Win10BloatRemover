@@ -178,6 +178,9 @@ namespace Win10BloatRemover
                 key.SetValue("DoNotShowFeedbackNotifications", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsInkWorkspace"))
                 key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
+
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Siuf\Rules"))
+                key.SetValue("NumberOfSIUFInPeriod", 0, RegistryValueKind.DWord);
         }
 
         public static void RemoveWindowsFeatures(string[] featuresToRemove)

@@ -15,7 +15,7 @@ namespace Win10BloatRemover
         DisableCortana,
         DisableScheduledTasks,
         DisableErrorReporting,
-        DisableWindowsTips,
+        DisableWindowsTipsAndFeedback,
         Credits,
         Quit
     }
@@ -107,8 +107,8 @@ namespace Win10BloatRemover
                 case MenuEntry.DisableErrorReporting:
                     description = "Windows Error Reporting disabling";
                     break;
-                case MenuEntry.DisableWindowsTips:
-                    description = "Windows Tips disabling";
+                case MenuEntry.DisableWindowsTipsAndFeedback:
+                    description = "Windows Tips and feedback requests disabling";
                     break;
                 case MenuEntry.Quit:
                     description = "Exit the application";
@@ -142,15 +142,21 @@ namespace Win10BloatRemover
                         explanation += $"  {feature}\n";
                     break;
                 case MenuEntry.DisableCortana:
-                    explanation = "This won't remove Cortana (otherwise the system would break), it will only be disabled using GP and blocked by the firewall.";
+                    explanation = "This won't remove Cortana (otherwise the system would break), it will only be disabled using Group Policy and blocked by the firewall.";
                     break;
                 case MenuEntry.RemoveServices:
                     explanation = "The following services will be removed:\n";
+                    foreach (string service in Configuration.ServicesToRemove)
+                        explanation += $"  {service}\n";
+                    explanation += "Services will be backed up in the same folder as this program executable.";
                     break;
                 case MenuEntry.DisableScheduledTasks:
                     explanation = "The following scheduled tasks will be disabled:\n";
                     foreach (string task in Configuration.ScheduledTasksToDisable)
                         explanation += $"  {task}\n";
+                    break;
+                case MenuEntry.DisableAutoUpdates:
+                    explanation = "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
                     break;
                 case MenuEntry.Quit:
                     explanation = "Are you sure?";

@@ -117,7 +117,8 @@ namespace Win10BloatRemover
                         var serviceRemover = new ServiceRemover(Configuration.ServicesToRemove);
                         Console.WriteLine("Backing up services...");
                         serviceRemover.PerformBackup();
-                        // TODO REMOVAL
+                        Console.WriteLine("Removing services...");
+                        serviceRemover.PerformRemoval();
                         break;
                     case MenuEntry.DisableErrorReporting:
                         Operations.DisableWinErrorReporting();
@@ -127,7 +128,7 @@ namespace Win10BloatRemover
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.DisableWindowsTipsAndFeedback:
-                        Operations.DisableWindowsTips();
+                        Operations.DisableWindowsTipsAndFeedback();
                         break;
                     case MenuEntry.RemoveWindowsFeatures:
                         Operations.RemoveWindowsFeatures(Configuration.WindowsFeaturesToRemove);

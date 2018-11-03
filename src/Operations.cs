@@ -165,7 +165,7 @@ namespace Win10BloatRemover
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
         }
 
-        public static void DisableWindowsTips()
+        public static void DisableWindowsTipsAndFeedback()
         {
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\CloudContent"))
             {

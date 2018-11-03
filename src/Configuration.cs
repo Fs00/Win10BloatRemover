@@ -19,7 +19,10 @@ namespace Win10BloatRemover
             "wercplsupport",
             "PcaSvc",           // Program Compatibility Assistant
             "wisvc",            // Windows Insider
-            "RetailDemo"
+            "RetailDemo",
+            // these two will be moved to additional tasks in app removal
+            "MessagingService",
+            "OneSyncSvc"
         };
 
         public static readonly string[] UWPAppsToRemove = {

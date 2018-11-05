@@ -101,10 +101,6 @@ namespace Win10BloatRemover
                     case MenuEntry.RemoveWinDefender:
                         Operations.RemoveWindowsDefender();
                         break;
-                    case MenuEntry.RemoveConnectApp:
-                        Operations.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");
-                        Console.WriteLine("A system reboot is recommended.");
-                        break;
                     case MenuEntry.RemoveMSEdge:
                         Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Internet-Browser");
                         Console.WriteLine("A system reboot is recommended.");

@@ -18,32 +18,22 @@ namespace Win10BloatRemover
             "WerSvc",
             "wercplsupport",
             "PcaSvc",           // Program Compatibility Assistant
-            "wisvc",            // Windows Insider
-            "RetailDemo",
-            // these two will be moved to additional tasks in app removal
-            "MessagingService",
-            "OneSyncSvc"
+            "RetailDemo"
         };
 
-        public static readonly string[] UWPAppsToRemove = {
-            "ZuneMusic",
-            "ZuneVideo",
-            "windowscommunicationsapps",
-            "OneNote",
-            "MicrosoftOfficeHub",
-            "WindowsCamera",
-            "WindowsMaps",
-            "YourPhone",
-            "GetHelp",
-            "BingSports",
-            "BingWeather",
-            "BingNews",
-            "BingFinance",
-            "People_",
-            "PeopleExperienceHost",
-            "WindowsFeedback",
-            "Microsoft.Getstarted",
-            "OneConnect"
+        public static readonly UWPAppGroup[] UWPAppsToRemove = {
+            UWPAppGroup.Zune,
+            UWPAppGroup.MailAndCalendar,
+            UWPAppGroup.OneNote,
+            UWPAppGroup.OfficeHub,
+            UWPAppGroup.Camera,
+            UWPAppGroup.Maps,
+            UWPAppGroup.Mobile,
+            UWPAppGroup.HelpAndFeedback,
+            UWPAppGroup.Bing,
+            UWPAppGroup.Messaging,
+            UWPAppGroup.People,
+            UWPAppGroup.Skype
         };
 
         public static readonly string[] ScheduledTasksToDisable = {

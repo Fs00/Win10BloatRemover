@@ -7,7 +7,6 @@ namespace Win10BloatRemover
         RemoveUWPApps,
         RemoveWinDefender,
         RemoveMSEdge,
-        RemoveConnectApp,
         RemoveOneDrive,
         RemoveWindowsFeatures,
         RemoveServices,
@@ -80,9 +79,6 @@ namespace Win10BloatRemover
                 case MenuEntry.RemoveWinDefender:
                     description = "Windows Defender removal";
                     break;
-                case MenuEntry.RemoveConnectApp:
-                    description = "Connect app removal";
-                    break;
                 case MenuEntry.RemoveMSEdge:
                     description = "Microsoft Edge removal";
                     break;
@@ -126,9 +122,9 @@ namespace Win10BloatRemover
             switch (entry)
             {
                 case MenuEntry.RemoveUWPApps:
-                    explanation = "The following UWP apps will be removed:\n";
-                    foreach (string app in Configuration.UWPAppsToRemove)
-                        explanation += $"  {app}\n";
+                    explanation = "The following groups of UWP apps will be removed:\n";
+                    foreach (UWPAppGroup app in Configuration.UWPAppsToRemove)
+                        explanation += $"  {app.ToString()}\n";
                     break;
                 case MenuEntry.RemoveWinDefender:
                     explanation = "Windows Defender menu icon will remain there, but the program won't start anymore.";

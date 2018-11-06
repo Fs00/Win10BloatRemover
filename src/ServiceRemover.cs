@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Management.Automation;
 using Microsoft.Win32;
 
 namespace Win10BloatRemover
@@ -19,7 +20,7 @@ namespace Win10BloatRemover
             this.servicesToRemove = servicesToRemove;
         }
 
-        public void PerformBackup()
+        public ServiceRemover PerformBackup()
         {
             if (backupPerformed)
                 throw new InvalidOperationException("Backup already done!");
@@ -29,11 +30,13 @@ namespace Win10BloatRemover
             {
                 // Here we find all the services that start with the specified service name, in order to include services that end with a random code
                 // Destination file will have the name of the service (%~nx assumes that the string is a path and returnes only filename + extension)
+                // TODO REWRITE USING POWERSHELL
                 SystemUtils.ExecuteWindowsCommand($"for /f \"tokens=1\" %I in ('reg query \"HKLM\\SYSTEM\\CurrentControlSet\\Services\" /k /f \"{serviceName}\" ^| find /i \"{serviceName}\"') " +
                                                   $"do reg export %I {backupDirectory.FullName}\\%~nxI.reg");
             }
 
             backupPerformed = true;
+            return this;    // allows chaining with PerformRemoval
         }
 
         public void PerformRemoval()
@@ -45,8 +48,22 @@ namespace Win10BloatRemover
 
             foreach (string serviceName in servicesToRemove)
             {
-                SystemUtils.ExecuteWindowsCommand($"for /f \"tokens=1\" %I in ('reg query \"HKLM\\SYSTEM\\CurrentControlSet\\Services\" /k /f \"{serviceName}\" ^| find /i \"{serviceName}\"') " +
-                                                   "do sc delete %~nxI");
+                using (PowerShell psInstance = PowerShell.Create())
+                {
+                    string removalScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
+                                                        "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
+                                           "if ($services) {" +
+                                               "$services | ForEach-Object {" +
+                                                    "sc.exe delete $_;" +
+                                                    "if ($LASTEXITCODE = 5) {" +
+                                                        "Write-Host \"Access denied\"" +    // TODO Set-Acl
+                                                    "}" +
+                                               "}" +
+                                           "} else { Write-Host \"Service " + serviceName + " not found\" }";
+
+                    Console.WriteLine($"\nRemoving {serviceName} service...");
+                    psInstance.RunScriptAndPrintOutput(removalScript);
+                }
             }
 
             PerformAdditionalTasks();
@@ -59,7 +76,6 @@ namespace Win10BloatRemover
          */
         private void PerformAdditionalTasks()
         {
-            // TODO REMOVE DPS, WdiServiceHost and WdiSystemHost
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
                 key.SetValue("Start", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))

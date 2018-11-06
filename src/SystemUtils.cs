@@ -61,30 +61,25 @@ namespace Win10BloatRemover
         /**
          *  Runs a script on the given PowerShell instance and prints the messages written to info,
          *  error and warning streams asynchronously.
-         *  Script termination is awaited synchronously.
          */
         public static void RunScriptAndPrintOutput(this PowerShell psInstance, string script)
         {
             psInstance.AddScript(script);
-            psInstance.Streams.Information.DataAdded += (s, evtArgs) => Console.WriteLine(psInstance.Streams.Information[evtArgs.Index].ToString());
-            psInstance.Streams.Error.DataAdded += (s, evtArgs) => {
+            psInstance.Streams.Information.DataAdding += (s, evtArgs) => Console.WriteLine(evtArgs.ItemAdded.ToString());
+            psInstance.Streams.Error.DataAdding += (s, evtArgs) => {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(psInstance.Streams.Error[evtArgs.Index].ToString());
+                Console.WriteLine(evtArgs.ItemAdded.ToString());
                 Console.ResetColor();
             };
-            psInstance.Streams.Warning.DataAdded += (s, evtArgs) => {
+            psInstance.Streams.Warning.DataAdding += (s, evtArgs) => {
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine(psInstance.Streams.Warning[evtArgs.Index].ToString());
+                Console.WriteLine(evtArgs.ItemAdded.ToString());
                 Console.ResetColor();
-            };
-            psInstance.Streams.Progress.DataAdded += (s, evtArgs) => {
-                var progressRecord = psInstance.Streams.Progress[evtArgs.Index];
-                if (progressRecord.PercentComplete > 0)
-                    Console.WriteLine($"{progressRecord?.Activity}: {progressRecord.PercentComplete}%");
             };
 
-            var asyncTask = psInstance.BeginInvoke();
-            asyncTask.AsyncWaitHandle.WaitOne();
+            psInstance.Invoke();
+            // Clear PowerShell pipeline to avoid the script being re-executed the next time we use this instance
+            psInstance.Commands.Clear();
         }
 
         /**

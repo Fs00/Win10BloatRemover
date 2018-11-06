@@ -125,6 +125,7 @@ namespace Win10BloatRemover
                     explanation = "The following groups of UWP apps will be removed:\n";
                     foreach (UWPAppGroup app in Configuration.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
+                    explanation += "Some specific app-related services will also be removed (but backed up in case you need to restore them).";
                     break;
                 case MenuEntry.RemoveWinDefender:
                     explanation = "Windows Defender menu icon will remain there, but the program won't start anymore.";

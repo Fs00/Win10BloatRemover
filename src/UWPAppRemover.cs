@@ -1,12 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Management.Automation;
 
 namespace Win10BloatRemover
 {
     public enum UWPAppGroup
     {
-        Bing,               // Weather, Finance, News etc.
+        Bing,               // Weather and News
         Mobile,             // YourPhone, OneConnect (aka Mobile plans) and Connect app
         Xbox,
         OfficeHub,
@@ -20,7 +21,8 @@ namespace Win10BloatRemover
         Messaging,
         SolitaireCollection,
         StickyNotes,
-        MixedReality,       // includes Paint 3D
+        MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
+        Paint3D,
         Skype,
         Photos,
         AlarmsAndClock,
@@ -38,6 +40,40 @@ namespace Win10BloatRemover
         private readonly UWPAppGroup[] appsToRemove;
         private bool removalPerformed = false;
 
+        // This dictionary contains the exact apps names corresponding to every group in the enum
+        private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {
+            { UWPAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
+            { UWPAppGroup.Bing, new[] { "Microsoft.BingNews", "Microsoft.BingWeather" } },
+            { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
+            { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
+            { UWPAppGroup.HelpAndFeedback, new[] { "Microsoft.WindowsFeedbackHub", "Microsoft.GetHelp", "Microsoft.Getstarted" } },
+            { UWPAppGroup.MailAndCalendar, new[] { "microsoft.windowscommunicationsapps" } },
+            { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
+            { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
+            { UWPAppGroup.MixedReality, new[] { "Microsoft.Microsoft3DViewer", "Microsoft.Print3D", "Microsoft.MixedReality.Portal" } },
+            { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
+            { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
+            { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
+            { UWPAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
+            { UWPAppGroup.People, new[] { "Microsoft.People" } },
+            { UWPAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
+            { UWPAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
+            { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.SkreenSketch" } },
+            { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
+            { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
+            { UWPAppGroup.Xbox, new[] {
+                    "Microsoft.XboxGameCallableUI",
+                    "Microsoft.XboxSpeechToTextOverlay",
+                    "Microsoft.XboxApp",
+                    "Microsoft.XboxGameOverlay",
+                    "Microsoft.XboxGamingOverlay",
+                    "Microsoft.XboxIdentityProvider",
+                    "Microsoft.Xbox.TCUI"
+                }
+            },
+            { UWPAppGroup.Zune, new[] {"Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
+        };
+
         public UWPAppRemover(UWPAppGroup[] appsToRemove)
         {
             this.appsToRemove = appsToRemove;
@@ -48,37 +84,41 @@ namespace Win10BloatRemover
             if (removalPerformed)
                 throw new InvalidOperationException("Apps have been already removed!");
 
-            PowerShell psInstance = PowerShell.Create();
             foreach (UWPAppGroup appGroup in appsToRemove)
             {
-                foreach (string appName in GetAppNamesForGroup(appGroup))
+                // PowerShell session is recreated every time to prevent single output messages
+                // being written multiple times (which is likely a bug in the API)
+                using (PowerShell psInstance = PowerShell.Create())
                 {
-                    // The following script uninstalls the specified app package for all users when it is found
-                    // and removes the package from Windows image (so that new users don't find the removed app)
-                    string appRemovalScript = $"$package = Get-AppxPackage -AllUsers -Name \"{appName}\";" +
-                                               "if ($package) { Remove-AppxPackage -AllUsers $package;" +
-                                               "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"$package.Name\"};" +
-                                               "if ($provisionedPackage) { Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName; } }";
+                    foreach (string appName in appNamesForGroup[appGroup])
+                    {
+                        // The following script uninstalls the specified app package for all users when it is found
+                        // and removes the package from Windows image (so that new users don't find the removed app)
+                        string appRemovalScript = $"$package = Get-AppxPackage -AllUsers -Name \"{appName}\";" +
+                                                   "if ($package) {" +
+                                                       $"Write-Host \"Removing app $($package.Name)...\";" +
+                                                       "Remove-AppxPackage -AllUsers $package;" +
+                                                       "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"$package.Name\"};" +
+                                                       "if ($provisionedPackage) {" +
+                                                            "Write-Host \"Removing provisioned package for app $($package.Name)...\";" +
+                                                            "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
+                                                       "} else { Write-Host \"No provisioned package found for app $($package.Name)\"; }" +
+                                                   "} else {" +
+                                                        $"Write-Host \"App {appName} is not installed.\";" +
+                                                   "}";
 
-                    Console.WriteLine($"Removing {appName} app...");
-                    psInstance.RunScriptAndPrintOutput(appRemovalScript);
-                }
+                        Console.WriteLine($"\nRemoving {appName} app...");
+                        psInstance.RunScriptAndPrintOutput(appRemovalScript);
+                    }
 
-                // Perform post-uninstall operations only if package removal was successful
-                if (!psInstance.HadErrors)
-                {
-                    Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
-                    PerformPostUninstallOperations(appGroup);
-                }
-                else
-                {
-                    // This is a workaround to avoid previous errors being rewritten to the error stream
-                    // every time a script is executed (which is supposedly a PowerShell API bug)
-                    psInstance.Dispose();
-                    psInstance = PowerShell.Create();
+                    // Perform post-uninstall operations only if package removal was successful
+                    if (!psInstance.HadErrors)
+                    {
+                        Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
+                        PerformPostUninstallOperations(appGroup);
+                    }
                 }
             }
-            psInstance.Dispose();
             removalPerformed = true;
         }
 
@@ -93,27 +133,22 @@ namespace Win10BloatRemover
                     Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport");
                     break;
                 case UWPAppGroup.Maps:
-                    var serviceRemover = new ServiceRemover(new[] { "MapsBroker", "lfsvc" });
-                    serviceRemover.PerformBackup();
-                    serviceRemover.PerformRemoval();
+                    Console.WriteLine("Removing app-related services...");
+                    new ServiceRemover(new[] { "MapsBroker", "lfsvc" }).PerformBackup().PerformRemoval();
                     SystemUtils.ExecuteWindowsCommand("schtasks /Change /TN \"\\Microsoft\\Windows\\Maps\\MapsUpdateTask\" /disable");
                     break;
                 case UWPAppGroup.Messaging:
-                    var svcRemover = new ServiceRemover(new[] { "MessagingService" });
-                    svcRemover.PerformBackup();
-                    svcRemover.PerformRemoval();
+                    Console.WriteLine("Removing app-related services...");
+                    new ServiceRemover(new[] { "MessagingService" }).PerformBackup().PerformRemoval();
                     break;
                 case UWPAppGroup.MailAndCalendar:
                 case UWPAppGroup.People:
-                    // TODO ADD WARNING
-                    var svcRemover2 = new ServiceRemover(new[] { "OneSyncSvc" });
-                    svcRemover2.PerformBackup();
-                    svcRemover2.PerformRemoval();
+                    Console.WriteLine("Removing app-related services...");
+                    new ServiceRemover(new[] { "OneSyncSvc" }).PerformBackup().PerformRemoval();
                     break;
                 case UWPAppGroup.Xbox:
-                    var serviceRemover2 = new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" });
-                    serviceRemover2.PerformBackup();
-                    serviceRemover2.PerformRemoval();
+                    Console.WriteLine("Removing app-related services...");
+                    new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" }).PerformBackup().PerformRemoval();
                     SystemUtils.ExecuteWindowsCommand("schtasks /Change /TN \"Microsoft\\XblGameSave\\XblGameSaveTask\" /disable & " +
                                                       "schtasks /Change /TN \"Microsoft\\XblGameSave\\XblGameSaveTaskLogon\" /disable");
                     using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
@@ -122,81 +157,6 @@ namespace Win10BloatRemover
                 default:
                     Console.WriteLine("Nothing to do.");
                     break;
-            }
-        }
-
-        private static string[] GetAppNamesForGroup(UWPAppGroup appGroup)
-        {
-            switch (appGroup)
-            {
-                case UWPAppGroup.Bing:
-                    return new[] {
-                        "Microsoft.BingNews",
-                        "Microsoft.BingWeather"
-                    };
-                case UWPAppGroup.AlarmsAndClock:
-                    return new[] { "Microsoft.WindowsAlarms" };
-                case UWPAppGroup.Calculator:
-                    return new[] { "Microsoft.WindowsCalculator" };
-                case UWPAppGroup.Camera:
-                    return new[] { "Microsoft.WindowsCamera" };
-                case UWPAppGroup.HelpAndFeedback:
-                    return new[] {
-                        "Microsoft.WindowsFeedbackHub",
-                        "Microsoft.GetHelp",
-                        "Microsoft.Getstarted"
-                    };
-                case UWPAppGroup.MailAndCalendar:
-                    return new[] { "microsoft.windowscommunicationsapps" };
-                case UWPAppGroup.Maps:
-                    return new[] { "Microsoft.WindowsMaps" };
-                case UWPAppGroup.Messaging:
-                    return new[] { "Microsoft.Messaging" };
-                case UWPAppGroup.MixedReality:         // unsure if it will remain
-                    return new[] {
-                        "Microsoft.Microsoft3DViewer",
-                        "Microsoft.MSPaint",
-                        "Microsoft.Print3D",
-                        "Microsoft.MixedReality.Portal"
-                    };
-                case UWPAppGroup.Mobile:
-                    return new[] {
-                        "Microsoft.YourPhone",
-                        "Microsoft.OneConnect"
-                    };
-                case UWPAppGroup.OfficeHub:
-                    return new[] { "Microsoft.MicrosoftOfficeHub" };
-                case UWPAppGroup.OneNote:
-                    return new[] { "Microsoft.Office.OneNote" };
-                case UWPAppGroup.People:
-                    return new[] { "Microsoft.People" };
-                case UWPAppGroup.Photos:
-                    return new[] { "Microsoft.Windows.Photos" };
-                case UWPAppGroup.Skype:
-                    return new[] { "Microsoft.SkypeApp" };
-                case UWPAppGroup.SnipAndSketch:
-                    return new[] { "Microsoft.SkreenSketch" };
-                case UWPAppGroup.SolitaireCollection:
-                    return new[] { "Microsoft.MicrosoftSolitaireCollection" };
-                case UWPAppGroup.StickyNotes:
-                    return new[] { "Microsoft.MicrosoftStickyNotes" };
-                case UWPAppGroup.Xbox:
-                    return new[] {
-                        "Microsoft.XboxGameCallableUI",
-                        "Microsoft.XboxSpeechToTextOverlay",
-                        "Microsoft.XboxApp",
-                        "Microsoft.XboxGameOverlay",
-                        "Microsoft.XboxGamingOverlay",
-                        "Microsoft.XboxIdentityProvider",
-                        "Microsoft.Xbox.TCUI"
-                    };
-                case UWPAppGroup.Zune:
-                    return new[] {
-                        "Microsoft.ZuneMusic",
-                        "Microsoft.ZuneVideo"
-                    };
-                default:
-                    return new string[0];
             }
         }
     }

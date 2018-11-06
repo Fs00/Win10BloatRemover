@@ -18,7 +18,10 @@ namespace Win10BloatRemover
             "WerSvc",
             "wercplsupport",
             "PcaSvc",           // Program Compatibility Assistant
-            "RetailDemo"
+            "RetailDemo",
+            "DPS",
+            "WdiServiceHost",
+            "WdiSystemHost"
         };
 
         public static readonly UWPAppGroup[] UWPAppsToRemove = {

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
+using System.Management.Automation.Runspaces;
 
 namespace Win10BloatRemover
 {
@@ -64,6 +65,12 @@ namespace Win10BloatRemover
          */
         public static void RunScriptAndPrintOutput(this PowerShell psInstance, string script)
         {
+            // Create a new Runspace that uses the current thread to execute commands (no more wild thread spawning)
+            psInstance.Runspace.Dispose();
+            psInstance.Runspace = RunspaceFactory.CreateRunspace();
+            psInstance.Runspace.ThreadOptions = PSThreadOptions.UseCurrentThread;
+            psInstance.Runspace.Open();
+
             psInstance.AddScript(script);
             psInstance.Streams.Information.DataAdding += (s, evtArgs) => Console.WriteLine(evtArgs.ItemAdded.ToString());
             psInstance.Streams.Error.DataAdding += (s, evtArgs) => {

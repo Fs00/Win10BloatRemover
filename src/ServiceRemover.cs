@@ -50,13 +50,32 @@ namespace Win10BloatRemover
             {
                 using (PowerShell psInstance = PowerShell.Create())
                 {
+                    // At the moment it doesn't replace permissions on child objects
+                    // Possible solution: https://social.technet.microsoft.com/Forums/msonline/en-US/96017fc4-58ab-49bf-9fac-ccb2a7529f35/
                     string removalScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
                                                         "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
                                            "if ($services) {" +
                                                "$services | ForEach-Object {" +
                                                     "sc.exe delete $_;" +
                                                     "if ($LASTEXITCODE = 5) {" +
-                                                        "Write-Host \"Access denied\"" +    // TODO Set-Acl
+                                                        "Write-Host \"Access denied to admin, editing key permissions\";" +
+                                                        "$serviceKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"SYSTEM\\CurrentControlSet\\Services\\$_\"," +
+                                                                      "[Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree," +
+                                                                      "[System.Security.AccessControl.RegistryRights]::ChangePermissions);" +
+                                                        "$acl = $serviceKey.GetAccessControl();" +
+                                                        "$acl.GetAccessRules(1, 1, [type][System.Security.Principal.NTAccount]) | foreach { $acl.RemoveAccessRule($_) };" +
+                                                        "$currentUser = [System.Security.Principal.NTAccount]\"$env:userdomain\\$env:username\";" +
+                                                        "$newRule = New-Object System.Security.AccessControl.RegistryAccessRule($currentUser," +
+                                                                    "[System.Security.AccessControl.RegistryRights]\"FullControl\"," +
+                                                                    "[System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"," +
+                                                                    "[System.Security.AccessControl.PropagationFlags]\"None\"," +
+                                                                    "[System.Security.AccessControl.AccessControlType]\"Allow\");" +
+                                                        "$acl.AddAccessRule($newRule);" +
+                                                        "$acl.SetAccessRuleProtection(1, 0);" +
+                                                        "$serviceKey.SetAccessControl($acl);" +
+                                                        "sc.exe delete $_;" +
+                                                        "if ($LASTEXITCODE = 0) { Write-Host \"Removal successful\" }" +
+                                                        "else { Write-Error \"Removal failed after changing permissions\" }" +
                                                     "}" +
                                                "}" +
                                            "} else { Write-Host \"Service " + serviceName + " not found\" }";

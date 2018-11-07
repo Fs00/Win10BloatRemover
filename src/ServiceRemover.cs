@@ -29,10 +29,19 @@ namespace Win10BloatRemover
             foreach (string serviceName in servicesToRemove)
             {
                 // Here we find all the services that start with the specified service name, in order to include services that end with a random code
-                // Destination file will have the name of the service (%~nx assumes that the string is a path and returnes only filename + extension)
-                // TODO REWRITE USING POWERSHELL
-                SystemUtils.ExecuteWindowsCommand($"for /f \"tokens=1\" %I in ('reg query \"HKLM\\SYSTEM\\CurrentControlSet\\Services\" /k /f \"{serviceName}\" ^| find /i \"{serviceName}\"') " +
-                                                  $"do reg export %I {backupDirectory.FullName}\\%~nxI.reg");
+                // Destination file will have the name of the service
+                using (PowerShell psInstance = PowerShell.Create())
+                {
+                    string backupScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
+                                                       "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
+                                          "$services | ForEach-Object {" +
+                                               $"reg export HKLM\\SYSTEM\\CurrentControlSet\\Services\\$_ {backupDirectory.FullName}\\$($_).reg;" +
+                                                "if ($LASTEXITCODE -ne 0) { Write-Error \"Backup failed for service $_.\" }" +
+                                                "else { Write-Host \"Service $_ backed up.\" }" +
+                                          "}";
+
+                    psInstance.RunScriptAndPrintOutput(backupScript);
+                }
             }
 
             backupPerformed = true;

@@ -50,9 +50,17 @@ namespace Win10BloatRemover
 
         public static void DisableAutomaticUpdates()
         {
-            // SEEMS NOT TO WORK AS INTENDED, MORE INVESTIGATIONS TO BE DONE
-            using (RegistryKey winUpdatePolicies = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"))
-                winUpdatePolicies.SetValue("NoAutoUpdate", 1, RegistryValueKind.DWord);
+            // Disable Windows Update auto updates
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"))
+                key.SetValue("NoAutoUpdate", 1, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Policies\Microsoft\Windows\WindowsUpdate\AU"))
+                key.SetValue("NoAutoUpdate", 1, RegistryValueKind.DWord);
+
+            // Disable Windows Store auto updates
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsStore"))
+                key.SetValue("AutoDownload", 2, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Policies\Microsoft\WindowsStore"))
+                key.SetValue("AutoDownload", 2, RegistryValueKind.DWord);
         }
 
         public static void RemoveWindowsDefender()

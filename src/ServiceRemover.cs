@@ -112,6 +112,7 @@ namespace Win10BloatRemover
                 }
             }
 
+            Console.WriteLine("Performing additional tasks to disable telemetry-related features...");
             PerformAdditionalTasks();
             removalPerformed = true;
         }

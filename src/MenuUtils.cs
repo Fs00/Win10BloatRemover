@@ -153,7 +153,8 @@ namespace Win10BloatRemover
                         explanation += $"  {task}\n";
                     break;
                 case MenuEntry.DisableAutoUpdates:
-                    explanation = "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
+                    explanation = "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
+                                  "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
                     break;
                 case MenuEntry.Quit:
                     explanation = "Are you sure?";

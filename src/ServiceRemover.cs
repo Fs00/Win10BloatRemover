@@ -34,11 +34,16 @@ namespace Win10BloatRemover
                 {
                     string backupScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
                                                        "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
-                                          "$services | ForEach-Object {" +
-                                               $"reg export HKLM\\SYSTEM\\CurrentControlSet\\Services\\$_ {backupDirectory.FullName}\\$($_).reg;" +
-                                                "if ($LASTEXITCODE -ne 0) { Write-Error \"Backup failed for service $_.\" }" +
-                                                "else { Write-Host \"Service $_ backed up.\" }" +
-                                          "}";
+                                          "if ($services) {" +
+                                              "foreach ($serviceName in $services) {" +
+                                                   $"reg export HKLM\\SYSTEM\\CurrentControlSet\\Services\\$serviceName {backupDirectory.FullName}\\$($serviceName).reg;" +
+                                                    "if ($LASTEXITCODE -ne 0)" +
+                                                        "{ Write-Error \"Backup failed for service $serviceName.\" }" +
+                                                    "else" +
+                                                        "{ Write-Host \"Service $serviceName backed up.\" }" +
+                                              "}" +
+                                          "}" +
+                                          "else { Write-Host \"No services found with name " + serviceName + "\" }";
 
                     psInstance.RunScriptAndPrintOutput(backupScript);
                 }
@@ -57,39 +62,52 @@ namespace Win10BloatRemover
 
             foreach (string serviceName in servicesToRemove)
             {
+                // PowerShell session is recreated every time to prevent single output messages
+                // being written multiple times (which is likely a bug in the API)
                 using (PowerShell psInstance = PowerShell.Create())
                 {
-                    // At the moment it doesn't replace permissions on child objects
-                    // Possible solution: https://social.technet.microsoft.com/Forums/msonline/en-US/96017fc4-58ab-49bf-9fac-ccb2a7529f35/
                     string removalScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
                                                         "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
-                                           "if ($services) {" +
-                                               "$services | ForEach-Object {" +
-                                                    "sc.exe delete $_;" +
-                                                    "if ($LASTEXITCODE = 5) {" +
-                                                        "Write-Host \"Access denied to admin, editing key permissions\";" +
-                                                        "$serviceKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"SYSTEM\\CurrentControlSet\\Services\\$_\"," +
-                                                                      "[Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree," +
-                                                                      "[System.Security.AccessControl.RegistryRights]::ChangePermissions);" +
-                                                        "$acl = $serviceKey.GetAccessControl();" +
-                                                        "$acl.GetAccessRules(1, 1, [type][System.Security.Principal.NTAccount]) | foreach { $acl.RemoveAccessRule($_) };" +
-                                                        "$currentUser = [System.Security.Principal.NTAccount]\"$env:userdomain\\$env:username\";" +
-                                                        "$newRule = New-Object System.Security.AccessControl.RegistryAccessRule($currentUser," +
-                                                                    "[System.Security.AccessControl.RegistryRights]\"FullControl\"," +
-                                                                    "[System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"," +
-                                                                    "[System.Security.AccessControl.PropagationFlags]\"None\"," +
-                                                                    "[System.Security.AccessControl.AccessControlType]\"Allow\");" +
-                                                        "$acl.AddAccessRule($newRule);" +
-                                                        "$acl.SetAccessRuleProtection(1, 0);" +
-                                                        "$serviceKey.SetAccessControl($acl);" +
-                                                        "sc.exe delete $_;" +
-                                                        "if ($LASTEXITCODE = 0) { Write-Host \"Removal successful\" }" +
-                                                        "else { Write-Error \"Removal failed after changing permissions\" }" +
+                                            "foreach ($service in $services) {" +
+                                                "sc.exe delete $service;" +
+                                                "if ($LASTEXITCODE -eq 0)" +
+                                                    "{ Write-Host \"Service $service removed successfully.\" }" +
+                                                "else" +
+                                                    "{ Write-Error \"Service $service removal failed: exit code $LASTEXITCODE\" }" +
+                                                /*
+                                                 * Here I tried to edit permissions for service reg keys which are protected by permissions.
+                                                 * Unfortunately the subkeys of those services can't be opened even with ChangePermissions permission.
+                                                 */
+                                                /*
+                                                "if ($LASTEXITCODE = 5) {" +
+                                                    "Write-Host \"Access denied, editing key permissions\";" +
+                                                    "$serviceKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"SYSTEM\\CurrentControlSet\\Services\\$service\"," +
+                                                                    "[Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree," +
+                                                                    "[System.Security.AccessControl.RegistryRights]::ChangePermissions);" +
+                                                    "$acl = $serviceKey.GetAccessControl();" +
+                                                    "$acl.GetAccessRules(1, 1, [type][System.Security.Principal.NTAccount]) | foreach { $acl.RemoveAccessRule($service) };" +
+                                                    "$currentUser = [System.Security.Principal.NTAccount]\"$env:userdomain\\$env:username\";" +
+                                                    "$newRule = New-Object System.Security.AccessControl.RegistryAccessRule($currentUser," +
+                                                                "[System.Security.AccessControl.RegistryRights]\"FullControl\"," +
+                                                                "[System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"," +
+                                                                "[System.Security.AccessControl.PropagationFlags]\"None\"," +
+                                                                "[System.Security.AccessControl.AccessControlType]\"Allow\");" +
+                                                    "$acl.AddAccessRule($newRule);" +
+                                                    "$acl.SetAccessRuleProtection(1, 0);" +
+                                                    "$serviceKey.SetAccessControl($acl);" +
+                                                    "$serviceSubkeys = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services\\$service -Name;" +
+                                                    "foreach ($serviceSubkey in $serviceSubkeys) {" +
+                                                        "$subkey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"SYSTEM\\CurrentControlSet\\Services\\$service\\$serviceSubkey\"," +
+                                                                    "[Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree," +
+                                                                    "[System.Security.AccessControl.RegistryRights]::ChangePermissions);" +
+                                                        "subkey.SetAccessControl($acl);" +
                                                     "}" +
-                                               "}" +
-                                           "} else { Write-Host \"Service " + serviceName + " not found\" }";
+                                                    "sc.exe delete $service;" +
+                                                    "if ($LASTEXITCODE = 0) { Write-Host \"Removal successful\" }" +
+                                                    "else { Write-Error \"Removal failed after changing permissions\" }" +
+                                                "}" +*/
+                                            "}";
 
-                    Console.WriteLine($"\nRemoving {serviceName} service...");
                     psInstance.RunScriptAndPrintOutput(removalScript);
                 }
             }

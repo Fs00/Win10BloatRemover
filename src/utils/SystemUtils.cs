@@ -48,18 +48,14 @@ namespace Win10BloatRemover
             psInstance.Streams.Error.DataAdded += (s, evtArgs) => {
                 if (evtArgs.Index >= psErrorMessagesRead)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(psInstance.Streams.Error[evtArgs.Index].ToString());
-                    Console.ResetColor();
+                    ConsoleUtils.WriteLine(psInstance.Streams.Error[evtArgs.Index].ToString(), ConsoleColor.Red);
                     psErrorMessagesRead++;
                 }
             };
             psInstance.Streams.Warning.DataAdded += (s, evtArgs) => {
                 if (evtArgs.Index >= psWarningMessagesRead)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine(psInstance.Streams.Warning[evtArgs.Index].ToString());
-                    Console.ResetColor();
+                    ConsoleUtils.WriteLine(psInstance.Streams.Warning[evtArgs.Index].ToString(), ConsoleColor.DarkYellow);
                     psWarningMessagesRead++;
                 }
             };
@@ -77,10 +73,7 @@ namespace Win10BloatRemover
         public static void PrintOutputAndErrors(this Process process)
         {
             Console.Write(process.StandardOutput.ReadToEnd());
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write(process.StandardError.ReadToEnd());
-            Console.ResetColor();
+            ConsoleUtils.Write(process.StandardError.ReadToEnd(), ConsoleColor.Red);
         }
 
         /**
@@ -108,11 +101,7 @@ namespace Win10BloatRemover
                 };
                 process.ErrorDataReceived += (s, e) => {
                     if (!string.IsNullOrEmpty(e.Data))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(e.Data);
-                        Console.ResetColor();
-                    }
+                        ConsoleUtils.WriteLine(e.Data, ConsoleColor.Red);
                 };
             }
 
@@ -150,9 +139,7 @@ namespace Win10BloatRemover
                 }
                 catch (Exception exc)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"An error occurred when deleting folder {path}: {exc.Message}");
-                    Console.ResetColor();
+                    ConsoleUtils.WriteLine($"An error occurred when deleting folder {path}: {exc.Message}", ConsoleColor.Red);
                 }
             }
             else

@@ -48,7 +48,7 @@ namespace Win10BloatRemover
         public static void PrintCredits()
         {
             Console.WriteLine("Developed by Fs00");
-            //Console.WriteLine("Official GitHub repository: github.com/Fs00/Win10BloatRemover");
+            Console.WriteLine("Official GitHub repository: github.com/Fs00/Win10BloatRemover");
             Console.WriteLine("Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com");
         }
 

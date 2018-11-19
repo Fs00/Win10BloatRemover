@@ -111,9 +111,9 @@ namespace Win10BloatRemover
                         break;
                     case MenuEntry.RemoveServices:
                         var serviceRemover = new ServiceRemover(Configuration.ServicesToRemove);
-                        Console.WriteLine("Backing up services...");
+                        ConsoleUtils.WriteLine("Backing up services...", ConsoleColor.Green);
                         serviceRemover.PerformBackup();
-                        Console.WriteLine("Removing services...");
+                        ConsoleUtils.WriteLine("Removing services...", ConsoleColor.Green);
                         serviceRemover.PerformRemoval();
                         Console.WriteLine("Performing additional tasks to disable telemetry-related features...");
                         Operations.DisableTelemetryRelatedFeatures();
@@ -147,9 +147,7 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Operation failed: {exc.Message}");
-                Console.ResetColor();
+                ConsoleUtils.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
             }
 
             if (entry != MenuEntry.Quit)

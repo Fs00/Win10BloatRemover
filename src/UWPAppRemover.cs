@@ -105,7 +105,7 @@ namespace Win10BloatRemover
                                                         $"Write-Host \"App {appName} is not installed.\";" +
                                                    "}";
 
-                        Console.WriteLine($"\nRemoving {appName} app...");
+                        ConsoleUtils.WriteLine($"\nRemoving {appName} app...", ConsoleColor.Green);
                         psInstance.RunScriptAndPrintOutput(appRemovalScript);
                     }
 

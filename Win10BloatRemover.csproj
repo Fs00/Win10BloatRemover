@@ -43,11 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Configuration.cs" />
-    <Compile Include="src\MenuUtils.cs" />
+    <Compile Include="src\utils\ConsoleUtils.cs" />
+    <Compile Include="src\utils\MenuUtils.cs" />
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\ServiceRemover.cs" />
-    <Compile Include="src\SystemUtils.cs" />
+    <Compile Include="src\utils\SystemUtils.cs" />
     <Compile Include="src\Operations.cs" />
     <Compile Include="src\UWPAppRemover.cs" />
   </ItemGroup>

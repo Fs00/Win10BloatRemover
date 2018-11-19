@@ -27,11 +27,7 @@ namespace Win10BloatRemover
                 if (installWimTweakProcess.ExitCode == 0)
                     Console.WriteLine("Install-wim-tweak executed successfully!");
                 else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"An error occurred during the removal of {component}: install-wim-tweak exited with a non-zero status.");
-                    Console.ResetColor();
-                }
+                    ConsoleUtils.WriteLine($"An error occurred during the removal of {component}: install-wim-tweak exited with a non-zero status.", ConsoleColor.Red);
             }
         }
 

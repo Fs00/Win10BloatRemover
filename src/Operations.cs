@@ -94,12 +94,13 @@ namespace Win10BloatRemover
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
                 key.DeleteValue("SecurityHealth", false);
 
-            // It seems that this key can't be retrieved programmatically (only MS knows why)
+            // It seems that this key can't be retrieved programmatically (API bug?)
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", true))
             {
                 if (key != null)
                     key.DeleteValue("SecurityHealth", false);
-                Console.WriteLine("WARNING: Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\" /v \"SecurityHealth\" /f\"");
+                else
+                    Console.WriteLine("WARNING: Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\" /v \"SecurityHealth\" /f\"");
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
@@ -203,6 +204,27 @@ namespace Win10BloatRemover
 
             using (PowerShell psInstance = PowerShell.Create())
                 psInstance.RunScriptAndPrintOutput(removalScript);
+        }
+
+        /**
+         *  Additional tasks to disable telemetry-related features
+         *  Include blocking of CompatTelRunner, Inventory (collection of installed programs), Steps Recorder, Compatibility Assistant
+         */
+        public static void DisableTelemetryRelatedFeatures()
+        {
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
+                key.SetValue("Start", 0, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))
+            {
+                key.SetValue("AITEnable", 0, RegistryValueKind.DWord);
+                key.SetValue("DisableInventory", 1, RegistryValueKind.DWord);
+                key.SetValue("DisablePCA", 1, RegistryValueKind.DWord);
+                key.SetValue("DisableUAR", 1, RegistryValueKind.DWord);
+            }
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System"))
+                key.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe"))
+                key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
         }
     }
 }

@@ -26,12 +26,12 @@ namespace Win10BloatRemover
                 throw new InvalidOperationException("Backup already done!");
 
             DirectoryInfo backupDirectory = Directory.CreateDirectory($"./servicesBackup_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm")}");
-            foreach (string serviceName in servicesToRemove)
+            using (PowerShell psInstance = PowerShell.Create())
             {
-                // Here we find all the services that start with the specified service name, in order to include services that end with a random code
-                // Destination file will have the name of the service
-                using (PowerShell psInstance = PowerShell.Create())
+                foreach (string serviceName in servicesToRemove)
                 {
+                    // We find all the services that start with the specified service name, in order to include services that end with a random code
+                    // Destination file will have the name of the service
                     string backupScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
                                                        "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
                                           "if ($services) {" +
@@ -60,11 +60,9 @@ namespace Win10BloatRemover
             if (removalPerformed)
                 throw new InvalidOperationException("Removal already performed.");
 
-            foreach (string serviceName in servicesToRemove)
+            using (PowerShell psInstance = PowerShell.Create())
             {
-                // PowerShell session is recreated every time to prevent single output messages
-                // being written multiple times (which is likely a bug in the API)
-                using (PowerShell psInstance = PowerShell.Create())
+                foreach (string serviceName in servicesToRemove)
                 {
                     string removalScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
                                                         "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
@@ -111,31 +109,7 @@ namespace Win10BloatRemover
                     psInstance.RunScriptAndPrintOutput(removalScript);
                 }
             }
-
-            Console.WriteLine("Performing additional tasks to disable telemetry-related features...");
-            PerformAdditionalTasks();
             removalPerformed = true;
-        }
-
-        /**
-         *  Additional tasks to disable telemetry-related features
-         *  Include blocking of CompatTelRunner, Inventory (collection of installed programs), Steps Recorder, Compatibility Assistant
-         */
-        private void PerformAdditionalTasks()
-        {
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
-                key.SetValue("Start", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))
-            {
-                key.SetValue("AITEnable", 0, RegistryValueKind.DWord);
-                key.SetValue("DisableInventory", 1, RegistryValueKind.DWord);
-                key.SetValue("DisablePCA", 1, RegistryValueKind.DWord);
-                key.SetValue("DisableUAR", 1, RegistryValueKind.DWord);
-            }
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System"))
-                key.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe"))
-                key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
         }
     }
 }

@@ -115,6 +115,8 @@ namespace Win10BloatRemover
                         serviceRemover.PerformBackup();
                         Console.WriteLine("Removing services...");
                         serviceRemover.PerformRemoval();
+                        Console.WriteLine("Performing additional tasks to disable telemetry-related features...");
+                        Operations.DisableTelemetryRelatedFeatures();
                         break;
                     case MenuEntry.DisableErrorReporting:
                         Operations.DisableWinErrorReporting();

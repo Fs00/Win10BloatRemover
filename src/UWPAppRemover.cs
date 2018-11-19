@@ -84,11 +84,9 @@ namespace Win10BloatRemover
             if (removalPerformed)
                 throw new InvalidOperationException("Apps have been already removed!");
 
-            foreach (UWPAppGroup appGroup in appsToRemove)
+            using (PowerShell psInstance = PowerShell.Create())
             {
-                // PowerShell session is recreated every time to prevent single output messages
-                // being written multiple times (which is likely a bug in the API)
-                using (PowerShell psInstance = PowerShell.Create())
+                foreach (UWPAppGroup appGroup in appsToRemove)
                 {
                     foreach (string appName in appNamesForGroup[appGroup])
                     {
@@ -112,7 +110,7 @@ namespace Win10BloatRemover
                     }
 
                     // Perform post-uninstall operations only if package removal was successful
-                    if (!psInstance.HadErrors)
+                    if (psInstance.Streams.Error.Count == 0)
                     {
                         Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
                         PerformPostUninstallOperations(appGroup);

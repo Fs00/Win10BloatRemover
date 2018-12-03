@@ -45,13 +45,6 @@ namespace Win10BloatRemover
             Console.WriteLine();
         }
 
-        public static void PrintCredits()
-        {
-            Console.WriteLine("Developed by Fs00");
-            Console.WriteLine("Official GitHub repository: github.com/Fs00/Win10BloatRemover");
-            Console.WriteLine("Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com");
-        }
-
         /**
          *  Waits for user input and returns the MenuEntry corresponding to the number pressed
          *  If the number doesn't map to an existing entry, null is returned
@@ -155,6 +148,11 @@ namespace Win10BloatRemover
                 case MenuEntry.DisableAutoUpdates:
                     explanation = "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
                                   "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
+                    break;
+                case MenuEntry.Credits:
+                    explanation = "Developed by Fs00\n" +
+                                  "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +
+                                  "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n";
                     break;
                 case MenuEntry.Quit:
                     explanation = "Are you sure?";

@@ -96,11 +96,13 @@ namespace Win10BloatRemover
                 if (key != null)
                     key.DeleteValue("SecurityHealth", false);
                 else
-                    Console.WriteLine("WARNING: Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\" /v \"SecurityHealth\" /f\"");
+                    ConsoleUtils.WriteLine("WARNING: Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\"" +
+                                           " /v \"SecurityHealth\" /f\"", ConsoleColor.DarkYellow);
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
-            
+
+            Console.WriteLine();
             RemoveComponentUsingInstallWimTweak("Windows-Defender");
         }
 
@@ -191,10 +193,17 @@ namespace Win10BloatRemover
         public static void RemoveWindowsFeatures(string[] featuresToRemove)
         {
             string removalScript = "";
-            foreach (string feature in featuresToRemove)
+            foreach (string featureName in featuresToRemove)
             {
-                removalScript += $"Remove-WindowsPackage -Online -NoRestart -PackageName (Get-WindowsPackage -Online -PackageName *{feature}*).PackageName;";
-                if (feature == "Hello-Face-Package")
+                removalScript += $"$feature = Get-WindowsPackage -Online -PackageName *{featureName}*;" +
+                                 "if ($feature) {" +
+                                    "Write-Host \"Removing feature $($feature.PackageName)...\";" +
+                                    "Remove-WindowsPackage -Online -NoRestart -PackageName $feature.PackageName;" +
+                                 "}" +
+                                 "else" +
+                                    "{ Write-Host \"Feature " + featureName + " is not installed.\"; }";
+
+                if (featureName == "Hello-Face-Package")
                     removalScript += "schtasks /Change /TN \"\\Microsoft\\Windows\\HelloFace\\FODCleanupTask\" /Disable;";
             }
 

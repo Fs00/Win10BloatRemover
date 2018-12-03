@@ -80,18 +80,20 @@ namespace Win10BloatRemover
         {
             try
             {
-                Console.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --");
+                ConsoleUtils.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --", ConsoleColor.Green);
                 Console.WriteLine(MenuUtils.GetMenuEntryExplanation(entry));
                 Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
                 if (Console.ReadKey().Key != ConsoleKey.Enter)
                     return;
 
+                Console.WriteLine();
                 switch (entry)
                 {
                     case MenuEntry.RemoveUWPApps:
                         new UWPAppRemover(Configuration.UWPAppsToRemove).PerformRemoval();
                         break;
                     case MenuEntry.DisableAutoUpdates:
+                        Console.WriteLine("Writing values into the Registry...");
                         Operations.DisableAutomaticUpdates();
                         break;
                     case MenuEntry.DisableCortana:
@@ -115,10 +117,11 @@ namespace Win10BloatRemover
                         serviceRemover.PerformBackup();
                         ConsoleUtils.WriteLine("Removing services...", ConsoleColor.Green);
                         serviceRemover.PerformRemoval();
-                        Console.WriteLine("Performing additional tasks to disable telemetry-related features...");
+                        ConsoleUtils.WriteLine("Performing additional tasks to disable telemetry-related features...", ConsoleColor.Green);
                         Operations.DisableTelemetryRelatedFeatures();
                         break;
                     case MenuEntry.DisableErrorReporting:
+                        Console.WriteLine("Writing values into the Registry...");
                         Operations.DisableWinErrorReporting();
                         break;
                     case MenuEntry.DisableScheduledTasks:
@@ -126,6 +129,7 @@ namespace Win10BloatRemover
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.DisableWindowsTipsAndFeedback:
+                        Console.WriteLine("Writing values into the Registry...");
                         Operations.DisableWindowsTipsAndFeedback();
                         break;
                     case MenuEntry.RemoveWindowsFeatures:
@@ -133,8 +137,8 @@ namespace Win10BloatRemover
                         Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.Credits:
-                        MenuUtils.PrintCredits();
-                        break;
+                        // Credits are printed through GetMenuEntryExplanation(). We want to skip "Done" message in this case.
+                        return;
                     case MenuEntry.Quit:
                         exit = true;
                         break;
@@ -143,7 +147,7 @@ namespace Win10BloatRemover
                         break;
                 }
 
-                Console.Write("Done! ");
+                Console.Write("\nDone! ");
             }
             catch (Exception exc)
             {
@@ -165,8 +169,8 @@ namespace Win10BloatRemover
 
         public static void ExtractInstallWimTweak()
         {
-            ResourceManager binResources = new ResourceManager("Win10BloatRemover.resources.Binaries", typeof(Operations).Assembly);
-            File.WriteAllBytes(Configuration.InstallWimTweakPath, (byte[])binResources.GetObject("install_wim_tweak"));
+            var binResources = new ResourceManager("Win10BloatRemover.resources.Binaries", typeof(Operations).Assembly);
+            File.WriteAllBytes(Configuration.InstallWimTweakPath, (byte[]) binResources.GetObject("install_wim_tweak"));
         }
 
         public static void DeleteTempInstallWimTweak()

@@ -25,7 +25,7 @@ namespace Win10BloatRemover
             if (backupPerformed)
                 throw new InvalidOperationException("Backup already done!");
 
-            DirectoryInfo backupDirectory = Directory.CreateDirectory($"./servicesBackup_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm")}");
+            DirectoryInfo backupDirectory = Directory.CreateDirectory($"./servicesBackup_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}");
             using (PowerShell psInstance = PowerShell.Create())
             {
                 foreach (string serviceName in servicesToRemove)

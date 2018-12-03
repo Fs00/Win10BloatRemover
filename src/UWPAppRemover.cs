@@ -88,6 +88,7 @@ namespace Win10BloatRemover
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
+                    bool appUninstalled = false;
                     foreach (string appName in appNamesForGroup[appGroup])
                     {
                         // The following script uninstalls the specified app package for all users when it is found
@@ -96,7 +97,7 @@ namespace Win10BloatRemover
                                                    "if ($package) {" +
                                                        $"Write-Host \"Removing app $($package.Name)...\";" +
                                                        "Remove-AppxPackage -AllUsers $package;" +
-                                                       "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"$package.Name\"};" +
+                                                       "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq $package.Name};" +
                                                        "if ($provisionedPackage) {" +
                                                             "Write-Host \"Removing provisioned package for app $($package.Name)...\";" +
                                                             "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
@@ -107,10 +108,15 @@ namespace Win10BloatRemover
 
                         ConsoleUtils.WriteLine($"\nRemoving {appName} app...", ConsoleColor.Green);
                         psInstance.RunScriptAndPrintOutput(appRemovalScript);
+
+                        // Check if uninstall has been performed for at least one app of the group
+                        if (!appUninstalled)
+                            appUninstalled = psInstance.Runspace.SessionStateProxy.PSVariable.Get("package").Value.ToString() != "";
                     }
 
-                    // Perform post-uninstall operations only if package removal was successful
-                    if (psInstance.Streams.Error.Count == 0)
+                    // Perform post-uninstall operations only if package removal was successful and at least one
+                    // app of the group has been uninstalled (avoids performing the tasks when app is not installed anymore)
+                    if (appUninstalled && psInstance.Streams.Error.Count == 0)
                     {
                         Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
                         PerformPostUninstallOperations(appGroup);

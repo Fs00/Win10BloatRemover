@@ -8,10 +8,10 @@ namespace Win10BloatRemover
         RemoveWinDefender,
         RemoveMSEdge,
         RemoveOneDrive,
-        RemoveWindowsFeatures,
         RemoveServices,
-        DisableAutoUpdates,
+        RemoveWindowsFeatures,
         DisableCortana,
+        DisableAutoUpdates,
         DisableScheduledTasks,
         DisableErrorReporting,
         DisableWindowsTipsAndFeedback,
@@ -79,7 +79,7 @@ namespace Win10BloatRemover
                     description = "OneDrive removal";
                     break;
                 case MenuEntry.RemoveWindowsFeatures:
-                    description = "Useless Windows features removal";
+                    description = "Windows features removal";
                     break;
                 case MenuEntry.DisableAutoUpdates:
                     description = "Automatic Windows updates disabling";
@@ -88,7 +88,7 @@ namespace Win10BloatRemover
                     description = "Cortana disabling";
                     break;
                 case MenuEntry.RemoveServices:
-                    description = "Diagnostic services removal";
+                    description = "Services and diagnostics removal";
                     break;
                 case MenuEntry.DisableScheduledTasks:
                     description = "Useless scheduled tasks disabling";

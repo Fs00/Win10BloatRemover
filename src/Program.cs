@@ -8,6 +8,7 @@ namespace Win10BloatRemover
 {
     static class Program
     {
+        public static string InstallWimTweakPath { get; } = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
         private static bool exit = false;
 
         static void Main()
@@ -41,13 +42,23 @@ namespace Win10BloatRemover
                 Environment.Exit(-1);
             }
 
+            string configurationLoadingError = Configuration.Load();
             while (!exit)
             {
-                bool userInputIsCorrect = false;
-                Console.Clear();
+                // Console screen mustn't be cleared if at the first iteration was detected an error when
+                // loading options, so that the user can be warned of it
+                if (configurationLoadingError != null)
+                {
+                    ConsoleUtils.WriteLine(configurationLoadingError, ConsoleColor.Red);
+                    configurationLoadingError = null;
+                }
+                else
+                    Console.Clear();
+
                 MenuUtils.PrintHeading();
                 MenuUtils.PrintMenu();
 
+                bool userInputIsCorrect = false;
                 MenuEntry? chosenEntry = null;
                 while (!userInputIsCorrect)
                 {
@@ -90,7 +101,7 @@ namespace Win10BloatRemover
                 switch (entry)
                 {
                     case MenuEntry.RemoveUWPApps:
-                        new UWPAppRemover(Configuration.UWPAppsToRemove).PerformRemoval();
+                        new UWPAppRemover(Configuration.Instance.UWPAppsToRemove).PerformRemoval();
                         break;
                     case MenuEntry.DisableAutoUpdates:
                         Console.WriteLine("Writing values into the Registry...");
@@ -112,7 +123,7 @@ namespace Win10BloatRemover
                         Console.WriteLine("Some folders may not exist, it's normal.");
                         break;
                     case MenuEntry.RemoveServices:
-                        var serviceRemover = new ServiceRemover(Configuration.ServicesToRemove);
+                        var serviceRemover = new ServiceRemover(Configuration.Instance.ServicesToRemove);
                         ConsoleUtils.WriteLine("Backing up services...", ConsoleColor.Green);
                         serviceRemover.PerformBackup();
                         ConsoleUtils.WriteLine("Removing services...", ConsoleColor.Green);
@@ -125,7 +136,7 @@ namespace Win10BloatRemover
                         Operations.DisableWinErrorReporting();
                         break;
                     case MenuEntry.DisableScheduledTasks:
-                        Operations.DisableScheduledTasks(Configuration.ScheduledTasksToDisable);
+                        Operations.DisableScheduledTasks(Configuration.Instance.ScheduledTasksToDisable);
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
                     case MenuEntry.DisableWindowsTipsAndFeedback:
@@ -133,7 +144,7 @@ namespace Win10BloatRemover
                         Operations.DisableWindowsTipsAndFeedback();
                         break;
                     case MenuEntry.RemoveWindowsFeatures:
-                        Operations.RemoveWindowsFeatures(Configuration.WindowsFeaturesToRemove);
+                        Operations.RemoveWindowsFeatures(Configuration.Instance.WindowsFeaturesToRemove);
                         Console.WriteLine("A system reboot is recommended.");
                         break;
                     case MenuEntry.Credits:
@@ -169,14 +180,14 @@ namespace Win10BloatRemover
 
         public static void ExtractInstallWimTweak()
         {
-            var binResources = new ResourceManager("Win10BloatRemover.resources.Binaries", typeof(Operations).Assembly);
-            File.WriteAllBytes(Configuration.InstallWimTweakPath, (byte[]) binResources.GetObject("install_wim_tweak"));
+            var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Operations).Assembly);
+            File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak"));
         }
 
         public static void DeleteTempInstallWimTweak()
         {
-            if (File.Exists(Configuration.InstallWimTweakPath))
-                File.Delete(Configuration.InstallWimTweakPath);
+            if (File.Exists(InstallWimTweakPath))
+                File.Delete(InstallWimTweakPath);
         }
     }
 }

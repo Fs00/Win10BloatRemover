@@ -56,12 +56,18 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="resources\Binaries.resx" />
+    <EmbeddedResource Include="resources\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\config.json" />
     <None Include="resources\install_wim_tweak.exe" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.1</Version>
+    </PackageReference>
     <PackageReference Include="System.Management.Automation.dll">
       <Version>10.0.10586</Version>
     </PackageReference>

@@ -1,86 +1,63 @@
-﻿using System.IO;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
+using System.IO;
+using System.Resources;
 
 namespace Win10BloatRemover
 {
     /**
      *  Configuration
-     *  This class stores the configuration data of the app
+     *  Singleton class that stores user-configurable data, which are loaded from a JSON file
      */
-    static class Configuration
+    class Configuration
     {
-        public static readonly string InstallWimTweakPath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
+        public static Configuration Instance { private set; get; }
 
-        public static readonly string[] ServicesToRemove = {
-            "DiagTrack",
-            "diagsvc",
-            "diagnosticshub.standardcollector.service",
-            "dmwappushservice",
-            "WerSvc",
-            "wercplsupport",
-            "PcaSvc",           // Program Compatibility Assistant
-            "RetailDemo",
-            "DPS",
-            "WdiServiceHost",
-            "WdiSystemHost"
-        };
+        /**
+         *  Initializes the singleton by loading settings from the config.json file found in current directory
+         *  If the file doesn't exist, it is created firstly using default settings
+         */
+        public static string Load()
+        {
+            string errorMessage = null;
+            string configurationFile = "./config.json";
+            var defaultSettings = (string) new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Configuration).Assembly).GetObject("config.json");
+            if (!File.Exists(configurationFile))
+            {
+                try
+                {
+                    File.WriteAllText(configurationFile, defaultSettings);
+                }
+                catch (Exception exc)
+                {
+                    errorMessage += $"Can't write configuration file with default settings: {exc.Message}\n";
+                }
+            }
 
-        public static readonly UWPAppGroup[] UWPAppsToRemove = {
-            UWPAppGroup.Zune,
-            UWPAppGroup.MailAndCalendar,
-            UWPAppGroup.OneNote,
-            UWPAppGroup.OfficeHub,
-            UWPAppGroup.Camera,
-            UWPAppGroup.Maps,
-            UWPAppGroup.Mobile,
-            UWPAppGroup.HelpAndFeedback,
-            UWPAppGroup.Bing,
-            UWPAppGroup.Messaging,
-            UWPAppGroup.People,
-            UWPAppGroup.Skype
-        };
+            // If loading settings from config.json file fails, default settings are loaded
+            try
+            {
+                Instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationFile));
+            }
+            catch (Exception exc)
+            {
+                errorMessage += $"Error when loading custom settings file: {exc.Message} Default settings have been loaded instead.\n";
+                Instance = JsonConvert.DeserializeObject<Configuration>(defaultSettings);
+            }
+            return errorMessage;
+        }
 
-        public static readonly string[] ScheduledTasksToDisable = {
-            @"Microsoft\Windows\AppID\SmartScreenSpecific",
-            @"Microsoft\Windows\Application Experience\AitAgent",
-            @"Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
-            @"Microsoft\Windows\Application Experience\ProgramDataUpdater",
-            @"Microsoft\Windows\Application Experience\StartupAppTask",
-            @"Microsoft\Windows\Autochk\Proxy",
-            @"Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
-            @"Microsoft\Windows\Customer Experience Improvement Program\BthSQM",
-            @"Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
-            @"Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask",
-            @"Microsoft\Windows\Customer Experience Improvement Program\Uploader",
-            @"Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
-            @"Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
-            @"Microsoft\Windows\DiskFootprint\Diagnostics",
-            @"Microsoft\Windows\FileHistory\File History (maintenance mode)",
-            @"Microsoft\Windows\Maintenance\WinSAT",
-            @"Microsoft\Windows\PI\Sqm-Tasks",
-            @"Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",
-            @"Microsoft\Windows\Shell\FamilySafetyMonitor",
-            @"Microsoft\Windows\Shell\FamilySafetyRefresh",
-            @"Microsoft\Windows\Shell\FamilySafetyUpload",
-            @"Microsoft\Windows\Windows Error Reporting\QueueReporting",
-            @"Microsoft\Windows\WindowsUpdate\Automatic App Update",
-            @"Microsoft\Windows\License Manager\TempSignedLicenseExchange",
-            @"Microsoft\Windows\WindowsUpdate\Automatic App Update",
-            @"Microsoft\Windows\Clip\License Validation",
-            @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
-            @"\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",
-            @"\Microsoft\Windows\PushToInstall\LoginCheck",
-            @"\Microsoft\Windows\PushToInstall\Registration",
-            @"\Microsoft\Windows\Shell\FamilySafetyMonitor",
-            @"\Microsoft\Windows\Shell\FamilySafetyMonitorToastTask",
-            @"\Microsoft\Windows\Shell\FamilySafetyRefreshTask",
-            @"\Microsoft\Windows\Subscription\EnableLicenseAcquisition",
-            @"\Microsoft\Windows\Subscription\LicenseAcquisition"
-        };
+        [JsonProperty]
+        public readonly string[] ServicesToRemove;
 
-        public static readonly string[] WindowsFeaturesToRemove = {
-            "InternetExplorer-Optional-Package",
-            "Hello-Face-Package",
-            "QuickAssist-Package"
-        };
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
+        public readonly UWPAppGroup[] UWPAppsToRemove;
+
+        [JsonProperty]
+        public readonly string[] ScheduledTasksToDisable;
+
+        [JsonProperty]
+        public readonly string[] WindowsFeaturesToRemove;
     }
 }

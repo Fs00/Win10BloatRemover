@@ -19,7 +19,7 @@ namespace Win10BloatRemover
         public static void RemoveComponentUsingInstallWimTweak(string component)
         {
             Console.WriteLine($"Running install-wim-tweak to remove {component}...");
-            using (var installWimTweakProcess = SystemUtils.RunProcess(Configuration.InstallWimTweakPath, $"/o /c {component} /r", true))
+            using (var installWimTweakProcess = SystemUtils.RunProcess(Program.InstallWimTweakPath, $"/o /c {component} /r", true))
             {
                 installWimTweakProcess.BeginOutputReadLine();
                 installWimTweakProcess.BeginErrorReadLine();

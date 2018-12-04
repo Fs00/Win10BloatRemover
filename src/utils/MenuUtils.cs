@@ -116,7 +116,7 @@ namespace Win10BloatRemover
             {
                 case MenuEntry.RemoveUWPApps:
                     explanation = "The following groups of UWP apps will be removed:\n";
-                    foreach (UWPAppGroup app in Configuration.UWPAppsToRemove)
+                    foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
                     explanation += "Some specific app-related services will also be removed (but backed up in case you need to restore them).";
                     break;
@@ -128,7 +128,7 @@ namespace Win10BloatRemover
                     break;
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";
-                    foreach (string feature in Configuration.WindowsFeaturesToRemove)
+                    foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)
                         explanation += $"  {feature}\n";
                     break;
                 case MenuEntry.DisableCortana:
@@ -136,13 +136,13 @@ namespace Win10BloatRemover
                     break;
                 case MenuEntry.RemoveServices:
                     explanation = "The services starting with the following names will be removed:\n";
-                    foreach (string service in Configuration.ServicesToRemove)
+                    foreach (string service in Configuration.Instance.ServicesToRemove)
                         explanation += $"  {service}\n";
                     explanation += "Services will be backed up in the same folder as this program executable.";
                     break;
                 case MenuEntry.DisableScheduledTasks:
                     explanation = "The following scheduled tasks will be disabled:\n";
-                    foreach (string task in Configuration.ScheduledTasksToDisable)
+                    foreach (string task in Configuration.Instance.ScheduledTasksToDisable)
                         explanation += $"  {task}\n";
                     break;
                 case MenuEntry.DisableAutoUpdates:

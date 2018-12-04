@@ -130,6 +130,9 @@ namespace Win10BloatRemover
                         serviceRemover.PerformRemoval();
                         ConsoleUtils.WriteLine("Performing additional tasks to disable telemetry-related features...", ConsoleColor.Green);
                         Operations.DisableTelemetryRelatedFeatures();
+                        ConsoleUtils.WriteLine("You may also want to remove DPS, WdiSystemHost and WdiServiceHost services, " +
+                                               "which can't be easily deleted programmatically due to their permissions.", ConsoleColor.Cyan);
+                        ConsoleUtils.WriteLine("Follow this steps to do it: github.com/adolfintel/Windows10-Privacy/blob/master/data/delkey.gif", ConsoleColor.Cyan);
                         break;
                     case MenuEntry.DisableErrorReporting:
                         Console.WriteLine("Writing values into the Registry...");

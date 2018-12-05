@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Resources;
-using System.Security.Principal;
 
 namespace Win10BloatRemover
 {
@@ -16,16 +15,26 @@ namespace Win10BloatRemover
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en");
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
-            if (!Program.HasAdministratorRights())
+            if (!SystemUtils.HasAdministratorRights())
             {
-                Console.WriteLine("This application needs to be run with administrator rights!");
+                ConsoleUtils.WriteLine("This application needs to be run with administrator rights!", ConsoleColor.Red);
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
             
-            if (SystemUtils.GetWindowsReleaseId() != "1809")
+            if (!SystemUtils.IsWindowsReleaseId("1809"))
             {
-                Console.WriteLine("This application is compatible only with Windows 10 October 2018 Update!");
+                ConsoleUtils.WriteLine("This application is compatible only with Windows 10 October 2018 Update!", ConsoleColor.Red);
+                Console.ReadKey();
+                Environment.Exit(-1);
+            }
+
+            if (DependenciesAreMissing())
+            {
+                ConsoleUtils.WriteLine("One or more required dependencies of the application are missing.\n" + 
+                                       "Make sure you have the following DLLs in the same folder as this application:\n" +
+                                       " Newtonsoft.Json.dll\n" +
+                                       " System.Management.Automation.dll", ConsoleColor.Red);
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
@@ -43,18 +52,16 @@ namespace Win10BloatRemover
             }
 
             string configurationLoadingError = Configuration.Load();
+            if (configurationLoadingError != null)
+            {
+                ConsoleUtils.WriteLine(configurationLoadingError, ConsoleColor.DarkYellow);
+                Console.WriteLine("Press a key to continue to the main menu.");
+                Console.ReadKey();
+            }
+
             while (!exit)
             {
-                // Console screen mustn't be cleared if at the first iteration was detected an error when
-                // loading options, so that the user can be warned of it
-                if (configurationLoadingError != null)
-                {
-                    ConsoleUtils.WriteLine(configurationLoadingError, ConsoleColor.Red);
-                    configurationLoadingError = null;
-                }
-                else
-                    Console.Clear();
-
+                Console.Clear();
                 MenuUtils.PrintHeading();
                 MenuUtils.PrintMenu();
 
@@ -175,19 +182,18 @@ namespace Win10BloatRemover
             }
         }
 
-        public static bool HasAdministratorRights()
+        private static bool DependenciesAreMissing()
         {
-            var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
-            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            return !File.Exists("./Newtonsoft.Json.dll") || !File.Exists("./System.Management.Automation.dll");
         }
 
-        public static void ExtractInstallWimTweak()
+        private static void ExtractInstallWimTweak()
         {
             var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Operations).Assembly);
             File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak"));
         }
 
-        public static void DeleteTempInstallWimTweak()
+        private static void DeleteTempInstallWimTweak()
         {
             if (File.Exists(InstallWimTweakPath))
                 File.Delete(InstallWimTweakPath);

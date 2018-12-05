@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Security.Principal;
 
 namespace Win10BloatRemover
 {
@@ -149,9 +150,16 @@ namespace Win10BloatRemover
             }
         }
 
-        public static string GetWindowsReleaseId()
+        public static bool IsWindowsReleaseId(string expectedId)
         {
-            return Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
+            string releaseId = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
+            return releaseId == expectedId;
+        }
+
+        public static bool HasAdministratorRights()
+        {
+            var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 }

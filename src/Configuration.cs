@@ -42,7 +42,7 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                errorMessage += $"Error when loading custom settings file: {exc.Message} Default settings have been loaded instead.\n";
+                errorMessage += $"Error when loading custom settings file: {exc.Message}\nDefault settings have been loaded instead.\n";
                 Instance = JsonConvert.DeserializeObject<Configuration>(defaultSettings);
             }
             return errorMessage;

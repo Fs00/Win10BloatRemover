@@ -73,7 +73,7 @@ namespace Win10BloatRemover
                                                 "else" +
                                                     "{ Write-Error \"Service $service removal failed: exit code $LASTEXITCODE\" }" +
                                                 /*
-                                                 * Here I tried to edit permissions for service reg keys which are protected by permissions.
+                                                 * Here I tried to edit permissions for service reg keys which are protected by permissions (DPS, WdiSystemHost, WdiServiceHost).
                                                  * Unfortunately the subkeys of those services can't be opened even with ChangePermissions permission.
                                                  */
                                                 /*

@@ -76,12 +76,6 @@ namespace Win10BloatRemover
                 key.SetValue("SubmitSamplesConsent", 2, RegistryValueKind.DWord);
                 key.SetValue("DontReportInfectionInformation", 1, RegistryValueKind.DWord);
             }
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
-            {
-                key.DeleteSubKeyTree("Sense", false);
-                key.DeleteSubKeyTree("SecurityHealthService", false);
-                key.DeleteSubKeyTree("wscsvc", false);
-            }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\MRT"))
             {
                 key.SetValue("DontReportInfectionInformation", 1, RegistryValueKind.DWord);
@@ -90,17 +84,20 @@ namespace Win10BloatRemover
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
                 key.DeleteValue("SecurityHealth", false);
 
-            // It seems that this key can't be retrieved programmatically (API bug?)
+            // It seems that this key can't be retrieved inside this program, neither via .NET API nor via CMD (permissions needed? API bug?)
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", true))
             {
                 if (key != null)
                     key.DeleteValue("SecurityHealth", false);
                 else
-                    ConsoleUtils.WriteLine("WARNING: Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\"" +
+                    ConsoleUtils.WriteLine("Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\"" +
                                            " /v \"SecurityHealth\" /f\"", ConsoleColor.DarkYellow);
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
+
+            Console.WriteLine("\nRemoving Security Health services...");
+            new ServiceRemover(new[] { "Sense", "SecurityHealthService", "wscsvc" }).PerformBackup().PerformRemoval();
 
             Console.WriteLine();
             RemoveComponentUsingInstallWimTweak("Windows-Defender");

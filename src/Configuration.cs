@@ -48,16 +48,16 @@ namespace Win10BloatRemover
             return errorMessage;
         }
 
-        [JsonProperty]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public readonly string[] ServicesToRemove;
 
-        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter), NullValueHandling = NullValueHandling.Ignore)]
         public readonly UWPAppGroup[] UWPAppsToRemove;
 
-        [JsonProperty]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public readonly string[] ScheduledTasksToDisable;
 
-        [JsonProperty]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public readonly string[] WindowsFeaturesToRemove;
     }
 }

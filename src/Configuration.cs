@@ -38,7 +38,10 @@ namespace Win10BloatRemover
             // If loading settings from config.json file fails, default settings are loaded
             try
             {
-                Instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationFile));
+                Instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationFile), new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore    // it seems not to work (why?)
+                });
             }
             catch (Exception exc)
             {
@@ -48,16 +51,16 @@ namespace Win10BloatRemover
             return errorMessage;
         }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public readonly string[] ServicesToRemove;
+        [JsonProperty(Required = Required.Always)]
+        public string[] ServicesToRemove { private set; get; }
 
-        [JsonProperty(ItemConverterType = typeof(StringEnumConverter), NullValueHandling = NullValueHandling.Ignore)]
-        public readonly UWPAppGroup[] UWPAppsToRemove;
+        [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
+        public UWPAppGroup[] UWPAppsToRemove { private set; get; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public readonly string[] ScheduledTasksToDisable;
+        [JsonProperty(Required = Required.Always)]
+        public string[] ScheduledTasksToDisable { private set; get; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public readonly string[] WindowsFeaturesToRemove;
+        [JsonProperty(Required = Required.Always)]
+        public string[] WindowsFeaturesToRemove { private set; get; }
     }
 }

@@ -61,6 +61,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="resources\config.json" />
     <None Include="resources\install_wim_tweak.exe" />
   </ItemGroup>

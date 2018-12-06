@@ -1,7 +1,7 @@
 ﻿# Windows 10 Bloat Remover and Tweaker
 This configurable tool offers a simple CLI to debloat and apply some tweaks to your Windows 10 installation. Here's a comprehensive feature list:
 
-* **UWP apps removal**: Uninstalls the specified list of apps from all users and deletes their corresponding provisioned packages (if present), so that apps aren't reinstalled for new users or after system updates.
+* **UWP apps removal**: Uninstalls the specified list of apps from all users and deletes their corresponding provisioned packages (if present), so that apps aren't reinstalled for new users or after system updates.  
 Take note that you can't configure the program to remove single UWP packages but only groups of them, to make user configuration less tricky and because some apps are made of multiple packages (e.g. Xbox) which depend on each other. Groups are defined as follows:
 	* *Bing*: Weather and News
     * *Mobile*: YourPhone, Mobile plans and Connect app
@@ -25,7 +25,7 @@ Take note that you can't configure the program to remove single UWP packages but
     * *Calculator*
     * *SnipAndSketch*
 * **Automatic updates disabling:** Prevents automatic download and installing of Windows and Store apps updates through Group Policies. Therefore, this method won't work on Windows 10 Home.
-* **Services and telemetry removal:** deletes (not just disables) the services specified in configuration after backing them up, so that you can restore them if any feature breaks.
+* **Services and telemetry removal:** deletes (not just disables) the services specified in configuration after backing them up, so that you can restore them if any feature breaks. In addition, it also disables several Microsoft telemetry features such as Compatibility Telemetry, Inventory and others.
 * **Removal of Windows Defender and Microsoft Edge:** This is accomplished using [install-wim-tweak](https://github.com/shiitake/win6x_registry_tweak) tool. Please take note that Security Center UWP package won't be removed to avoid breaking the system.
 * **OneDrive removal** using stock uninstaller, its folder in Explorer sidebar will also be hidden
 * **Windows features removal:** uninstalls the optional features packages specified in configuration. Take note that these features are the ones listed in Settings app, not the ones in Control Panel. You can find the names of installed features packages with the PowerShell command `Get-WindowsPackage -Online`.

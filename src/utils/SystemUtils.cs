@@ -4,6 +4,7 @@ using System.IO;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Security.Principal;
+using Microsoft.Win32;
 
 namespace Win10BloatRemover
 {
@@ -152,7 +153,8 @@ namespace Win10BloatRemover
 
         public static bool IsWindowsReleaseId(string expectedId)
         {
-            string releaseId = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
+            string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion",
+                                                  "ReleaseId", "").ToString();
             return releaseId == expectedId;
         }
 

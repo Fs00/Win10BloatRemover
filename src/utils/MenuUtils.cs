@@ -132,7 +132,8 @@ namespace Win10BloatRemover
                         explanation += $"  {feature}\n";
                     break;
                 case MenuEntry.DisableCortana:
-                    explanation = "This won't remove Cortana (otherwise the system would break), it will only be disabled using Group Policy and blocked by the firewall.";
+                    explanation = "This won't remove Cortana (otherwise the system would break), it will only be disabled " +
+                                  "using Group Policy and blocked by the firewall.";
                     break;
                 case MenuEntry.RemoveServices:
                     explanation = "The services starting with the following names will be removed:\n";

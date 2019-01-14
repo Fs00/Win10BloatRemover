@@ -46,11 +46,21 @@ namespace Win10BloatRemover
             { UWPAppGroup.Bing, new[] { "Microsoft.BingNews", "Microsoft.BingWeather" } },
             { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
-            { UWPAppGroup.HelpAndFeedback, new[] { "Microsoft.WindowsFeedbackHub", "Microsoft.GetHelp", "Microsoft.Getstarted" } },
+            { UWPAppGroup.HelpAndFeedback, new[] {
+                    "Microsoft.WindowsFeedbackHub",
+                    "Microsoft.GetHelp",
+                    "Microsoft.Getstarted"
+                }
+            },
             { UWPAppGroup.MailAndCalendar, new[] { "microsoft.windowscommunicationsapps" } },
             { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
             { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
-            { UWPAppGroup.MixedReality, new[] { "Microsoft.Microsoft3DViewer", "Microsoft.Print3D", "Microsoft.MixedReality.Portal" } },
+            { UWPAppGroup.MixedReality, new[] {
+                    "Microsoft.Microsoft3DViewer",
+                    "Microsoft.Print3D",
+                    "Microsoft.MixedReality.Portal"
+                }
+            },
             { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
             { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
             { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
@@ -93,18 +103,21 @@ namespace Win10BloatRemover
                     {
                         // The following script uninstalls the specified app package for all users when it is found
                         // and removes the package from Windows image (so that new users don't find the removed app)
-                        string appRemovalScript = $"$package = Get-AppxPackage -AllUsers -Name \"{appName}\";" +
-                                                   "if ($package) {" +
-                                                       $"Write-Host \"Removing app $($package.Name)...\";" +
-                                                       "Remove-AppxPackage -AllUsers $package;" +
-                                                       "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq $package.Name};" +
-                                                       "if ($provisionedPackage) {" +
-                                                            "Write-Host \"Removing provisioned package for app $($package.Name)...\";" +
-                                                            "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
-                                                       "} else { Write-Host \"No provisioned package found for app $($package.Name)\"; }" +
-                                                   "} else {" +
-                                                        $"Write-Host \"App {appName} is not installed.\";" +
-                                                   "}";
+                        string appRemovalScript =
+                            $"$package = Get-AppxPackage -AllUsers -Name \"{appName}\";" +
+                            "if ($package) {" +
+                                $"Write-Host \"Removing app $($package.Name)...\";" +
+                                "Remove-AppxPackage -AllUsers $package;" +
+                                "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq $package.Name};" +
+                                "if ($provisionedPackage) {" +
+                                    "Write-Host \"Removing provisioned package for app $($package.Name)...\";" +
+                                    "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
+                                "}" +
+                                "else { Write-Host \"No provisioned package found for app $($package.Name)\"; }" +
+                            "}" +
+                            "else {" +
+                                $"Write-Host \"App {appName} is not installed.\";" +
+                            "}";
 
                         ConsoleUtils.WriteLine($"\nRemoving {appName} app...", ConsoleColor.Green);
                         psInstance.RunScriptAndPrintOutput(appRemovalScript);
@@ -126,38 +139,50 @@ namespace Win10BloatRemover
             removalPerformed = true;
         }
 
+        /**
+         * Removes any eventual services, scheduled tasks and/or registry keys related to the specified app group.
+         * In certain cases this method is used to remove apps that can be removed only by using install-wim-tweak.
+         */
         private void PerformPostUninstallOperations(UWPAppGroup appGroup)
         {
             switch (appGroup)
             {
                 case UWPAppGroup.Mobile:
-                    Operations.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");
+                    Operations.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");  // Connect app
                     break;
+
                 case UWPAppGroup.HelpAndFeedback:
                     Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport");
                     break;
+
                 case UWPAppGroup.Maps:
                     Console.WriteLine("Removing app-related services...");
                     new ServiceRemover(new[] { "MapsBroker", "lfsvc" }).PerformBackup().PerformRemoval();
-                    SystemUtils.ExecuteWindowsCommand("schtasks /Change /TN \"\\Microsoft\\Windows\\Maps\\MapsUpdateTask\" /disable");
+                    SystemUtils.ExecuteWindowsCommand(@"schtasks /Change /TN ""\Microsoft\Windows\Maps\MapsUpdateTask"" /disable");
                     break;
+
                 case UWPAppGroup.Messaging:
                     Console.WriteLine("Removing app-related services...");
                     new ServiceRemover(new[] { "MessagingService" }).PerformBackup().PerformRemoval();
                     break;
+
                 case UWPAppGroup.MailAndCalendar:
                 case UWPAppGroup.People:
                     Console.WriteLine("Removing app-related services...");
                     new ServiceRemover(new[] { "OneSyncSvc" }).PerformBackup().PerformRemoval();
                     break;
+
                 case UWPAppGroup.Xbox:
                     Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" }).PerformBackup().PerformRemoval();
-                    SystemUtils.ExecuteWindowsCommand("schtasks /Change /TN \"Microsoft\\XblGameSave\\XblGameSaveTask\" /disable & " +
-                                                      "schtasks /Change /TN \"Microsoft\\XblGameSave\\XblGameSaveTaskLogon\" /disable");
+                    new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" })
+                        .PerformBackup()
+                        .PerformRemoval();
+                    SystemUtils.ExecuteWindowsCommand(@"schtasks /Change /TN ""Microsoft\XblGameSave\XblGameSaveTask"" /disable & " +
+                                                      @"schtasks /Change /TN ""Microsoft\XblGameSave\XblGameSaveTaskLogon"" /disable");
                     using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
                         key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
                     break;
+
                 default:
                     Console.WriteLine("Nothing to do.");
                     break;

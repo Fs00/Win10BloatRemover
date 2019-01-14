@@ -22,7 +22,9 @@ namespace Win10BloatRemover
         {
             string errorMessage = null;
             string configurationFile = "./config.json";
-            var defaultSettings = (string) new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Configuration).Assembly).GetObject("config.json");
+            var defaultSettings = (string) new ResourceManager("Win10BloatRemover.resources.Resources",
+                                  typeof(Configuration).Assembly).GetObject("config.json");
+
             if (!File.Exists(configurationFile))
             {
                 try
@@ -38,10 +40,8 @@ namespace Win10BloatRemover
             // If loading settings from config.json file fails, default settings are loaded
             try
             {
-                Instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationFile), new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore    // it seems not to work (why?)
-                });
+                Instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationFile),
+                           new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });  // this setting seems not to work (why?)
             }
             catch (Exception exc)
             {

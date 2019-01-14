@@ -110,25 +110,31 @@ namespace Win10BloatRemover
                     case MenuEntry.RemoveUWPApps:
                         new UWPAppRemover(Configuration.Instance.UWPAppsToRemove).PerformRemoval();
                         break;
+
                     case MenuEntry.DisableAutoUpdates:
                         Console.WriteLine("Writing values into the Registry...");
                         Operations.DisableAutomaticUpdates();
                         break;
+
                     case MenuEntry.DisableCortana:
                         Operations.DisableCortana();
                         Console.WriteLine("A system reboot is recommended.");
                         break;
+
                     case MenuEntry.RemoveWinDefender:
                         Operations.RemoveWindowsDefender();
                         break;
+
                     case MenuEntry.RemoveMSEdge:
                         Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Internet-Browser");
                         Console.WriteLine("A system reboot is recommended.");
                         break;
+
                     case MenuEntry.RemoveOneDrive:
                         Operations.RemoveOneDrive();
                         Console.WriteLine("Some folders may not exist, it's normal.");
                         break;
+
                     case MenuEntry.RemoveServices:
                         var serviceRemover = new ServiceRemover(Configuration.Instance.ServicesToRemove);
                         ConsoleUtils.WriteLine("Backing up services...", ConsoleColor.Green);
@@ -141,28 +147,35 @@ namespace Win10BloatRemover
                                                "which can't be easily deleted programmatically due to their permissions.\n" +
                                                "Follow this steps to do it: github.com/adolfintel/Windows10-Privacy/blob/master/data/delkey.gif", ConsoleColor.Cyan);
                         break;
+
                     case MenuEntry.DisableErrorReporting:
                         Console.WriteLine("Writing values into the Registry...");
                         Operations.DisableWinErrorReporting();
                         break;
+
                     case MenuEntry.DisableScheduledTasks:
                         Operations.DisableScheduledTasks(Configuration.Instance.ScheduledTasksToDisable);
                         Console.WriteLine("Some commands may fail, it's normal.");
                         break;
+
                     case MenuEntry.DisableWindowsTipsAndFeedback:
                         Console.WriteLine("Writing values into the Registry...");
                         Operations.DisableWindowsTipsAndFeedback();
                         break;
+
                     case MenuEntry.RemoveWindowsFeatures:
                         Operations.RemoveWindowsFeatures(Configuration.Instance.WindowsFeaturesToRemove);
                         Console.WriteLine("A system reboot is recommended.");
                         break;
+
                     case MenuEntry.Credits:
                         // Credits are printed through GetMenuEntryExplanation(). We want to skip "Done" message in this case.
                         return;
+
                     case MenuEntry.Quit:
                         exit = true;
                         break;
+
                     default:
                         Console.WriteLine($"Unimplemented function: {entry.ToString()}");
                         break;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Env = System.Environment;
 using Microsoft.Win32;
 using System.Management.Automation;
 
@@ -27,7 +28,8 @@ namespace Win10BloatRemover
                 if (installWimTweakProcess.ExitCode == 0)
                     Console.WriteLine("Install-wim-tweak executed successfully!");
                 else
-                    ConsoleUtils.WriteLine($"An error occurred during the removal of {component}: install-wim-tweak exited with a non-zero status.", ConsoleColor.Red);
+                    ConsoleUtils.WriteLine($"An error occurred during the removal of {component}: " +
+                                            "install-wim-tweak exited with a non-zero status.", ConsoleColor.Red);
             }
         }
 
@@ -62,11 +64,13 @@ namespace Win10BloatRemover
         public static void RemoveWindowsDefender()
         {
             Console.WriteLine("Editing keys in Windows Registry...");
+
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"))
                 key.SetValue("SmartScreenEnabled", "Off", RegistryValueKind.String);
             using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AppHost"))
                 key.SetValue("EnableWebContentEvaluation", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\PhishingFilter"))
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Local Settings\Software\Microsoft\" +
+                   @"Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\PhishingFilter"))
                 key.SetValue("EnabledV9", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows Defender"))
                 key.SetValue("DisableAntiSpyware", 1, RegistryValueKind.DWord);
@@ -90,14 +94,18 @@ namespace Win10BloatRemover
                 if (key != null)
                     key.DeleteValue("SecurityHealth", false);
                 else
-                    ConsoleUtils.WriteLine("Remember to execute manually command \"reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run\"" +
-                                           " /v \"SecurityHealth\" /f\"", ConsoleColor.DarkYellow);
+                    ConsoleUtils.WriteLine(@"Remember to execute manually command ""reg delete HKLM\SOFTWARE\Microsoft\Windows\" + 
+                                           @"CurrentVersion\Explorer\StartupApproved\Run /v SecurityHealth /f""", ConsoleColor.DarkYellow);
             }
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe"))
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
+                   @"Image File Execution Options\SecHealthUI.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
 
             Console.WriteLine("\nRemoving Security Health services...");
-            new ServiceRemover(new[] { "Sense", "SecurityHealthService", "wscsvc" }).PerformBackup().PerformRemoval(ServiceRemovalMode.Registry);
+
+            new ServiceRemover(new[] { "Sense", "SecurityHealthService", "wscsvc" })
+                .PerformBackup()
+                .PerformRemoval(ServiceRemovalMode.Registry);
 
             Console.WriteLine();
             RemoveComponentUsingInstallWimTweak("Windows-Defender");
@@ -120,14 +128,15 @@ namespace Win10BloatRemover
                 else
                 {
                     Console.WriteLine("Removing old files...");
-                    SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
+                    SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
                     SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
-                    SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
-                    SystemUtils.DeleteDirectoryIfExists($@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
+                    SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
+                    SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
 
                     try
                     {
-                        string oneDriveStandaloneUpdater = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive\OneDriveStandaloneUpdater.exe";
+                        string oneDriveStandaloneUpdater = $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\" +
+                                                            @"Microsoft\OneDrive\OneDriveStandaloneUpdater.exe";
                         if (File.Exists(oneDriveStandaloneUpdater))
                             File.Delete(oneDriveStandaloneUpdater);
                     }
@@ -147,18 +156,18 @@ namespace Win10BloatRemover
 
         private static string RetrieveOneDriveUninstallerPath()
         {
-            if (Environment.Is64BitOperatingSystem)
-                return $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe";
+            if (Env.Is64BitOperatingSystem)
+                return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe";
             else
-                return $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\System32\OneDriveSetup.exe";
+                return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\System32\OneDriveSetup.exe";
         }
 
         public static void DisableScheduledTasks(string[] scheduledTasksList)
         {
             foreach (string task in scheduledTasksList)
-                SystemUtils.ExecuteWindowsCommand($"schtasks /Change /TN \"{task}\" /disable");
+                SystemUtils.ExecuteWindowsCommand($@"schtasks /Change /TN ""{task}"" /disable");
 
-            SystemUtils.ExecuteWindowsCommand("del /F /Q \"C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\SettingSync\\*\"");
+            SystemUtils.ExecuteWindowsCommand(@"del /F /Q ""C:\Windows\System32\Tasks\Microsoft\Windows\SettingSync\*""");
         }
 
         public static void DisableWinErrorReporting()
@@ -225,7 +234,8 @@ namespace Win10BloatRemover
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System"))
                 key.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe"))
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
+                   @"Image File Execution Options\CompatTelRunner.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
         }
     }

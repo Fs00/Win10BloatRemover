@@ -5,6 +5,12 @@ using Microsoft.Win32;
 
 namespace Win10BloatRemover
 {
+    // ServiceRemover can remove services using sc or reg commands (see below)
+    public enum ServiceRemovalMode {
+        ServiceControl,
+        Registry
+    }
+
     /**
      *  ServiceRemover
      *  Performs backup (export of registry keys) and removal of the services passed into the constructor
@@ -53,7 +59,12 @@ namespace Win10BloatRemover
             return this;    // allows chaining with PerformRemoval
         }
 
-        public void PerformRemoval()
+        /**
+         *  Performs the removal of the services by using either sc or reg command, according to the passed parameter
+         *  (default is sc).
+         *  In some situations using reg command seems to bypass certain permissions, e.g. for Windows Defender services.
+         */
+        public void PerformRemoval(ServiceRemovalMode removalMode = ServiceRemovalMode.ServiceControl)
         {
             if (!backupPerformed)
                 throw new InvalidOperationException("Backup services before removing them!");
@@ -67,7 +78,9 @@ namespace Win10BloatRemover
                     string removalScript = "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
                                                         "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
                                             "foreach ($service in $services) {" +
-                                                "sc.exe delete $service;" +
+                                                (removalMode == ServiceRemovalMode.ServiceControl ? 
+                                                "sc.exe delete $service;" :
+                                                "reg delete HKLM\\SYSTEM\\CurrentControlSet\\Services\\$service /f;") +
                                                 "if ($LASTEXITCODE -eq 0)" +
                                                     "{ Write-Host \"Service $service removed successfully.\" }" +
                                                 "else" +

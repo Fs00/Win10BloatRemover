@@ -97,7 +97,7 @@ namespace Win10BloatRemover
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
 
             Console.WriteLine("\nRemoving Security Health services...");
-            new ServiceRemover(new[] { "Sense", "SecurityHealthService", "wscsvc" }).PerformBackup().PerformRemoval();
+            new ServiceRemover(new[] { "Sense", "SecurityHealthService", "wscsvc" }).PerformBackup().PerformRemoval(ServiceRemovalMode.Registry);
 
             Console.WriteLine();
             RemoveComponentUsingInstallWimTweak("Windows-Defender");

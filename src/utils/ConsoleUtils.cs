@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Win10BloatRemover
+namespace Win10BloatRemover.Utils
 {
     static class ConsoleUtils
     {

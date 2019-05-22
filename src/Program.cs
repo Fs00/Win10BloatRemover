@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.IO;
 using System.Resources;
+using Win10BloatRemover.Operations;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
 {
@@ -96,102 +98,31 @@ namespace Win10BloatRemover
          */
         private static void ProcessMenuEntry(MenuEntry entry)
         {
+            ConsoleUtils.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --", ConsoleColor.Green);
+            Console.WriteLine(MenuUtils.GetMenuEntryExplanation(entry));
+            Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
+            if (Console.ReadKey().Key != ConsoleKey.Enter || entry == MenuEntry.Credits)
+                return;
+
+            if (entry == MenuEntry.Quit)
+            {
+                exit = true;
+                return;
+            }
+
             try
             {
-                ConsoleUtils.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --", ConsoleColor.Green);
-                Console.WriteLine(MenuUtils.GetMenuEntryExplanation(entry));
-                Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
-                if (Console.ReadKey().Key != ConsoleKey.Enter)
-                    return;
-
                 Console.WriteLine();
-                switch (entry)
-                {
-                    case MenuEntry.RemoveUWPApps:
-                        new UWPAppRemover(Configuration.Instance.UWPAppsToRemove).PerformRemoval();
-                        break;
-
-                    case MenuEntry.DisableAutoUpdates:
-                        Console.WriteLine("Writing values into the Registry...");
-                        Operations.DisableAutomaticUpdates();
-                        break;
-
-                    case MenuEntry.DisableCortana:
-                        Operations.DisableCortana();
-                        Console.WriteLine("A system reboot is recommended.");
-                        break;
-
-                    case MenuEntry.RemoveWinDefender:
-                        Operations.RemoveWindowsDefender();
-                        break;
-
-                    case MenuEntry.RemoveMSEdge:
-                        Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Internet-Browser");
-                        Console.WriteLine("A system reboot is recommended.");
-                        break;
-
-                    case MenuEntry.RemoveOneDrive:
-                        Operations.RemoveOneDrive();
-                        Console.WriteLine("Some folders may not exist, it's normal.");
-                        break;
-
-                    case MenuEntry.RemoveServices:
-                        var serviceRemover = new ServiceRemover(Configuration.Instance.ServicesToRemove);
-                        ConsoleUtils.WriteLine("Backing up services...", ConsoleColor.Green);
-                        serviceRemover.PerformBackup();
-                        ConsoleUtils.WriteLine("Removing services...", ConsoleColor.Green);
-                        serviceRemover.PerformRemoval();
-                        ConsoleUtils.WriteLine("Performing additional tasks to disable telemetry-related features...", ConsoleColor.Green);
-                        Operations.DisableTelemetryRelatedFeatures();
-                        ConsoleUtils.WriteLine("You may also want to remove DPS, WdiSystemHost and WdiServiceHost services, " +
-                                               "which can't be easily deleted programmatically due to their permissions.\n" +
-                                               "Follow this steps to do it: github.com/adolfintel/Windows10-Privacy/blob/master/data/delkey.gif", ConsoleColor.Cyan);
-                        break;
-
-                    case MenuEntry.DisableErrorReporting:
-                        Console.WriteLine("Writing values into the Registry...");
-                        Operations.DisableWinErrorReporting();
-                        break;
-
-                    case MenuEntry.DisableScheduledTasks:
-                        Operations.DisableScheduledTasks(Configuration.Instance.ScheduledTasksToDisable);
-                        Console.WriteLine("Some commands may fail, it's normal.");
-                        break;
-
-                    case MenuEntry.DisableWindowsTipsAndFeedback:
-                        Console.WriteLine("Writing values into the Registry...");
-                        Operations.DisableWindowsTipsAndFeedback();
-                        break;
-
-                    case MenuEntry.RemoveWindowsFeatures:
-                        Operations.RemoveWindowsFeatures(Configuration.Instance.WindowsFeaturesToRemove);
-                        Console.WriteLine("A system reboot is recommended.");
-                        break;
-
-                    case MenuEntry.Credits:
-                        // Credits are printed through GetMenuEntryExplanation(). We want to skip "Done" message in this case.
-                        return;
-
-                    case MenuEntry.Quit:
-                        exit = true;
-                        break;
-
-                    default:
-                        Console.WriteLine($"Unimplemented function: {entry.ToString()}");
-                        break;
-                }
+                IOperation operation = MenuUtils.GetOperationInstanceForMenuEntry(entry);
+                operation.PerformTask();
 
                 Console.Write("\nDone! ");
+                Console.WriteLine("Press a key to return to the main menu");
+                Console.ReadKey();
             }
             catch (Exception exc)
             {
                 ConsoleUtils.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
-            }
-
-            if (entry != MenuEntry.Quit)
-            {
-                Console.WriteLine("Press a key to return to the main menu");
-                Console.ReadKey();
             }
         }
 
@@ -202,7 +133,7 @@ namespace Win10BloatRemover
 
         private static void ExtractInstallWimTweak()
         {
-            var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Operations).Assembly);
+            var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
             File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak"));
         }
 

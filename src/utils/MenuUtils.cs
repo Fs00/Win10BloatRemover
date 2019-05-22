@@ -1,6 +1,7 @@
 ﻿using System;
+using Win10BloatRemover.Operations;
 
-namespace Win10BloatRemover
+namespace Win10BloatRemover.Utils
 {
     public enum MenuEntry
     {
@@ -10,6 +11,7 @@ namespace Win10BloatRemover
         RemoveOneDrive,
         RemoveServices,
         RemoveWindowsFeatures,
+        DisableTelemetry,
         DisableCortana,
         DisableAutoUpdates,
         DisableScheduledTasks,
@@ -63,50 +65,37 @@ namespace Win10BloatRemover
          */
         public static string GetMenuEntryDescription(MenuEntry entry)
         {
-            string description;
             switch (entry)
             {
                 case MenuEntry.RemoveUWPApps:
-                    description = "UWP apps removal";
-                    break;
+                    return "UWP apps removal";
                 case MenuEntry.RemoveWinDefender:
-                    description = "Windows Defender removal";
-                    break;
+                    return "Windows Defender removal";
                 case MenuEntry.RemoveMSEdge:
-                    description = "Microsoft Edge removal";
-                    break;
+                    return "Microsoft Edge removal";
                 case MenuEntry.RemoveOneDrive:
-                    description = "OneDrive removal";
-                    break;
+                    return "OneDrive removal";
                 case MenuEntry.RemoveWindowsFeatures:
-                    description = "Windows features removal";
-                    break;
+                    return "Windows features removal";
+                case MenuEntry.DisableTelemetry:
+                    return "Telemetry disabling";
                 case MenuEntry.DisableAutoUpdates:
-                    description = "Automatic Windows updates disabling";
-                    break;
+                    return "Automatic Windows updates disabling";
                 case MenuEntry.DisableCortana:
-                    description = "Cortana disabling";
-                    break;
+                    return "Cortana disabling";
                 case MenuEntry.RemoveServices:
-                    description = "Services and diagnostics removal";
-                    break;
+                    return "Miscellaneous services removal";
                 case MenuEntry.DisableScheduledTasks:
-                    description = "Useless scheduled tasks disabling";
-                    break;
+                    return "Useless scheduled tasks disabling";
                 case MenuEntry.DisableErrorReporting:
-                    description = "Windows Error Reporting disabling";
-                    break;
+                    return "Windows Error Reporting disabling";
                 case MenuEntry.DisableWindowsTipsAndFeedback:
-                    description = "Windows Tips and feedback requests disabling";
-                    break;
+                    return "Windows Tips and feedback requests disabling";
                 case MenuEntry.Quit:
-                    description = "Exit the application";
-                    break;
+                    return "Exit the application";
                 default:
-                    description = entry.ToString();
-                    break;
+                    return entry.ToString();
             }
-            return description;
         }
 
         public static string GetMenuEntryExplanation(MenuEntry entry)
@@ -118,51 +107,84 @@ namespace Win10BloatRemover
                     explanation = "The following groups of UWP apps will be removed:\n";
                     foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
-                    explanation += "Some specific app-related services will also be removed (but backed up in case you need to restore them).";
-                    break;
+                    return explanation + "Some specific app-related services will also be removed (but backed up in case you need to restore them).";
+
                 case MenuEntry.RemoveWinDefender:
-                    explanation = "Windows Defender menu icon will remain there, but the program won't start anymore.";
-                    break;
+                    return "Windows Defender menu icon will remain there, but the program won't start anymore.";
+
                 case MenuEntry.RemoveMSEdge:
-                    explanation = "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!";
-                    break;
+                    return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!";
+
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";
                     foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)
                         explanation += $"  {feature}\n";
-                    break;
+                    return explanation;
+
                 case MenuEntry.DisableCortana:
-                    explanation = "This won't remove Cortana (otherwise the system would break), it will only be disabled " +
-                                  "using Group Policy and blocked by the firewall.";
-                    break;
+                    return "This won't remove Cortana (otherwise the system would break), it will only be disabled " +
+                           "using Group Policy and blocked by the firewall.";
+
                 case MenuEntry.RemoveServices:
                     explanation = "The services starting with the following names will be removed:\n";
                     foreach (string service in Configuration.Instance.ServicesToRemove)
                         explanation += $"  {service}\n";
-                    explanation += "Services will be backed up in the same folder as this program executable.";
-                    break;
+                    return explanation + "Services will be backed up in the same folder as this program executable.";
+
                 case MenuEntry.DisableScheduledTasks:
                     explanation = "The following scheduled tasks will be disabled:\n";
                     foreach (string task in Configuration.Instance.ScheduledTasksToDisable)
                         explanation += $"  {task}\n";
-                    break;
+                    return explanation;
+
                 case MenuEntry.DisableAutoUpdates:
-                    explanation = "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
-                                  "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
-                    break;
+                    return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
+                           "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
+
                 case MenuEntry.Credits:
-                    explanation = "Developed by Fs00\n" +
-                                  "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +
-                                  "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n";
-                    break;
+                    return "Developed by Fs00\n" +
+                           "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +
+                           "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n";
+
                 case MenuEntry.Quit:
-                    explanation = "Are you sure?";
-                    break;
+                    return "Are you sure?";
+
                 default:
-                    explanation = string.Empty;
-                    break;
+                    return string.Empty;
             }
-            return explanation;
+        }
+
+        public static IOperation GetOperationInstanceForMenuEntry(MenuEntry entry)
+        {
+            switch (entry)
+            {
+                case MenuEntry.RemoveUWPApps:
+                    return new UWPAppRemover();
+                case MenuEntry.RemoveWinDefender:
+                    return new WindowsDefenderRemover();
+                case MenuEntry.RemoveMSEdge:
+                    return new EdgeRemover();
+                case MenuEntry.RemoveOneDrive:
+                    return new OneDriveRemover();
+                case MenuEntry.RemoveServices:
+                    return new MiscServicesRemover();
+                case MenuEntry.RemoveWindowsFeatures:
+                    return new FeaturesRemover();
+                case MenuEntry.DisableTelemetry:
+                    return new TelemetryDisabler();
+                case MenuEntry.DisableCortana:
+                    return new CortanaDisabler();
+                case MenuEntry.DisableAutoUpdates:
+                    return new AutoUpdatesDisabler();
+                case MenuEntry.DisableScheduledTasks:
+                    return new ScheduledTasksDisabler();
+                case MenuEntry.DisableErrorReporting:
+                    return new ErrorReportingDisabler();
+                case MenuEntry.DisableWindowsTipsAndFeedback:
+                    return new WindowsTipsDisabler();
+                default:
+                    throw new NotImplementedException($"Unimplemented operation: {entry.ToString()}");
+            }
         }
     }
 }

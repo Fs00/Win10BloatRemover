@@ -3,6 +3,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.IO;
 using System.Resources;
+using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
 {

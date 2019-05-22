@@ -43,14 +43,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Configuration.cs" />
-    <Compile Include="src\utils\ConsoleUtils.cs" />
-    <Compile Include="src\utils\MenuUtils.cs" />
+    <Compile Include="src\Operations\AutoUpdatesDisabler.cs" />
+    <Compile Include="src\Operations\CortanaDisabler.cs" />
+    <Compile Include="src\Operations\EdgeRemover.cs" />
+    <Compile Include="src\Operations\ErrorReportingDisabler.cs" />
+    <Compile Include="src\Operations\FeaturesRemover.cs" />
+    <Compile Include="src\Operations\IOperation.cs" />
+    <Compile Include="src\Operations\MiscServicesRemover.cs" />
+    <Compile Include="src\Operations\OneDriveRemover.cs" />
+    <Compile Include="src\Operations\ScheduledTasksDisabler.cs" />
+    <Compile Include="src\Operations\TelemetryDisabler.cs" />
+    <Compile Include="src\Operations\WindowsDefenderRemover.cs" />
+    <Compile Include="src\Operations\WindowsTipsDisabler.cs" />
+    <Compile Include="src\Utils\ConsoleUtils.cs" />
+    <Compile Include="src\Utils\MenuUtils.cs" />
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\ServiceRemover.cs" />
-    <Compile Include="src\utils\SystemUtils.cs" />
-    <Compile Include="src\Operations.cs" />
-    <Compile Include="src\UWPAppRemover.cs" />
+    <Compile Include="src\Utils\SystemUtils.cs" />
+    <Compile Include="src\Utils\OperationUtils.cs" />
+    <Compile Include="src\Operations\UWPAppRemover.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

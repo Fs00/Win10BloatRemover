@@ -2,6 +2,7 @@
 using System.IO;
 using System.Management.Automation;
 using Microsoft.Win32;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
 {

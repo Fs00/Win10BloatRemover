@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Win10BloatRemover.Utils;
 
-namespace Win10BloatRemover
+namespace Win10BloatRemover.Operations
 {
     public enum UWPAppGroup
     {
@@ -30,16 +31,8 @@ namespace Win10BloatRemover
         SnipAndSketch
     }
 
-    /**
-     *  UWPAppRemover
-     *  Removes the UWP which are passed into the constructor
-     *  Once removal is performed, the class instance can not be reused
-     */
-    class UWPAppRemover
+    class UWPAppRemover : IOperation
     {
-        private readonly UWPAppGroup[] appsToRemove;
-        private bool removalPerformed = false;
-
         // This dictionary contains the exact apps names corresponding to every group in the enum
         private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {
             { UWPAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
@@ -84,21 +77,18 @@ namespace Win10BloatRemover
             { UWPAppGroup.Zune, new[] {"Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
-        public UWPAppRemover(UWPAppGroup[] appsToRemove)
+        public void PerformTask()
         {
-            this.appsToRemove = appsToRemove;
+            PerformRemoval(Configuration.Instance.UWPAppsToRemove);
         }
 
-        public void PerformRemoval()
+        private void PerformRemoval(UWPAppGroup[] appsToRemove)
         {
-            if (removalPerformed)
-                throw new InvalidOperationException("Apps have been already removed!");
-
             using (PowerShell psInstance = PowerShell.Create())
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
-                    bool appUninstalled = false;
+                    bool atLeastOneAppUninstalled = false;
                     foreach (string appName in appNamesForGroup[appGroup])
                     {
                         // The following script uninstalls the specified app package for all users when it is found
@@ -122,37 +112,35 @@ namespace Win10BloatRemover
                         ConsoleUtils.WriteLine($"\nRemoving {appName} app...", ConsoleColor.Green);
                         psInstance.RunScriptAndPrintOutput(appRemovalScript);
 
-                        // Check if uninstall has been performed for at least one app of the group
-                        if (!appUninstalled)
-                            appUninstalled = psInstance.Runspace.SessionStateProxy.PSVariable.Get("package").Value.ToString() != "";
+                        if (!atLeastOneAppUninstalled)
+                            atLeastOneAppUninstalled = psInstance.GetVariable("package").IsNotEmpty();
                     }
 
-                    // Perform post-uninstall operations only if package removal was successful and at least one
-                    // app of the group has been uninstalled (avoids performing the tasks when app is not installed anymore)
-                    if (appUninstalled && psInstance.Streams.Error.Count == 0)
+                    // We check also if at least one app has been uninstalled to avoid
+                    // performing tasks when app is not installed anymore
+                    if (atLeastOneAppUninstalled && psInstance.Streams.Error.Count == 0)
                     {
                         Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
                         PerformPostUninstallOperations(appGroup);
                     }
                 }
             }
-            removalPerformed = true;
         }
 
         /**
          * Removes any eventual services, scheduled tasks and/or registry keys related to the specified app group.
-         * In certain cases this method is used to remove apps that can be removed only by using install-wim-tweak.
+         * In certain cases this method is used to remove certain apps that can be removed only by using install-wim-tweak.
          */
         private void PerformPostUninstallOperations(UWPAppGroup appGroup)
         {
             switch (appGroup)
             {
                 case UWPAppGroup.Mobile:
-                    Operations.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");  // Connect app
+                    OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");  // Connect app
                     break;
 
                 case UWPAppGroup.HelpAndFeedback:
-                    Operations.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport");
+                    OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport");
                     break;
 
                 case UWPAppGroup.Maps:

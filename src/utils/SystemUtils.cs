@@ -6,7 +6,7 @@ using System.Management.Automation.Runspaces;
 using System.Security.Principal;
 using Microsoft.Win32;
 
-namespace Win10BloatRemover
+namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
@@ -27,7 +27,7 @@ namespace Win10BloatRemover
             psWarningMessagesRead = 0;
             psErrorMessagesRead = 0;
 
-            // Needed to make counters match the actual number of messages in the streams
+            // Make our counters match the actual number of messages in the streams
             psInstance.Streams.ClearStreams();
 
             // Make sure that the Runspace uses the current thread to execute commands (avoids wild thread spawning)
@@ -65,6 +65,16 @@ namespace Win10BloatRemover
             psInstance.Invoke();
             // Clear PowerShell pipeline to avoid the script being re-executed the next time we use this instance
             psInstance.Commands.Clear();
+        }
+
+        public static PSVariable GetVariable(this PowerShell psInstance, string name)
+        {
+            return psInstance.Runspace.SessionStateProxy.PSVariable.Get(name);
+        }
+
+        public static bool IsNotEmpty(this PSVariable psVariable)
+        {
+            return psVariable.Value.ToString() != "";
         }
 
         /**

@@ -17,6 +17,7 @@ namespace Win10BloatRemover.Utils
         DisableScheduledTasks,
         DisableErrorReporting,
         DisableWindowsTipsAndFeedback,
+        OpenGitHubIssue,
         Credits,
         Quit
     }
@@ -91,6 +92,8 @@ namespace Win10BloatRemover.Utils
                     return "Windows Error Reporting disabling";
                 case MenuEntry.DisableWindowsTipsAndFeedback:
                     return "Windows Tips and feedback requests disabling";
+                case MenuEntry.OpenGitHubIssue:
+                    return "Report an issue/Suggest a feature";
                 case MenuEntry.Quit:
                     return "Exit the application";
                 default:
@@ -107,7 +110,8 @@ namespace Win10BloatRemover.Utils
                     explanation = "The following groups of UWP apps will be removed:\n";
                     foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
-                    return explanation + "Some specific app-related services will also be removed (but backed up in case you need to restore them).";
+                    return explanation + "Some specific app-related services will also be removed " +
+                            "(but backed up in case you need to restore them).";
 
                 case MenuEntry.RemoveWinDefender:
                     return "Windows Defender menu icon will remain there, but the program won't start anymore.";
@@ -137,9 +141,14 @@ namespace Win10BloatRemover.Utils
                         explanation += $"  {task}\n";
                     return explanation;
 
+                case MenuEntry.OpenGitHubIssue:
+                    return "Your browser will now open on a GitHub page where you will be able to " +
+                           "open an issue to report a bug or suggest a new feature.";
+
                 case MenuEntry.DisableAutoUpdates:
                     return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
-                           "This method won't work on Windows 10 Home. On that version, disable Windows Update service using msconfig instead.";
+                           "This method won't work on Windows 10 Home. " +
+                           "On that version, disable Windows Update service using msconfig instead.";
 
                 case MenuEntry.Credits:
                     return "Developed by Fs00\n" +
@@ -182,6 +191,8 @@ namespace Win10BloatRemover.Utils
                     return new ErrorReportingDisabler();
                 case MenuEntry.DisableWindowsTipsAndFeedback:
                     return new WindowsTipsDisabler();
+                case MenuEntry.OpenGitHubIssue:
+                    return new BrowserOpener();
                 default:
                     throw new NotImplementedException($"Unimplemented operation: {entry.ToString()}");
             }

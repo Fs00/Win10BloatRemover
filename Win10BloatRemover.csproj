@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="src\Configuration.cs" />
     <Compile Include="src\Operations\AutoUpdatesDisabler.cs" />
+    <Compile Include="src\Operations\BrowserOpener.cs" />
     <Compile Include="src\Operations\CortanaDisabler.cs" />
     <Compile Include="src\Operations\EdgeRemover.cs" />
     <Compile Include="src\Operations\ErrorReportingDisabler.cs" />

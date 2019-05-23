@@ -31,7 +31,8 @@ namespace Win10BloatRemover.Operations
 
         /**
          *  Additional tasks to disable telemetry-related features
-         *  Include blocking of CompatTelRunner, Inventory (collection of installed programs), Steps Recorder, Compatibility Assistant
+         *  Include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
+         *   Steps Recorder, Compatibility Assistant
          */
         private void DisableTelemetryFeaturesViaRegistryEdits()
         {
@@ -48,6 +49,9 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
                    @"Image File Execution Options\CompatTelRunner.exe"))
+                key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
+                   @"Image File Execution Options\DeviceCensus.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
         }
     }

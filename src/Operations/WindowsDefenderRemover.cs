@@ -44,15 +44,9 @@ namespace Win10BloatRemover.Operations
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
                 key.DeleteValue("SecurityHealth", false);
 
-            // It seems that this key can't be retrieved inside this program, neither via .NET API nor via CMD (permissions needed? API bug?)
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", true))
-            {
-                if (key != null)
-                    key.DeleteValue("SecurityHealth", false);
-                else
-                    ConsoleUtils.WriteLine(@"Remember to execute manually command ""reg delete HKLM\SOFTWARE\Microsoft\Windows\" +
-                                           @"CurrentVersion\Explorer\StartupApproved\Run /v SecurityHealth /f""", ConsoleColor.DarkYellow);
-            }
+            using (var localMachine64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            using (RegistryKey key = localMachine64.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", true))
+                key.DeleteValue("SecurityHealth", false);
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
                    @"Image File Execution Options\SecHealthUI.exe"))

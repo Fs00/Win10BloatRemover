@@ -150,6 +150,15 @@ namespace Win10BloatRemover.Utils
                            "This method won't work on Windows 10 Home. " +
                            "On that version, disable Windows Update service using msconfig instead.";
 
+                case MenuEntry.DisableTelemetry:
+                    return "This will backup and remove several telemetry-related services and disable features that " +
+                           "report data to Microsoft, including MS Compatibility Telemetry, Device Census, " +
+                           "SmartScreen, Steps Recorder and Compatibility Assistant.";
+
+                case MenuEntry.DisableErrorReporting:
+                    return "Windows Error Reporting will disabled by editing Group Policies, as well as by removing " +
+                           "its services (after backing them up).";
+
                 case MenuEntry.Credits:
                     return "Developed by Fs00\n" +
                            "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +

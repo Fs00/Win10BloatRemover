@@ -26,13 +26,15 @@ namespace Win10BloatRemover.Operations
         private void RemoveTelemetryServices()
         {
             ConsoleUtils.WriteLine("Backing up and removing telemetry services...", ConsoleColor.Green);
-            new ServiceRemover(TELEMETRY_SERVICES).PerformBackup().PerformRemoval();
+            new ServiceRemover(TELEMETRY_SERVICES)
+                .PerformBackup()
+                .PerformRemoval();
         }
 
         /**
          *  Additional tasks to disable telemetry-related features
          *  Include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
-         *   Steps Recorder, Compatibility Assistant
+         *   SmartScreen, Steps Recorder, Compatibility Assistant
          */
         private void DisableTelemetryFeaturesViaRegistryEdits()
         {

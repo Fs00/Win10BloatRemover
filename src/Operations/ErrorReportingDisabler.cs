@@ -26,7 +26,9 @@ namespace Win10BloatRemover.Operations
         private void RemoveErrorReportingServices()
         {
             ConsoleUtils.WriteLine("Backing up and removing error reporting services...", ConsoleColor.Green);
-            new ServiceRemover(ERROR_REPORTING_SERVICES).PerformBackup().PerformRemoval();
+            new ServiceRemover(ERROR_REPORTING_SERVICES)
+                .PerformBackup()
+                .PerformRemoval();
         }
     }
 }

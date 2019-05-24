@@ -54,7 +54,9 @@
     "\\Microsoft\\Windows\\Subscription\\EnableLicenseAcquisition",
     "\\Microsoft\\Windows\\Subscription\\LicenseAcquisition",
     "\\Microsoft\\Windows\\SettingSync\\BackgroundUploadTask",
-    "\\Microsoft\\Windows\\SettingSync\\NetworkStateChangeTask"
+    "\\Microsoft\\Windows\\SettingSync\\NetworkStateChangeTask",
+    "\\Microsoft\\Windows\\Diagnosis\\Scheduled",
+    "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo"
   ],
   "WindowsFeaturesToRemove": [
     "InternetExplorer-Optional-Package",

@@ -87,7 +87,7 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.RemoveServices:
                     return "Miscellaneous services removal";
                 case MenuEntry.DisableScheduledTasks:
-                    return "Useless scheduled tasks disabling";
+                    return "Miscellaneous scheduled tasks disabling";
                 case MenuEntry.DisableErrorReporting:
                     return "Windows Error Reporting disabling";
                 case MenuEntry.DisableWindowsTipsAndFeedback:

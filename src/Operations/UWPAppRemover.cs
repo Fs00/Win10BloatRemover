@@ -146,7 +146,8 @@ namespace Win10BloatRemover.Operations
                 case UWPAppGroup.Maps:
                     Console.WriteLine("Removing app-related services...");
                     new ServiceRemover(new[] { "MapsBroker", "lfsvc" }).PerformBackup().PerformRemoval();
-                    SystemUtils.ExecuteWindowsCommand(@"schtasks /Change /TN ""\Microsoft\Windows\Maps\MapsUpdateTask"" /disable");
+                    SystemUtils.ExecuteWindowsCommand(@"schtasks /Change /TN ""\Microsoft\Windows\Maps\MapsUpdateTask"" /disable & " +
+                                                      @"schtasks /Change /TN ""\Microsoft\Windows\Maps\MapsToastTask"" /disable");
                     break;
 
                 case UWPAppGroup.Messaging:
@@ -158,6 +159,16 @@ namespace Win10BloatRemover.Operations
                 case UWPAppGroup.People:
                     Console.WriteLine("Removing app-related services...");
                     new ServiceRemover(new[] { "OneSyncSvc" }).PerformBackup().PerformRemoval();
+                    break;
+
+                case UWPAppGroup.Paint3D:
+                    Console.WriteLine("Removing Paint 3D context menu entries...");
+                    SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
+                                                      @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " + 
+                                                      @"do (reg delete ""%I"" /f )");
+                    SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
+                                                      @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
+                                                      @"do (reg delete ""%I"" /f )");
                     break;
 
                 case UWPAppGroup.Xbox:

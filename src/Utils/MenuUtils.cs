@@ -177,7 +177,7 @@ namespace Win10BloatRemover.Utils
             switch (entry)
             {
                 case MenuEntry.RemoveUWPApps:
-                    return new UWPAppRemover();
+                    return new UWPAppRemover(Configuration.Instance.UWPAppsToRemove);
                 case MenuEntry.RemoveWinDefender:
                     return new WindowsDefenderRemover();
                 case MenuEntry.RemoveMSEdge:
@@ -185,9 +185,9 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.RemoveOneDrive:
                     return new OneDriveRemover();
                 case MenuEntry.RemoveServices:
-                    return new MiscServicesRemover();
+                    return new ServiceRemover(Configuration.Instance.ServicesToRemove);
                 case MenuEntry.RemoveWindowsFeatures:
-                    return new FeaturesRemover();
+                    return new FeaturesRemover(Configuration.Instance.WindowsFeaturesToRemove);
                 case MenuEntry.DisableTelemetry:
                     return new TelemetryDisabler();
                 case MenuEntry.DisableCortana:
@@ -195,13 +195,13 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.DisableAutoUpdates:
                     return new AutoUpdatesDisabler();
                 case MenuEntry.DisableScheduledTasks:
-                    return new ScheduledTasksDisabler();
+                    return new ScheduledTasksDisabler(Configuration.Instance.ScheduledTasksToDisable);
                 case MenuEntry.DisableErrorReporting:
                     return new ErrorReportingDisabler();
                 case MenuEntry.DisableWindowsTipsAndFeedback:
                     return new WindowsTipsDisabler();
                 case MenuEntry.OpenGitHubIssue:
-                    return new BrowserOpener();
+                    return new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
                 default:
                     throw new NotImplementedException($"Unimplemented operation: {entry.ToString()}");
             }

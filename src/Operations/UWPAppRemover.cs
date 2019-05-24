@@ -77,12 +77,14 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Zune, new[] {"Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
-        public void PerformTask()
+        private readonly UWPAppGroup[] appsToRemove;
+
+        public UWPAppRemover(UWPAppGroup[] appsToRemove)
         {
-            PerformRemoval(Configuration.Instance.UWPAppsToRemove);
+            this.appsToRemove = appsToRemove;
         }
 
-        private void PerformRemoval(UWPAppGroup[] appsToRemove)
+        public void PerformTask()
         {
             using (PowerShell psInstance = PowerShell.Create())
             {
@@ -145,9 +147,11 @@ namespace Win10BloatRemover.Operations
 
                 case UWPAppGroup.Maps:
                     Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "MapsBroker", "lfsvc" }).PerformBackup().PerformRemoval();
-                    SystemUtils.ExecuteWindowsCommand(@"schtasks /Change /TN ""\Microsoft\Windows\Maps\MapsUpdateTask"" /disable & " +
-                                                      @"schtasks /Change /TN ""\Microsoft\Windows\Maps\MapsToastTask"" /disable");
+                    new ServiceRemover(new[] { "MapsBroker", "lfsvc" })
+                        .PerformBackup()
+                        .PerformRemoval();
+                    new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask" })
+                        .PerformTask();
                     break;
 
                 case UWPAppGroup.Messaging:
@@ -158,7 +162,9 @@ namespace Win10BloatRemover.Operations
                 case UWPAppGroup.MailAndCalendar:
                 case UWPAppGroup.People:
                     Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "OneSyncSvc" }).PerformBackup().PerformRemoval();
+                    new ServiceRemover(new[] { "OneSyncSvc" })
+                        .PerformBackup()
+                        .PerformRemoval();
                     break;
 
                 case UWPAppGroup.Paint3D:
@@ -176,8 +182,8 @@ namespace Win10BloatRemover.Operations
                     new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" })
                         .PerformBackup()
                         .PerformRemoval();
-                    SystemUtils.ExecuteWindowsCommand(@"schtasks /Change /TN ""Microsoft\XblGameSave\XblGameSaveTask"" /disable & " +
-                                                      @"schtasks /Change /TN ""Microsoft\XblGameSave\XblGameSaveTaskLogon"" /disable");
+                    new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask", @"Microsoft\XblGameSave\XblGameSaveTaskLogon" })
+                        .PerformTask();
                     using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
                         key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
                     break;

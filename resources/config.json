@@ -52,7 +52,9 @@
     "\\Microsoft\\Windows\\Shell\\FamilySafetyMonitorToastTask",
     "\\Microsoft\\Windows\\Shell\\FamilySafetyRefreshTask",
     "\\Microsoft\\Windows\\Subscription\\EnableLicenseAcquisition",
-    "\\Microsoft\\Windows\\Subscription\\LicenseAcquisition"
+    "\\Microsoft\\Windows\\Subscription\\LicenseAcquisition",
+    "\\Microsoft\\Windows\\SettingSync\\BackgroundUploadTask",
+    "\\Microsoft\\Windows\\SettingSync\\NetworkStateChangeTask"
   ],
   "WindowsFeaturesToRemove": [
     "InternetExplorer-Optional-Package",

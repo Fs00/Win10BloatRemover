@@ -6,10 +6,17 @@ namespace Win10BloatRemover.Operations
 {
     class FeaturesRemover : IOperation
     {
+        private readonly string[] featuresToRemove;
+
+        public FeaturesRemover(string[] featuresToRemove)
+        {
+            this.featuresToRemove = featuresToRemove;
+        }
+
         public void PerformTask()
         {
             string removalScript = "";
-            foreach (string featureName in Configuration.Instance.WindowsFeaturesToRemove)
+            foreach (string featureName in featuresToRemove)
             {
                 removalScript += $"$feature = Get-WindowsPackage -Online -PackageName *{featureName}*;" +
                                  "if ($feature) {" +

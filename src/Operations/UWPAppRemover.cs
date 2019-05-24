@@ -172,6 +172,10 @@ namespace Win10BloatRemover.Operations
                     SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
                                                       @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " + 
                                                       @"do (reg delete ""%I"" /f )");
+                    break;
+
+                case UWPAppGroup.MixedReality:
+                    Console.WriteLine("Removing 3D Print context menu entries...");
                     SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
                                                       @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
                                                       @"do (reg delete ""%I"" /f )");

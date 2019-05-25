@@ -77,6 +77,18 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Zune, new[] {"Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
+        private static readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
+            { UWPAppGroup.Mobile, () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package") },  // Connect app
+            { UWPAppGroup.HelpAndFeedback, () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport") },
+            { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
+            { UWPAppGroup.Messaging, RemoveMessagingService },
+            { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntry },
+            { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntry },
+            { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
+            { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
+            { UWPAppGroup.People, RemoveMailAndPeopleService }
+        };
+
         private readonly UWPAppGroup[] appsToRemove;
 
         public UWPAppRemover(UWPAppGroup[] appsToRemove)
@@ -135,67 +147,67 @@ namespace Win10BloatRemover.Operations
          */
         private void PerformPostUninstallOperations(UWPAppGroup appGroup)
         {
-            switch (appGroup)
-            {
-                case UWPAppGroup.Mobile:
-                    OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package");  // Connect app
-                    break;
+            if (postUninstallOperationsForGroup.ContainsKey(appGroup))
+                postUninstallOperationsForGroup[appGroup]();
+            else
+                Console.WriteLine("Nothing to do.");
+        }
 
-                case UWPAppGroup.HelpAndFeedback:
-                    OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport");
-                    break;
+        private static void RemoveMapsServicesAndTasks()
+        {
+            Console.WriteLine("Removing app-related services and scheduled tasks...");
+            new ServiceRemover(new[] { "MapsBroker", "lfsvc" })
+                .PerformBackup()
+                .PerformRemoval();
 
-                case UWPAppGroup.Maps:
-                    Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "MapsBroker", "lfsvc" })
-                        .PerformBackup()
-                        .PerformRemoval();
-                    new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask" })
-                        .PerformTask();
-                    break;
+            new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask" })
+                .PerformTask();
+        }
 
-                case UWPAppGroup.Messaging:
-                    Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "MessagingService" }).PerformBackup().PerformRemoval();
-                    break;
+        private static void RemoveXboxServicesAndTasks()
+        {
+            Console.WriteLine("Removing app-related services and scheduled tasks...");
+            new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" })
+                .PerformBackup()
+                .PerformRemoval();
 
-                case UWPAppGroup.MailAndCalendar:
-                case UWPAppGroup.People:
-                    Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "OneSyncSvc" })
-                        .PerformBackup()
-                        .PerformRemoval();
-                    break;
+            new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask", @"Microsoft\XblGameSave\XblGameSaveTaskLogon" })
+                .PerformTask();
 
-                case UWPAppGroup.Paint3D:
-                    Console.WriteLine("Removing Paint 3D context menu entries...");
-                    SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
-                                                      @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " + 
-                                                      @"do (reg delete ""%I"" /f )");
-                    break;
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
+                key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
+        }
 
-                case UWPAppGroup.MixedReality:
-                    Console.WriteLine("Removing 3D Print context menu entries...");
-                    SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
-                                                      @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
-                                                      @"do (reg delete ""%I"" /f )");
-                    break;
+        private static void RemoveMessagingService()
+        {
+            Console.WriteLine("Removing app-related services...");
+            new ServiceRemover(new[] { "MessagingService" })
+                .PerformBackup()
+                .PerformRemoval();
+        }
 
-                case UWPAppGroup.Xbox:
-                    Console.WriteLine("Removing app-related services...");
-                    new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" })
-                        .PerformBackup()
-                        .PerformRemoval();
-                    new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask", @"Microsoft\XblGameSave\XblGameSaveTaskLogon" })
-                        .PerformTask();
-                    using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
-                        key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
-                    break;
+        private static void RemovePaint3DContextMenuEntry()
+        {
+            Console.WriteLine("Removing Paint 3D context menu entries...");
+            SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
+                                              @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " +
+                                              @"do (reg delete ""%I"" /f )");
+        }
 
-                default:
-                    Console.WriteLine("Nothing to do.");
-                    break;
-            }
+        private static void RemovePrint3DContextMenuEntry()
+        {
+            Console.WriteLine("Removing 3D Print context menu entries...");
+            SystemUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
+                                              @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
+                                              @"do (reg delete ""%I"" /f )");
+        }
+
+        private static void RemoveMailAndPeopleService()
+        {
+            Console.WriteLine("Removing app-related services...");
+            new ServiceRemover(new[] { "OneSyncSvc" })
+                .PerformBackup()
+                .PerformRemoval();
         }
     }
 }

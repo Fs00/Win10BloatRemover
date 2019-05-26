@@ -28,7 +28,8 @@ namespace Win10BloatRemover.Operations
         Photos,
         AlarmsAndClock,
         Calculator,
-        SnipAndSketch
+        SnipAndSketch,
+        Store
     }
 
     class UWPAppRemover : IOperation
@@ -64,6 +65,12 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.SkreenSketch" } },
             { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
             { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
+            { UWPAppGroup.Store, new[] {
+                    "Microsoft.WindowsStore",
+                    "Microsoft.StorePurchaseApp",
+                    "Microsoft.Services.Store.Engagement",
+                }
+            },
             { UWPAppGroup.Xbox, new[] {
                     "Microsoft.XboxGameCallableUI",
                     "Microsoft.XboxSpeechToTextOverlay",
@@ -78,15 +85,22 @@ namespace Win10BloatRemover.Operations
         };
 
         private static readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
-            { UWPAppGroup.Mobile, () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package") },  // Connect app
-            { UWPAppGroup.HelpAndFeedback, () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport") },
+            {
+                UWPAppGroup.Mobile,
+                () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package")   // Connect app
+            },
+            {
+                UWPAppGroup.HelpAndFeedback,
+                () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport")
+            },
             { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UWPAppGroup.Messaging, RemoveMessagingService },
             { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntry },
             { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntry },
             { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
             { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
-            { UWPAppGroup.People, RemoveMailAndPeopleService }
+            { UWPAppGroup.People, RemoveMailAndPeopleService },
+            { UWPAppGroup.Store, RemoveStoreFeaturesAndServices }
         };
 
         private readonly UWPAppGroup[] appsToRemove;
@@ -160,8 +174,10 @@ namespace Win10BloatRemover.Operations
                 .PerformBackup()
                 .PerformRemoval();
 
-            new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask" })
-                .PerformTask();
+            new ScheduledTasksDisabler(new[] {
+                @"\Microsoft\Windows\Maps\MapsUpdateTask",
+                @"\Microsoft\Windows\Maps\MapsToastTask"
+            }).PerformTask();
         }
 
         private static void RemoveXboxServicesAndTasks()
@@ -171,8 +187,10 @@ namespace Win10BloatRemover.Operations
                 .PerformBackup()
                 .PerformRemoval();
 
-            new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask", @"Microsoft\XblGameSave\XblGameSaveTaskLogon" })
-                .PerformTask();
+            new ScheduledTasksDisabler(new[] {
+                @"Microsoft\XblGameSave\XblGameSaveTask",
+                @"Microsoft\XblGameSave\XblGameSaveTaskLogon"
+            }).PerformTask();
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
                 key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
@@ -206,6 +224,31 @@ namespace Win10BloatRemover.Operations
         {
             Console.WriteLine("Removing app-related services...");
             new ServiceRemover(new[] { "OneSyncSvc" })
+                .PerformBackup()
+                .PerformRemoval();
+        }
+
+        private static void RemoveStoreFeaturesAndServices()
+        {
+            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContentDeliveryManager");
+            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Store");
+
+            Console.WriteLine("Writing values into the Registry...");
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\WindowsStore"))
+            {
+                key.SetValue("RemoveWindowsStore", 1, RegistryValueKind.DWord);
+                key.SetValue("DisableStoreApps", 1, RegistryValueKind.DWord);
+            }
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\PushToInstall"))
+                key.SetValue("DisablePushToInstall", 1, RegistryValueKind.DWord);
+
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"))
+                key.SetValue("SilentInstalledAppsEnabled", 0, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AppHost"))
+                key.SetValue("EnableWebContentEvaluation", 0, RegistryValueKind.DWord);
+
+            Console.WriteLine("Removing app-related services...");
+            new ServiceRemover(new[] { "PushToInstall" })
                 .PerformBackup()
                 .PerformRemoval();
         }

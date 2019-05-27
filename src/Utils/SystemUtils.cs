@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Security.Principal;
 using Microsoft.Win32;
 
@@ -10,130 +8,53 @@ namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
-        // These counters keep track of the number of messages written for every PowerShell stream
-        // That's a workaround to avoid messages being rewritten due to DataAdded event raised more than once
-        // for the same message (which is likely a bug in the API)
-        private static int psInformationMessagesRead = 0,
-                           psWarningMessagesRead = 0,
-                           psErrorMessagesRead = 0;
-
-        /**
-        *  Runs a script on the given PowerShell instance and prints the messages written to info,
-        *  error and warning streams asynchronously.
-        */
-        public static void RunScriptAndPrintOutput(this PowerShell psInstance, string script)
-        {
-            psInformationMessagesRead = 0;
-            psWarningMessagesRead = 0;
-            psErrorMessagesRead = 0;
-
-            // Make our counters match the actual number of messages in the streams
-            psInstance.Streams.ClearStreams();
-
-            // Make sure that the Runspace uses the current thread to execute commands (avoids wild thread spawning)
-            if (psInstance.Runspace.ThreadOptions != PSThreadOptions.UseCurrentThread)
-            {
-                psInstance.Runspace.Dispose();
-                psInstance.Runspace = RunspaceFactory.CreateRunspace();
-                psInstance.Runspace.ThreadOptions = PSThreadOptions.UseCurrentThread;
-                psInstance.Runspace.Open();
-            }
-
-            psInstance.AddScript(script);
-            psInstance.Streams.Information.DataAdded += (s, evtArgs) => {
-                if (evtArgs.Index >= psInformationMessagesRead)
-                {
-                    Console.WriteLine(psInstance.Streams.Information[evtArgs.Index].ToString());
-                    psInformationMessagesRead++;
-                }
-            };
-            psInstance.Streams.Error.DataAdded += (s, evtArgs) => {
-                if (evtArgs.Index >= psErrorMessagesRead)
-                {
-                    ConsoleUtils.WriteLine(psInstance.Streams.Error[evtArgs.Index].ToString(), ConsoleColor.Red);
-                    psErrorMessagesRead++;
-                }
-            };
-            psInstance.Streams.Warning.DataAdded += (s, evtArgs) => {
-                if (evtArgs.Index >= psWarningMessagesRead)
-                {
-                    ConsoleUtils.WriteLine(psInstance.Streams.Warning[evtArgs.Index].ToString(), ConsoleColor.DarkYellow);
-                    psWarningMessagesRead++;
-                }
-            };
-
-            psInstance.Invoke();
-            // Clear PowerShell pipeline to avoid the script being re-executed the next time we use this instance
-            psInstance.Commands.Clear();
-        }
-
-        public static PSVariable GetVariable(this PowerShell psInstance, string name)
-        {
-            return psInstance.Runspace.SessionStateProxy.PSVariable.Get(name);
-        }
-
-        public static bool IsNotEmpty(this PSVariable psVariable)
-        {
-            return psVariable.Value.ToString() != "";
-        }
-
-        /**
-         *  Extension method to be used on a running process
-         *  Prints synchronously all the content of StandardOutput and StandardError of the process
-         *  It locks the thread until the process stops writing on those streams (usually until its end)
-         */
-        public static void PrintOutputAndErrors(this Process process)
+        // This method locks the thread until the process stops writing on those streams (usually until its end)
+        public static void PrintSynchronouslyOutputAndErrors(this Process process)
         {
             Console.Write(process.StandardOutput.ReadToEnd());
             ConsoleUtils.Write(process.StandardError.ReadToEnd(), ConsoleColor.Red);
         }
 
-        /**
-         *  Runs a given process in the same terminal, redirecting its standard output/error and returning its Process instance
-         *  Can optionally add callbacks to the Process instance for printing its messages asynchronously;
-         *  they won't be printed until Begin[Output/Error]ReadLine() is called on the returned instance.
-         */
-        public static Process RunProcess(string name, string args, bool asyncMessagePrinting = false)
+        public static Process RunProcess(string name, string args)
         {
-            var process = new Process();
-            process.StartInfo = new ProcessStartInfo {
-                FileName = name,
-                Arguments = args,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            if (asyncMessagePrinting)
-            {
-                process.OutputDataReceived += (s, e) => {
-                    if (!string.IsNullOrEmpty(e.Data))
-                        Console.WriteLine(e.Data);
-                };
-                process.ErrorDataReceived += (s, e) => {
-                    if (!string.IsNullOrEmpty(e.Data))
-                        ConsoleUtils.WriteLine(e.Data, ConsoleColor.Red);
-                };
-            }
-
+            var process = CreateProcessInstance(name, args);
             process.Start();
             return process;
         }
 
-        /**
-         *  Executes a CMD command synchronously
-         *  Output and errors are printed asynchronously
-         */
-        public static void ExecuteWindowsCommand(string command)
+        public static Process RunProcessWithAsyncOutputPrinting(string name, string args)
         {
-            Debug.WriteLine($"Command executed: {command}");
-            using (var cmdProcess = RunProcess("cmd.exe", $"/c \"{command}\"", true))
+            var process = CreateProcessInstance(name, args);
+
+            process.OutputDataReceived += (_, evt) => {
+                if (!string.IsNullOrEmpty(evt.Data))
+                    Console.WriteLine(evt.Data);
+            };
+            process.ErrorDataReceived += (_, evt) => {
+                if (!string.IsNullOrEmpty(evt.Data))
+                    ConsoleUtils.WriteLine(evt.Data, ConsoleColor.Red);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            return process;
+        }
+
+        private static Process CreateProcessInstance(string name, string args)
+        {
+            return new Process
             {
-                cmdProcess.BeginOutputReadLine();
-                cmdProcess.BeginErrorReadLine();
-                cmdProcess.WaitForExit();
-            }
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = name,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
         }
 
         /**

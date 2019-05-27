@@ -21,7 +21,7 @@ namespace Win10BloatRemover.Operations
         private void KillOneDriveProcess()
         {
             Console.WriteLine("Killing OneDrive process...");
-            SystemUtils.ExecuteWindowsCommand("taskkill /F /IM onedrive.exe");
+            ShellUtils.ExecuteWindowsCommand("taskkill /F /IM onedrive.exe");
         }
 
         private string RetrieveOneDriveUninstallerPath()
@@ -37,7 +37,7 @@ namespace Win10BloatRemover.Operations
             Console.WriteLine("Executing OneDrive uninstaller...");
             using (var oneDriveUninstallProcess = SystemUtils.RunProcess(uninstallerPath, "/uninstall"))
             {
-                oneDriveUninstallProcess.PrintOutputAndErrors();
+                oneDriveUninstallProcess.PrintSynchronouslyOutputAndErrors();
                 oneDriveUninstallProcess.WaitForExit();
 
                 if (oneDriveUninstallProcess.ExitCode != 0)

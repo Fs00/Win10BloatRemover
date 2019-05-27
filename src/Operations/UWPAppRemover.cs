@@ -116,6 +116,8 @@ namespace Win10BloatRemover.Operations
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
+                    ConsoleUtils.WriteLine($"Removing {appGroup.ToString()} app(s)...", ConsoleColor.Green);
+
                     bool atLeastOneAppUninstalled = false;
                     foreach (string appName in appNamesForGroup[appGroup])
                     {
@@ -124,21 +126,21 @@ namespace Win10BloatRemover.Operations
                         string appRemovalScript =
                             $"$package = Get-AppxPackage -AllUsers -Name \"{appName}\";" +
                             "if ($package) {" +
-                                $"Write-Host \"Removing app $($package.Name)...\";" +
-                                "Remove-AppxPackage -AllUsers $package;" +
-                                "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq $package.Name};" +
+                                $"Write-Host \"Removing app {appName}...\";" +
+                                "$package | Remove-AppxPackage -AllUsers;" +
+                                "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"" + appName + "\"};" +
                                 "if ($provisionedPackage) {" +
-                                    "Write-Host \"Removing provisioned package for app $($package.Name)...\";" +
+                                    $"Write-Host \"Removing provisioned package for app {appName}...\";" +
                                     "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
                                 "}" +
-                                "else { Write-Host \"No provisioned package found for app $($package.Name)\"; }" +
+                                "else { Write-Host \"No provisioned package found for app " + appName + "\"; }" +
                             "}" +
                             "else {" +
                                 $"Write-Host \"App {appName} is not installed.\";" +
                             "}";
 
-                        ConsoleUtils.WriteLine($"\nRemoving {appName} app...", ConsoleColor.Green);
                         psInstance.RunScriptAndPrintOutput(appRemovalScript);
+                        Console.WriteLine();
 
                         if (!atLeastOneAppUninstalled)
                             atLeastOneAppUninstalled = psInstance.GetVariable("package").IsNotEmpty();

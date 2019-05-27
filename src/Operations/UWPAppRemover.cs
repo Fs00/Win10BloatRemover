@@ -95,8 +95,8 @@ namespace Win10BloatRemover.Operations
             },
             { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UWPAppGroup.Messaging, RemoveMessagingService },
-            { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntry },
-            { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntry },
+            { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
+            { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntries },
             { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
             { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
             { UWPAppGroup.People, RemoveMailAndPeopleService },
@@ -206,18 +206,18 @@ namespace Win10BloatRemover.Operations
                 .PerformRemoval();
         }
 
-        private static void RemovePaint3DContextMenuEntry()
+        private static void RemovePaint3DContextMenuEntries()
         {
             Console.WriteLine("Removing Paint 3D context menu entries...");
-            ShellUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
+            ShellUtils.ExecuteWindowsCommand(@"echo off & for /f ""tokens=1* delims="" %I in " +
                                               @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " +
                                              @"do (reg delete ""%I"" /f )");
         }
 
-        private static void RemovePrint3DContextMenuEntry()
+        private static void RemovePrint3DContextMenuEntries()
         {
             Console.WriteLine("Removing 3D Print context menu entries...");
-            ShellUtils.ExecuteWindowsCommand(@"for /f ""tokens=1* delims="" %I in " +
+            ShellUtils.ExecuteWindowsCommand(@"echo off & for /f ""tokens=1* delims="" %I in " +
                                               @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
                                              @"do (reg delete ""%I"" /f )");
         }

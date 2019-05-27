@@ -117,13 +117,14 @@ namespace Win10BloatRemover
                 operation.PerformTask();
 
                 Console.Write("\nDone! ");
-                Console.WriteLine("Press a key to return to the main menu");
-                Console.ReadKey();
             }
             catch (Exception exc)
             {
                 ConsoleUtils.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
             }
+
+            Console.WriteLine("Press a key to return to the main menu");
+            Console.ReadKey();
         }
 
         private static bool DependenciesAreMissing()

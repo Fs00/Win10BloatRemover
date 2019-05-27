@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
@@ -16,7 +15,7 @@ namespace Win10BloatRemover.Operations
 
         private void DisableErrorReportingViaRegistryEdits()
         {
-            ConsoleUtils.WriteLine("Writing values into the Registry...", ConsoleColor.Green);
+            Console.WriteLine("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting"))
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\Windows Error Reporting"))
@@ -25,7 +24,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveErrorReportingServices()
         {
-            ConsoleUtils.WriteLine("Backing up and removing error reporting services...", ConsoleColor.Green);
+            Console.WriteLine("Backing up and removing error reporting services...");
             new ServiceRemover(ERROR_REPORTING_SERVICES)
                 .PerformBackup()
                 .PerformRemoval();

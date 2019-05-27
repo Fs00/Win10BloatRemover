@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
@@ -13,14 +14,17 @@ namespace Win10BloatRemover.Operations
             "PcaSvc"
         };
 
+        private static readonly string[] PROTECTED_TELEMETRY_SERVICES = new[] {
+            "DPS",
+            "WdiSystemHost",
+            "WdiServiceHost"
+        };
+
         public void PerformTask()
         {
             RemoveTelemetryServices();
             ConsoleUtils.WriteLine("Performing some registry edits to disable telemetry-related features...", ConsoleColor.Green);
             DisableTelemetryFeaturesViaRegistryEdits();
-            ConsoleUtils.WriteLine("You may also want to remove DPS, WdiSystemHost and WdiServiceHost services, " +
-                                   "which can't be easily deleted programmatically due to their permissions.\n" +
-                                   "Follow this steps to do it: github.com/adolfintel/Windows10-Privacy/blob/master/data/delkey.gif", ConsoleColor.Cyan);
         }
 
         private void RemoveTelemetryServices()
@@ -29,6 +33,39 @@ namespace Win10BloatRemover.Operations
             new ServiceRemover(TELEMETRY_SERVICES)
                 .PerformBackup()
                 .PerformRemoval();
+
+            new ServiceRemover(PROTECTED_TELEMETRY_SERVICES).PerformBackup();
+            RemoveProtectedServices();
+        }
+
+        private void RemoveProtectedServices()
+        {
+            using (RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
+            {
+                foreach (string service in PROTECTED_TELEMETRY_SERVICES)
+                {
+                    try
+                    {
+                        allServicesKey.GrantFullControlOnSubKey(service);
+
+                        using (RegistryKey serviceKey = allServicesKey.OpenSubKey(service, true))
+                        {
+                            foreach (string subkeyName in serviceKey.GetSubKeyNames())
+                                serviceKey.GrantFullControlOnSubKey(subkeyName);
+                        }
+
+                        allServicesKey.DeleteSubKeyTree(service);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        Console.WriteLine($"Service {service} is not present or its key can't be retrieved.");
+                    }
+                    catch (Exception exc)
+                    {
+                        ConsoleUtils.WriteLine($"Error while trying to delete service {service}: {exc.Message}", ConsoleColor.Red);
+                    }
+                }
+            }
         }
 
         /**

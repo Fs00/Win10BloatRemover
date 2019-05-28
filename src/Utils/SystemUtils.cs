@@ -11,25 +11,12 @@ namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
-        public const string BACKUP_PRIVILEGE = "SeBackupPrivilege";
-        public const string RESTORE_PRIVILEGE = "SeRestorePrivilege";
-        public const string TAKE_OWNERSHIP_PRIVILEGE = "SeTakeOwnershipPrivilege";
-
+        // It's up to the caller to obtain the needed privileges (TakeOwnership, Restore) for this operation
         public static void GrantFullControlOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
-            GrantPrivilege(BACKUP_PRIVILEGE);
-            GrantPrivilege(RESTORE_PRIVILEGE);
-            GrantPrivilege(TAKE_OWNERSHIP_PRIVILEGE);
-
-            RegistryKey subKey = registryKey.OpenSubKey(subkeyName,
-                RegistryKeyPermissionCheck.ReadWriteSubTree,
+            using (RegistryKey subKey = registryKey.OpenSubKeyAndThrowIfMissing(subkeyName,
                 RegistryRights.TakeOwnership | RegistryRights.ChangePermissions
-            );
-
-            if (subKey == null)
-                throw new KeyNotFoundException($"Subkey {subkeyName} not found.");
-
-            using (subKey)
+            ))
             {
                 RegistrySecurity accessRules = subKey.GetAccessControl();
                 accessRules.SetOwner(WindowsIdentity.GetCurrent().User);
@@ -44,36 +31,27 @@ namespace Win10BloatRemover.Utils
                 );
                 subKey.SetAccessControl(accessRules);
             }
-
-            RevokePrivilege(TAKE_OWNERSHIP_PRIVILEGE);
-            RevokePrivilege(BACKUP_PRIVILEGE);
-            RevokePrivilege(RESTORE_PRIVILEGE);
         }
 
-        public static void GrantPrivilege(string privilege)
+        // It's up to the caller to obtain the needed privileges (TakeOwnership) for this operation
+        public static void TakeOwnershipOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
-            IntPtr tokenHandle = IntPtr.Zero;
-            OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, ref tokenHandle);
-            TokenPrivileges tokenPrivilege = new TokenPrivileges {
-                Count = 1,
-                LUID = 0,
-                Attributes = SE_PRIVILEGE_ENABLED
-            };
-            LookupPrivilegeValue(null, privilege, ref tokenPrivilege.LUID);
-            AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
+            using (RegistryKey subKey = registryKey.OpenSubKeyAndThrowIfMissing(subkeyName, RegistryRights.TakeOwnership))
+            {
+                RegistrySecurity accessRules = subKey.GetAccessControl();
+                accessRules.SetOwner(WindowsIdentity.GetCurrent().User);
+                subKey.SetAccessControl(accessRules);
+            }
         }
 
-        public static void RevokePrivilege(string privilege)
+        public static RegistryKey OpenSubKeyAndThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
         {
-            IntPtr tokenHandle = IntPtr.Zero;
-            OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, ref tokenHandle);
-            TokenPrivileges tokenPrivilege = new TokenPrivileges {
-                Count = 1,
-                LUID = 0,
-                Attributes = SE_PRIVILEGE_DISABLED
-            };
-            LookupPrivilegeValue(null, privilege, ref tokenPrivilege.LUID);
-            AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
+            RegistryKey subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);
+
+            if (subKey == null)
+                throw new KeyNotFoundException($"Subkey {subkeyName} not found.");
+
+            return subKey;
         }
 
         // This method locks the thread until the process stops writing on those streams (usually until its end)
@@ -163,13 +141,46 @@ namespace Win10BloatRemover.Utils
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
+        public static void GrantPrivilege(string privilege)
+        {
+            OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle);
+            SingleTokenPrivilege tokenPrivilege = new SingleTokenPrivilege
+            {
+                Count = 1,
+                Luid = 0,
+                Attributes = SE_PRIVILEGE_ENABLED
+            };
+            LookupPrivilegeValue(null, privilege, out tokenPrivilege.Luid);
+            bool successful = AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
+            if (!successful)
+                throw new PrivilegeNotHeldException($"Can't grant privilege {privilege}");
+        }
+
+        public static void RevokePrivilege(string privilege)
+        {
+            OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle);
+            SingleTokenPrivilege tokenPrivilege = new SingleTokenPrivilege
+            {
+                Count = 1,
+                Luid = 0,
+                Attributes = SE_PRIVILEGE_DISABLED
+            };
+            LookupPrivilegeValue(null, privilege, out tokenPrivilege.Luid);
+            bool successful = AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
+            if (!successful)
+                throw new PrivilegeNotHeldException($"Can't revoke privilege {privilege}");
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private struct TokenPrivileges
+        private struct SingleTokenPrivilege
         {
             public int Count;
-            public long LUID;
+            public long Luid;
             public int Attributes;
         }
+
+        public const string RESTORE_PRIVILEGE = "SeRestorePrivilege";
+        public const string TAKE_OWNERSHIP_PRIVILEGE = "SeTakeOwnershipPrivilege";
 
         private const int SE_PRIVILEGE_DISABLED = 0x00000000;
         private const int SE_PRIVILEGE_ENABLED = 0x00000002;
@@ -179,7 +190,7 @@ namespace Win10BloatRemover.Utils
         [DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
         private static extern bool AdjustTokenPrivileges(IntPtr tokenHandle,
                                                          bool disableAllPrivileges,
-                                                         ref TokenPrivileges newState,
+                                                         ref SingleTokenPrivilege newState,
                                                          int bufferLength,
                                                          IntPtr previousState,
                                                          IntPtr returnLength);
@@ -188,9 +199,9 @@ namespace Win10BloatRemover.Utils
         private static extern IntPtr GetCurrentProcess();
 
         [DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
-        private static extern bool OpenProcessToken(IntPtr processHandle, int desiredAccess, ref IntPtr tokenHandle);
+        private static extern bool OpenProcessToken(IntPtr processHandle, int desiredAccess, out IntPtr tokenHandle);
 
         [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern bool LookupPrivilegeValue(string systemName, string privilegeName, ref long privilegeLUID);
+        private static extern bool LookupPrivilegeValue(string systemName, string privilegeName, out long privilegeLUID);
     }
 }

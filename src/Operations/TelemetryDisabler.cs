@@ -40,6 +40,9 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveProtectedServices()
         {
+            SystemUtils.GrantPrivilege(SystemUtils.RESTORE_PRIVILEGE);
+            SystemUtils.GrantPrivilege(SystemUtils.TAKE_OWNERSHIP_PRIVILEGE);
+
             using (RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
             {
                 foreach (string service in PROTECTED_TELEMETRY_SERVICES)
@@ -51,10 +54,16 @@ namespace Win10BloatRemover.Operations
                         using (RegistryKey serviceKey = allServicesKey.OpenSubKey(service, true))
                         {
                             foreach (string subkeyName in serviceKey.GetSubKeyNames())
+                            {
+                                // Protected subkeys must first be opened only with TakeOwnership right,
+                                // otherwise the system would prevent us to access them to edit their ACL.
+                                serviceKey.TakeOwnershipOnSubKey(subkeyName);
                                 serviceKey.GrantFullControlOnSubKey(subkeyName);
+                            }
                         }
 
                         allServicesKey.DeleteSubKeyTree(service);
+                        Console.WriteLine($"Service {service} removed successfully.");
                     }
                     catch (KeyNotFoundException)
                     {
@@ -66,6 +75,9 @@ namespace Win10BloatRemover.Operations
                     }
                 }
             }
+
+            SystemUtils.RevokePrivilege(SystemUtils.TAKE_OWNERSHIP_PRIVILEGE);
+            SystemUtils.RevokePrivilege(SystemUtils.RESTORE_PRIVILEGE);
         }
 
         /**

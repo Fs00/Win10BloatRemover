@@ -14,7 +14,7 @@ namespace Win10BloatRemover.Utils
         // It's up to the caller to obtain the needed privileges (TakeOwnership, Restore) for this operation
         public static void GrantFullControlOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
-            using (RegistryKey subKey = registryKey.OpenSubKeyAndThrowIfMissing(subkeyName,
+            using (RegistryKey subKey = registryKey.OpenSubKeyOrThrowIfMissing(subkeyName,
                 RegistryRights.TakeOwnership | RegistryRights.ChangePermissions
             ))
             {
@@ -36,7 +36,7 @@ namespace Win10BloatRemover.Utils
         // It's up to the caller to obtain the needed privileges (TakeOwnership) for this operation
         public static void TakeOwnershipOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
-            using (RegistryKey subKey = registryKey.OpenSubKeyAndThrowIfMissing(subkeyName, RegistryRights.TakeOwnership))
+            using (RegistryKey subKey = registryKey.OpenSubKeyOrThrowIfMissing(subkeyName, RegistryRights.TakeOwnership))
             {
                 RegistrySecurity accessRules = subKey.GetAccessControl();
                 accessRules.SetOwner(WindowsIdentity.GetCurrent().User);
@@ -44,7 +44,7 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static RegistryKey OpenSubKeyAndThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
+        public static RegistryKey OpenSubKeyOrThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
         {
             RegistryKey subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);
 

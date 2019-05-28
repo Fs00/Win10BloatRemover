@@ -45,39 +45,44 @@ namespace Win10BloatRemover.Operations
 
             using (RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
             {
-                foreach (string service in PROTECTED_TELEMETRY_SERVICES)
+                foreach (string serviceName in PROTECTED_TELEMETRY_SERVICES)
                 {
                     try
                     {
-                        allServicesKey.GrantFullControlOnSubKey(service);
-
-                        using (RegistryKey serviceKey = allServicesKey.OpenSubKey(service, true))
-                        {
-                            foreach (string subkeyName in serviceKey.GetSubKeyNames())
-                            {
-                                // Protected subkeys must first be opened only with TakeOwnership right,
-                                // otherwise the system would prevent us to access them to edit their ACL.
-                                serviceKey.TakeOwnershipOnSubKey(subkeyName);
-                                serviceKey.GrantFullControlOnSubKey(subkeyName);
-                            }
-                        }
-
-                        allServicesKey.DeleteSubKeyTree(service);
-                        Console.WriteLine($"Service {service} removed successfully.");
+                        RemoveProtectedService(serviceName, allServicesKey);
+                        Console.WriteLine($"Service {serviceName} removed successfully.");
                     }
                     catch (KeyNotFoundException)
                     {
-                        Console.WriteLine($"Service {service} is not present or its key can't be retrieved.");
+                        Console.WriteLine($"Service {serviceName} is not present or its key can't be retrieved.");
                     }
                     catch (Exception exc)
                     {
-                        ConsoleUtils.WriteLine($"Error while trying to delete service {service}: {exc.Message}", ConsoleColor.Red);
+                        ConsoleUtils.WriteLine($"Error while trying to delete service {serviceName}: {exc.Message}", ConsoleColor.Red);
                     }
                 }
             }
 
             SystemUtils.RevokePrivilege(SystemUtils.TAKE_OWNERSHIP_PRIVILEGE);
             SystemUtils.RevokePrivilege(SystemUtils.RESTORE_PRIVILEGE);
+        }
+
+        private void RemoveProtectedService(string serviceName, RegistryKey allServicesKey)
+        {
+            allServicesKey.GrantFullControlOnSubKey(serviceName);
+
+            using (RegistryKey serviceKey = allServicesKey.OpenSubKey(serviceName, true))
+            {
+                foreach (string subkeyName in serviceKey.GetSubKeyNames())
+                {
+                    // Protected subkeys must first be opened only with TakeOwnership right,
+                    // otherwise the system would prevent us to access them to edit their ACL.
+                    serviceKey.TakeOwnershipOnSubKey(subkeyName);
+                    serviceKey.GrantFullControlOnSubKey(subkeyName);
+                }
+            }
+
+            allServicesKey.DeleteSubKeyTree(serviceName);
         }
 
         /**

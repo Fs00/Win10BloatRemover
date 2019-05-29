@@ -32,7 +32,7 @@ namespace Win10BloatRemover.Utils
         {
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine("|    Windows 10 Bloat Remover and Tweaker   |");
-            Console.WriteLine("|             for version 1809              |");
+            Console.WriteLine("|             for version 1903              |");
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine();
         }
@@ -115,9 +115,6 @@ namespace Win10BloatRemover.Utils
 
                 case MenuEntry.RemoveWinDefender:
                     return "Windows Defender menu icon will remain there, but the program won't start anymore.";
-
-                case MenuEntry.RemoveMSEdge:
-                    return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!";
 
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";

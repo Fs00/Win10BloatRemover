@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-  <assemblyIdentity version="1809.2.0.0" name="Win10BloatRemover.app"/>
+  <assemblyIdentity version="1903.1.0.0" name="Win10BloatRemover.app"/>
   
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>

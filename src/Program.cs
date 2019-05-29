@@ -124,7 +124,7 @@ namespace Win10BloatRemover
             }
 
             Console.WriteLine("Press a key to return to the main menu");
-            Console.ReadKey();
+            ConsoleUtils.ReadKeyIgnoringBuffer();
         }
 
         private static bool DependenciesAreMissing()

@@ -20,5 +20,16 @@ namespace Win10BloatRemover.Utils
             Console.Write(text);
             Console.ResetColor();
         }
+
+        /**
+         *  Equivalent of calling Console.ReadKey() after flushing standard input
+         */
+        public static ConsoleKeyInfo ReadKeyIgnoringBuffer()
+        {
+            while (Console.KeyAvailable)
+                Console.ReadKey(intercept: true);
+
+            return Console.ReadKey();
+        }
     }
 }

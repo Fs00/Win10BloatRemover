@@ -58,6 +58,9 @@ namespace Win10BloatRemover
         [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
         public UWPAppGroup[] UWPAppsToRemove { private set; get; }
 
+        [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
+        public UWPAppRemovalMode UWPAppsRemovalMode { private set; get; }
+
         [JsonProperty(Required = Required.Always)]
         public string[] ScheduledTasksToDisable { private set; get; }
 

@@ -110,8 +110,15 @@ namespace Win10BloatRemover.Utils
                     explanation = "The following groups of UWP apps will be removed:\n";
                     foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
-                    return explanation + "Some specific app-related services will also be removed " +
+                    explanation += "Some specific app-related services will also be removed " +
                             "(but backed up in case you need to restore them).";
+
+                    if (Configuration.Instance.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
+                        explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
+                            "aforementioned apps will be removed too.\n" +
+                            "This means that you won't be able to restore those apps unless you reinstall the system.\n" +
+                            @"To prevent this behaviour, change UWPAppsRemovalMode option to ""KeepProvisionedPackages"".";
+                    return explanation;
 
                 case MenuEntry.RemoveWinDefender:
                     return "Windows Defender menu icon will remain there, but the program won't start anymore.";
@@ -174,7 +181,7 @@ namespace Win10BloatRemover.Utils
             switch (entry)
             {
                 case MenuEntry.RemoveUWPApps:
-                    return new UWPAppRemover(Configuration.Instance.UWPAppsToRemove);
+                    return new UWPAppRemover(Configuration.Instance.UWPAppsToRemove, Configuration.Instance.UWPAppsRemovalMode);
                 case MenuEntry.RemoveWinDefender:
                     return new WindowsDefenderRemover();
                 case MenuEntry.RemoveMSEdge:

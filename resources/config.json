@@ -64,5 +64,6 @@
     "InternetExplorer-Optional-Package",
     "Hello-Face-Package",
     "QuickAssist-Package"
-  ]
+  ],
+  "UWPAppsRemovalMode": "RemoveProvisionedPackages"
 }

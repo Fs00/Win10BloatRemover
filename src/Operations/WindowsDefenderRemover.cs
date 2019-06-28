@@ -6,7 +6,7 @@ namespace Win10BloatRemover.Operations
 {
     class WindowsDefenderRemover : IOperation
     {
-        private static readonly string[] SECURITY_HEALTH_SERVICES = new[] { "Sense", "SecurityHealthService", "wscsvc" };
+        private static readonly string[] SECURITY_HEALTH_SERVICES = new[] { "SecurityHealthService", "wscsvc" };
 
         public void PerformTask()
         {

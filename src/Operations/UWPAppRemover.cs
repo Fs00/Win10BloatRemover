@@ -185,14 +185,12 @@ namespace Win10BloatRemover.Operations
         private static void RemoveXboxServicesAndTasks()
         {
             Console.WriteLine("Removing app-related services and scheduled tasks...");
-            new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "xbgm" })
+            new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" })
                 .PerformBackup()
                 .PerformRemoval();
 
-            new ScheduledTasksDisabler(new[] {
-                @"Microsoft\XblGameSave\XblGameSaveTask",
-                @"Microsoft\XblGameSave\XblGameSaveTaskLogon"
-            }).PerformTask();
+            new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" })
+                .PerformTask();
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR"))
                 key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);

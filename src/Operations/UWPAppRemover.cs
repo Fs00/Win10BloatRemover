@@ -6,6 +6,11 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
+    public enum UWPAppRemovalMode {
+        KeepProvisionedPackages,
+        RemoveProvisionedPackages
+    }
+
     public enum UWPAppGroup
     {
         Bing,               // Weather and News
@@ -104,10 +109,12 @@ namespace Win10BloatRemover.Operations
         };
 
         private readonly UWPAppGroup[] appsToRemove;
+        private readonly UWPAppRemovalMode removalMode;
 
-        public UWPAppRemover(UWPAppGroup[] appsToRemove)
+        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode)
         {
             this.appsToRemove = appsToRemove;
+            this.removalMode = removalMode;
         }
 
         public void PerformTask()
@@ -128,12 +135,15 @@ namespace Win10BloatRemover.Operations
                             "if ($package) {" +
                                 $"Write-Host \"Removing app {appName}...\";" +
                                 "$package | Remove-AppxPackage -AllUsers;" +
-                                "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"" + appName + "\"};" +
-                                "if ($provisionedPackage) {" +
-                                    $"Write-Host \"Removing provisioned package for app {appName}...\";" +
-                                    "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
-                                "}" +
-                                "else { Write-Host \"No provisioned package found for app " + appName + "\"; }" +
+                                (
+                                    removalMode == UWPAppRemovalMode.RemoveProvisionedPackages ?
+                                    "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"" + appName + "\"};" +
+                                    "if ($provisionedPackage) {" +
+                                        $"Write-Host \"Removing provisioned package for app {appName}...\";" +
+                                        "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
+                                    "}" +
+                                    "else { Write-Host \"No provisioned package found for app " + appName + "\"; }" : ""
+                                ) +
                             "}" +
                             "else {" +
                                 $"Write-Host \"App {appName} is not installed.\";" +

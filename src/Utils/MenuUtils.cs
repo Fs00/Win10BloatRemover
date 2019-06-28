@@ -121,7 +121,9 @@ namespace Win10BloatRemover.Utils
                     return explanation;
 
                 case MenuEntry.RemoveWinDefender:
-                    return "Windows Defender menu icon will remain there, but the program won't start anymore.";
+                    return "Important: Before starting, disable Tamper protection in Windows Security " +
+                           "under Virus & threat protection settings.\n" +
+                           "Windows Defender menu icon will remain there, but the program won't start anymore.";
 
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";

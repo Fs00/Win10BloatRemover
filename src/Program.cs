@@ -24,13 +24,15 @@ namespace Win10BloatRemover
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
-            
+
+            #if !DEBUG
             if (!SystemUtils.IsWindowsReleaseId("1903"))
             {
                 ConsoleUtils.WriteLine("This application is compatible only with Windows 10 May 2019 Update!", ConsoleColor.Red);
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
+            #endif
 
             try
             {

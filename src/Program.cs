@@ -32,16 +32,6 @@ namespace Win10BloatRemover
                 Environment.Exit(-1);
             }
 
-            if (DependenciesAreMissing())
-            {
-                ConsoleUtils.WriteLine("One or more required dependencies of the application are missing.\n" + 
-                                       "Make sure you have the following DLLs in the same folder as this application:\n" +
-                                       " Newtonsoft.Json.dll\n" +
-                                       " System.Management.Automation.dll", ConsoleColor.Red);
-                Console.ReadKey();
-                Environment.Exit(-1);
-            }
-
             try
             {
                 ExtractInstallWimTweak();
@@ -131,11 +121,6 @@ namespace Win10BloatRemover
 
             Console.WriteLine("Press a key to return to the main menu");
             ConsoleUtils.ReadKeyIgnoringBuffer();
-        }
-
-        private static bool DependenciesAreMissing()
-        {
-            return !File.Exists("./Newtonsoft.Json.dll") || !File.Exists("./System.Management.Automation.dll");
         }
 
         private static void ExtractInstallWimTweak()

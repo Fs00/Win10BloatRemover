@@ -132,7 +132,8 @@ namespace Win10BloatRemover.Utils
                     return explanation;
 
                 case MenuEntry.RemoveWinDefender:
-                    return "Windows Defender menu icon will remain there, but the program won't start anymore.";
+                    return "If you have already made system apps removable, Security Center app will be removed too; " +
+                           "otherwise, its menu icon will remain there, but the app won't start anymore.";
 
                 case MenuEntry.RemoveMSEdge:
                     return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!\n" +

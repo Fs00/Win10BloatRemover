@@ -35,14 +35,9 @@ namespace Win10BloatRemover.Operations
         private void RunOneDriveUninstaller(string uninstallerPath)
         {
             Console.WriteLine("Executing OneDrive uninstaller...");
-            using (var oneDriveUninstallProcess = SystemUtils.RunProcess(uninstallerPath, "/uninstall"))
-            {
-                oneDriveUninstallProcess.PrintSynchronouslyOutputAndErrors();
-                oneDriveUninstallProcess.WaitForExit();
-
-                if (oneDriveUninstallProcess.ExitCode != 0)
-                    throw new Exception("OneDrive uninstaller terminated with non-zero status.");
-            }
+            int exitCode = SystemUtils.RunProcessSynchronously(uninstallerPath, "/uninstall");
+            if (exitCode != 0)
+                throw new Exception("OneDrive uninstaller terminated with non-zero status.");
         }
 
         private void RemoveResidualFiles()

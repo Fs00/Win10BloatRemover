@@ -5,6 +5,7 @@ namespace Win10BloatRemover.Utils
 {
     public enum MenuEntry
     {
+        MakeSystemAppsRemovable,
         RemoveUWPApps,
         RemoveWinDefender,
         RemoveMSEdge,
@@ -68,6 +69,8 @@ namespace Win10BloatRemover.Utils
         {
             switch (entry)
             {
+                case MenuEntry.MakeSystemAppsRemovable:
+                    return "Make system apps removable";
                 case MenuEntry.RemoveUWPApps:
                     return "UWP apps removal";
                 case MenuEntry.RemoveWinDefender:
@@ -106,6 +109,14 @@ namespace Win10BloatRemover.Utils
             string explanation;
             switch (entry)
             {
+                case MenuEntry.MakeSystemAppsRemovable:
+                    return "This procedure will edit an internal database to allow the removal of system UWP apps " +
+                           "such as Edge, Security Center, Cortana via normal PowerShell methods.\n" +
+                           "A backup of the database will be saved in the current directory. " +
+                           "It will become useless as soon as you install/remove an app, so make sure you don't have " +
+                           "any problems with Windows Update or the Store after the operation is completed.\n" +
+                           "Take note that you might not receive any more Windows feature updates after applying these modifications.";
+
                 case MenuEntry.RemoveUWPApps:
                     explanation = "The following groups of UWP apps will be removed:\n";
                     foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
@@ -182,6 +193,8 @@ namespace Win10BloatRemover.Utils
         {
             switch (entry)
             {
+                case MenuEntry.MakeSystemAppsRemovable:
+                    return new SystemAppRemovalEnabler();
                 case MenuEntry.RemoveUWPApps:
                     return new UWPAppRemover(Configuration.Instance.UWPAppsToRemove, Configuration.Instance.UWPAppsRemovalMode);
                 case MenuEntry.RemoveWinDefender:

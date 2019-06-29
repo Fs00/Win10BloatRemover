@@ -124,7 +124,8 @@ namespace Win10BloatRemover.Utils
                     return "Windows Defender menu icon will remain there, but the program won't start anymore.";
 
                 case MenuEntry.RemoveMSEdge:
-                    return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!";
+                    return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!\n" +
+                           "This task will be accomplished by using install-wim-tweak.";
 
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";

@@ -54,18 +54,22 @@ namespace Win10BloatRemover.Utils
             return subKey;
         }
 
-        // This method locks the thread until the process stops writing on those streams (usually until its end)
-        public static void PrintSynchronouslyOutputAndErrors(this Process process)
+        public static int RunProcessSynchronously(string name, string args)
+        {
+            using (var process = CreateProcessInstance(name, args))
+            {
+                process.Start();
+                process.PrintSynchronouslyOutputAndErrors();
+                process.WaitForExit();
+                return process.ExitCode;
+            }
+        }
+
+        // Locks the thread until the process stops writing on those streams (usually until its end)
+        private static void PrintSynchronouslyOutputAndErrors(this Process process)
         {
             Console.Write(process.StandardOutput.ReadToEnd());
             ConsoleUtils.Write(process.StandardError.ReadToEnd(), ConsoleColor.Red);
-        }
-
-        public static Process RunProcess(string name, string args)
-        {
-            var process = CreateProcessInstance(name, args);
-            process.Start();
-            return process;
         }
 
         public static Process RunProcessWithAsyncOutputPrinting(string name, string args)

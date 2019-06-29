@@ -56,6 +56,7 @@
     <Compile Include="src\Operations\IOperation.cs" />
     <Compile Include="src\Operations\OneDriveRemover.cs" />
     <Compile Include="src\Operations\ScheduledTasksDisabler.cs" />
+    <Compile Include="src\Operations\SystemAppRemovalEnabler.cs" />
     <Compile Include="src\Operations\TelemetryDisabler.cs" />
     <Compile Include="src\Operations\WindowsDefenderRemover.cs" />
     <Compile Include="src\Operations\WindowsTipsDisabler.cs" />

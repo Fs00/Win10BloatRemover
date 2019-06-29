@@ -209,7 +209,7 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.OpenGitHubIssue:
                     return new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
                 default:
-                    throw new NotImplementedException($"Unimplemented operation: {entry.ToString()}");
+                    return null;
             }
         }
     }

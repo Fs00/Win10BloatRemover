@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Resources;
@@ -101,7 +102,7 @@ namespace Win10BloatRemover
             ConsoleUtils.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --", ConsoleColor.Green);
             Console.WriteLine(MenuUtils.GetMenuEntryExplanation(entry));
             Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
-            if (Console.ReadKey().Key != ConsoleKey.Enter || entry == MenuEntry.Credits)
+            if (Console.ReadKey().Key != ConsoleKey.Enter)
                 return;
 
             if (entry == MenuEntry.Quit)
@@ -114,6 +115,11 @@ namespace Win10BloatRemover
             {
                 Console.WriteLine();
                 IOperation operation = MenuUtils.GetOperationInstanceForMenuEntry(entry);
+                if (operation == null)
+                {
+                    Debug.WriteLine($"Unimplemented operation: {entry.ToString()}");
+                    return;
+                }
                 operation.PerformTask();
 
                 Console.Write("\nDone! ");

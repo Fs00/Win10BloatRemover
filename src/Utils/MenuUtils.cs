@@ -134,7 +134,8 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.RemoveWinDefender:
                     return "Important: Before starting, disable Tamper protection in Windows Security " +
                            "under Virus & threat protection settings.\n" +
-                           "Windows Defender menu icon will remain there, but the program won't start anymore.";
+                           "If you have already made system apps removable, Security Center app will be removed too; " +
+                           "otherwise, its menu icon will remain there, but the app won't start anymore.";
 
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";

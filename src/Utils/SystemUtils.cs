@@ -139,12 +139,6 @@ namespace Win10BloatRemover.Utils
             return releaseId == expectedId;
         }
 
-        public static bool HasAdministratorRights()
-        {
-            var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
-            return principal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
-
         public static void GrantPrivilege(string privilege)
         {
             OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle);

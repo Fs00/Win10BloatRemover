@@ -75,13 +75,14 @@ namespace Win10BloatRemover.Operations
                     $@"$package = Get-AppxPackage -AllUsers -Name ""{SECURITY_CENTER_APP_NAME}"";" +
                     @"if ($package) {
                         $package | Remove-AppxPackage -AllUsers;
-                        Write-Host ""Removal performed successfully."";
                     }
                     else {
                         Write-Host ""Security Center app is not installed."";
                     }";
 
                 psInstance.RunScriptAndPrintOutput(removalScript);
+                if (!psInstance.HadErrors)
+                    Console.WriteLine("Removal performed successfully.");
             }
         }
     }

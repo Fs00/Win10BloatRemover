@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using Win10BloatRemover;
 
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
 // set di attributi. Modificare i valori di questi attributi per modificare le informazioni
@@ -31,5 +32,5 @@ using System.Runtime.InteropServices;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build
 // usando l'asterisco '*' come illustrato di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1903.1.0.0")]
-[assembly: AssemblyFileVersion("1903.1.0.0")]
+[assembly: AssemblyVersion(Program.SUPPORTED_WINDOWS_RELEASE_ID + ".1.0.0")]
+[assembly: AssemblyFileVersion(Program.SUPPORTED_WINDOWS_RELEASE_ID + ".1.0.0")]

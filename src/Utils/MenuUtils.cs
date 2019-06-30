@@ -33,7 +33,7 @@ namespace Win10BloatRemover.Utils
         {
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine("|    Windows 10 Bloat Remover and Tweaker   |");
-            Console.WriteLine("|             for version 1903              |");
+            Console.WriteLine("|             for version " + Program.SUPPORTED_WINDOWS_RELEASE_ID + "              |");
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine();
         }

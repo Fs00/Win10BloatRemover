@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Resources;
+using System.Security.Principal;
 using Win10BloatRemover.Operations;
 using Win10BloatRemover.Utils;
 
@@ -10,6 +11,8 @@ namespace Win10BloatRemover
 {
     static class Program
     {
+        public const string SUPPORTED_WINDOWS_RELEASE_ID = "1903";
+
         public static string InstallWimTweakPath { get; } = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
         private static bool exit = false;
 
@@ -18,7 +21,7 @@ namespace Win10BloatRemover
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en");
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
-            if (!SystemUtils.HasAdministratorRights())
+            if (!Program.HasAdministratorRights())
             {
                 ConsoleUtils.WriteLine("This application needs to be run with administrator rights!", ConsoleColor.Red);
                 Console.ReadKey();
@@ -26,7 +29,7 @@ namespace Win10BloatRemover
             }
 
             #if !DEBUG
-            if (!SystemUtils.IsWindowsReleaseId("1903"))
+            if (!SystemUtils.IsWindowsReleaseId(SUPPORTED_WINDOWS_RELEASE_ID))
             {
                 ConsoleUtils.WriteLine("This application is compatible only with Windows 10 May 2019 Update!", ConsoleColor.Red);
                 Console.ReadKey();
@@ -54,6 +57,21 @@ namespace Win10BloatRemover
                 Console.ReadKey();
             }
 
+            RunMenuLoop();
+
+            try
+            {
+                DeleteTempInstallWimTweak();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"Unable to perform exit cleanup: {exc.Message}");
+                Console.ReadKey();
+            }
+        }
+
+        private static void RunMenuLoop()
+        {
             while (!exit)
             {
                 Console.Clear();
@@ -74,15 +92,6 @@ namespace Win10BloatRemover
 
                 Console.Clear();
                 ProcessMenuEntry(chosenEntry.Value);
-            }
-
-            try
-            {
-                DeleteTempInstallWimTweak();
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine($"Unable to perform exit cleanup: {exc.Message}");
             }
         }
 
@@ -123,6 +132,12 @@ namespace Win10BloatRemover
 
             Console.WriteLine("Press a key to return to the main menu");
             ConsoleUtils.ReadKeyIgnoringBuffer();
+        }
+
+        private static bool HasAdministratorRights()
+        {
+            var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         private static void ExtractInstallWimTweak()

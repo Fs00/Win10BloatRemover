@@ -122,12 +122,13 @@ namespace Win10BloatRemover.Utils
                     foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
                     explanation += "Some specific app-related services will also be removed " +
-                            "(but backed up in case you need to restore them).";
+                                   "(but backed up in case you need to restore them).\n" +
+                                   "In order to remove Edge and some components of Xbox, you need to make system apps removable first.";
 
                     if (Configuration.Instance.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
                         explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
                             "aforementioned apps will be removed too.\n" +
-                            "This means that you won't be able to restore those apps unless you reinstall the system.\n" +
+                            "This means that those apps won't be installed to new users when they log in for the first time.\n" +
                             @"To prevent this behaviour, change UWPAppsRemovalMode option to ""KeepProvisionedPackages"".";
                     return explanation;
 

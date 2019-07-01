@@ -127,7 +127,7 @@ namespace Win10BloatRemover.Utils
 
                     if (Configuration.Instance.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
                         explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
-                            "aforementioned apps will be removed too.\n" +
+                            "aforementioned apps will be removed too (if available).\n" +
                             "This means that those apps won't be installed to new users when they log in for the first time.\n" +
                             @"To prevent this behaviour, change UWPAppsRemovalMode option to ""KeepProvisionedPackages"".";
                     return explanation;

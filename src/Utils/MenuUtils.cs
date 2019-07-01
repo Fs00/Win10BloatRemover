@@ -137,6 +137,12 @@ namespace Win10BloatRemover.Utils
                            "If you have already made system apps removable, Security Center app will be removed too; " +
                            "otherwise, its menu icon will remain there, but the app won't start anymore.";
 
+                case MenuEntry.RemoveMSEdge:
+                    return "Starting from Windows 10 version 1903, install-wim-tweak can no longer be used to remove " +
+                           "Edge since it breaks the installation of cumulative updates.\n" +
+                           @"To accomplish this task, add ""Edge"" to the list ""UWPAppsToRemove"" in configuration " +
+                           "file, make system apps removable and then use UWP apps removal.";
+
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";
                     foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)
@@ -200,8 +206,6 @@ namespace Win10BloatRemover.Utils
                     return new UWPAppRemover(Configuration.Instance.UWPAppsToRemove, Configuration.Instance.UWPAppsRemovalMode);
                 case MenuEntry.RemoveWinDefender:
                     return new WindowsDefenderRemover();
-                case MenuEntry.RemoveMSEdge:
-                    return new EdgeRemover();
                 case MenuEntry.RemoveOneDrive:
                     return new OneDriveRemover();
                 case MenuEntry.RemoveServices:

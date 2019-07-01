@@ -34,7 +34,8 @@ namespace Win10BloatRemover.Operations
         AlarmsAndClock,
         Calculator,
         SnipAndSketch,
-        Store
+        Store,
+        Edge
     }
 
     class UWPAppRemover : IOperation
@@ -45,6 +46,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Bing, new[] { "Microsoft.BingNews", "Microsoft.BingWeather" } },
             { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
+            { UWPAppGroup.Edge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             { UWPAppGroup.HelpAndFeedback, new[] {
                     "Microsoft.WindowsFeedbackHub",
                     "Microsoft.GetHelp",
@@ -90,6 +92,7 @@ namespace Win10BloatRemover.Operations
         };
 
         private static readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
+            { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
             {
                 UWPAppGroup.Mobile,
                 () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package")   // Connect app
@@ -181,6 +184,15 @@ namespace Win10BloatRemover.Operations
                 postUninstallOperationsForGroup[appGroup]();
             else
                 Console.WriteLine("Nothing to do.");
+        }
+
+        public static void RemoveEdgeResidualFiles()
+        {
+            Console.WriteLine("Removing old files...");
+            SystemUtils.DeleteDirectoryIfExists(
+                $@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
+                handleErrors: true
+            );
         }
 
         private static void RemoveMapsServicesAndTasks()

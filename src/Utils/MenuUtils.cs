@@ -122,12 +122,13 @@ namespace Win10BloatRemover.Utils
                     foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
                         explanation += $"  {app.ToString()}\n";
                     explanation += "Some specific app-related services will also be removed " +
-                            "(but backed up in case you need to restore them).";
+                                   "(but backed up in case you need to restore them).\n" +
+                                   "In order to remove Edge and some components of Xbox, you need to make system apps removable first.";
 
                     if (Configuration.Instance.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
                         explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
                             "aforementioned apps will be removed too.\n" +
-                            "This means that you won't be able to restore those apps unless you reinstall the system.\n" +
+                            "This means that those apps won't be installed to new users when they log in for the first time.\n" +
                             @"To prevent this behaviour, change UWPAppsRemovalMode option to ""KeepProvisionedPackages"".";
                     return explanation;
 
@@ -137,7 +138,9 @@ namespace Win10BloatRemover.Utils
 
                 case MenuEntry.RemoveMSEdge:
                     return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!\n" +
-                           "This task will be accomplished by using install-wim-tweak.";
+                           "This task will be accomplished by using install-wim-tweak.\n" +
+                           "If you prefer new users to have Edge installed at their first login, remove it using UWP " +
+                           "app removal after making system apps removable.";
 
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";

@@ -104,6 +104,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UWPAppGroup.Messaging, RemoveMessagingService },
             { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
+            { UWPAppGroup.Photos, RestoreWindowsPhotoViewer },
             { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntries },
             { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
             { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
@@ -244,6 +245,31 @@ namespace Win10BloatRemover.Operations
             ShellUtils.ExecuteWindowsCommand(@"echo off & for /f ""tokens=1* delims="" %I in " +
                                               @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
                                              @"do (reg delete ""%I"" /f )");
+        }
+
+        private static void RestoreWindowsPhotoViewer()
+        {
+            Console.WriteLine("Setting file association with original photo viewer for BMP, GIF, JPEG, PNG and TIFF pictures...");
+
+            const string PHOTO_VIEWER_SHELL_COMMAND =
+                @"%SystemRoot%\System32\rundll32.exe ""%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll"", ImageView_Fullscreen %1";
+            const string PHOTO_VIEWER_CLSID = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}";
+
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"Applications\photoviewer.dll\shell\open"))
+                key.SetValue("MuiVerb", "@photoviewer.dll,-3043", RegistryValueKind.String);
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"Applications\photoviewer.dll\shell\open\command"))
+                key.SetValue("(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString);
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"Applications\photoviewer.dll\shell\open\DropTarget"))
+                key.SetValue("Clsid", PHOTO_VIEWER_CLSID, RegistryValueKind.String);
+
+            string[] imageTypes = new[] { "Paint.Picture", "giffile", "jpegfile", "pngfile" };
+            foreach (string type in imageTypes)
+            {
+                using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"{type}\shell\open\command"))
+                    key.SetValue("(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString);
+                using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"{type}\shell\open\DropTarget"))
+                    key.SetValue("Clsid", PHOTO_VIEWER_CLSID, RegistryValueKind.String);
+            }
         }
 
         private static void RemoveMailAndPeopleService()

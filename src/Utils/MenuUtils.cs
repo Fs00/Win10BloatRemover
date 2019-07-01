@@ -97,6 +97,8 @@ namespace Win10BloatRemover.Utils
                     return "Windows Tips and feedback requests disabling";
                 case MenuEntry.OpenGitHubIssue:
                     return "Report an issue/Suggest a feature";
+                case MenuEntry.Credits:
+                    return "Credits and license";
                 case MenuEntry.Quit:
                     return "Exit the application";
                 default:
@@ -187,7 +189,8 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.Credits:
                     return "Developed by Fs00\n" +
                            "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +
-                           "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n";
+                           "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n\n" +
+                           "This software is released under BSD 3-Clause Clear license (continue to read full text).";
 
                 case MenuEntry.Quit:
                     return "Are you sure?";
@@ -227,6 +230,8 @@ namespace Win10BloatRemover.Utils
                     return new WindowsTipsDisabler();
                 case MenuEntry.OpenGitHubIssue:
                     return new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
+                case MenuEntry.Credits:
+                    return new LicensePrinter();
                 default:
                     return null;
             }

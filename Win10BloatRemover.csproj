@@ -53,6 +53,7 @@
     <Compile Include="src\Operations\ErrorReportingDisabler.cs" />
     <Compile Include="src\Operations\FeaturesRemover.cs" />
     <Compile Include="src\Operations\IOperation.cs" />
+    <Compile Include="src\Operations\LicensePrinter.cs" />
     <Compile Include="src\Operations\OneDriveRemover.cs" />
     <Compile Include="src\Operations\ScheduledTasksDisabler.cs" />
     <Compile Include="src\Operations\SystemAppRemovalEnabler.cs" />
@@ -93,6 +94,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\LicenseText.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

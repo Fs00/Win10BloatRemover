@@ -146,6 +146,10 @@ namespace Win10BloatRemover.Utils
                            @"To accomplish this task, add ""Edge"" to the list ""UWPAppsToRemove"" in configuration " +
                            "file, make system apps removable and then use UWP apps removal.";
 
+                case MenuEntry.RemoveOneDrive:
+                    return "This will eradicate OneDrive from the system, preventing the app to be installed for new users " +
+                           "and to return after a reset or a major Windows update.";
+
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";
                     foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)

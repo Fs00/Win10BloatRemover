@@ -66,6 +66,7 @@
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Operations\ServiceRemover.cs" />
+    <Compile Include="src\Utils\PrivilegeUtils.cs" />
     <Compile Include="src\Utils\ShellUtils.cs" />
     <Compile Include="src\Utils\SystemUtils.cs" />
     <Compile Include="src\Utils\OperationUtils.cs" />

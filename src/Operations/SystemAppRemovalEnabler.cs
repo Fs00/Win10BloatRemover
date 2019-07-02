@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Security;
 using Microsoft.Data.Sqlite;
 using Win10BloatRemover.Utils;
 
@@ -44,16 +43,8 @@ namespace Win10BloatRemover.Operations
         private void GrantPermissionsOnAppRepository()
         {
             ConsoleUtils.WriteLine("\nGranting needed permissions...", ConsoleColor.Green);
-
-            int takeownExitCode = SystemUtils.RunProcessSynchronously("takeown",
-                                    @"/F C:\ProgramData\Microsoft\Windows\AppRepository /A");
-            if (takeownExitCode != 0)
-                throw new SecurityException("Could not take ownership on AppRepository folder.");
-
-            int icaclsExitCode = SystemUtils.RunProcessSynchronously("icacls",
-                                   $"{STATE_REPOSITORY_DB_PATH} /grant administrators:F");
-            if (icaclsExitCode != 0)
-                throw new SecurityException("Could not grant full control on state repository database.");
+            PrivilegeUtils.GrantFullControlOnDirectory(@"C:\ProgramData\Microsoft\Windows\AppRepository");
+            PrivilegeUtils.GrantFullControlOnFile(STATE_REPOSITORY_DB_PATH);
         }
 
         // If backup fails, the entire operation will stop

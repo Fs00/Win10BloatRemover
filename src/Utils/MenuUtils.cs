@@ -144,6 +144,10 @@ namespace Win10BloatRemover.Utils
                            "If you prefer new users to have Edge installed at their first login, remove it using UWP " +
                            "app removal after making system apps removable.";
 
+                case MenuEntry.RemoveOneDrive:
+                    return "This will eradicate OneDrive from the system, preventing the app to be installed for new users " +
+                           "and to return after a reset or a major Windows update.";
+
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";
                     foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.IO;
+using System.Diagnostics;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
 
@@ -10,18 +10,35 @@ namespace Win10BloatRemover.Operations
     {
         public void PerformTask()
         {
-            KillOneDriveProcess();
-            string uninstallerPath = RetrieveOneDriveUninstallerPath();
-            RunOneDriveUninstaller(uninstallerPath);
+            KillProcess("onedrive.exe");
+            RunOneDriveUninstaller();
+            DisableOneDriveViaGroupPolicies();
+
+            KillProcess("explorer.exe");
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
-            Console.WriteLine("Some folders may not exist, it's normal.");
+            // Full path is needed otherwise it opens only an explorer window, without restoring the taskbar
+            Process.Start(@"C:\Windows\explorer.exe");
+
+            Console.WriteLine();
+            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-OneDrive-Setup");
+
+            Console.WriteLine("If you get an error when launching system programs, just log out and log in again.");
         }
 
-        private void KillOneDriveProcess()
+        private void KillProcess(string processName)
         {
-            Console.WriteLine("Killing OneDrive process...");
-            ShellUtils.ExecuteWindowsCommand("taskkill /F /IM onedrive.exe");
+            Console.WriteLine($"\nKilling {processName}...");
+            ShellUtils.ExecuteWindowsCommand($"taskkill /F /IM {processName}");
+        }
+
+        private void RunOneDriveUninstaller()
+        {
+            string uninstallerPath = RetrieveOneDriveUninstallerPath();
+            Console.WriteLine("Executing OneDrive uninstaller...");
+            int exitCode = SystemUtils.RunProcessSynchronously(uninstallerPath, "/uninstall");
+            if (exitCode != 0)
+                throw new Exception("OneDrive uninstaller terminated with non-zero status.");
         }
 
         private string RetrieveOneDriveUninstallerPath()
@@ -32,38 +49,27 @@ namespace Win10BloatRemover.Operations
                 return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\System32\OneDriveSetup.exe";
         }
 
-        private void RunOneDriveUninstaller(string uninstallerPath)
+        private void DisableOneDriveViaGroupPolicies()
         {
-            Console.WriteLine("Executing OneDrive uninstaller...");
-            int exitCode = SystemUtils.RunProcessSynchronously(uninstallerPath, "/uninstall");
-            if (exitCode != 0)
-                throw new Exception("OneDrive uninstaller terminated with non-zero status.");
+            Console.WriteLine("\nDisabling OneDrive via Group Policies...");
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
+                key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Policies\Microsoft\Windows\OneDrive"))
+                key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
         }
 
         private void RemoveResidualFiles()
         {
-            Console.WriteLine("Removing old files...");
-            SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
+            Console.WriteLine("\nRemoving old files...");
             SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
             SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
             SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
-
-            try
-            {
-                string oneDriveStandaloneUpdater = $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\" +
-                                                    @"Microsoft\OneDrive\OneDriveStandaloneUpdater.exe";
-                if (File.Exists(oneDriveStandaloneUpdater))
-                    File.Delete(oneDriveStandaloneUpdater);
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine($"An error occurred while deleting OneDrive standalone updater: {exc.Message}");
-            }
+            SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
         }
 
         private void RemoveResidualRegistryKeys()
         {
-            Console.WriteLine("Deleting old registry keys...");
+            Console.WriteLine("\nDeleting old registry keys...");
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"CLSID", true))
                 key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Wow6432Node\CLSID", true))

@@ -40,8 +40,8 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveProtectedServices()
         {
-            SystemUtils.GrantPrivilege(SystemUtils.RESTORE_PRIVILEGE);
-            SystemUtils.GrantPrivilege(SystemUtils.TAKE_OWNERSHIP_PRIVILEGE);
+            PrivilegeUtils.GrantPrivilege(PrivilegeUtils.RESTORE_PRIVILEGE);
+            PrivilegeUtils.GrantPrivilege(PrivilegeUtils.TAKE_OWNERSHIP_PRIVILEGE);
 
             using (RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
             {
@@ -63,8 +63,8 @@ namespace Win10BloatRemover.Operations
                 }
             }
 
-            SystemUtils.RevokePrivilege(SystemUtils.TAKE_OWNERSHIP_PRIVILEGE);
-            SystemUtils.RevokePrivilege(SystemUtils.RESTORE_PRIVILEGE);
+            PrivilegeUtils.RevokePrivilege(PrivilegeUtils.TAKE_OWNERSHIP_PRIVILEGE);
+            PrivilegeUtils.RevokePrivilege(PrivilegeUtils.RESTORE_PRIVILEGE);
         }
 
         private void RemoveProtectedService(string serviceName, RegistryKey allServicesKey)

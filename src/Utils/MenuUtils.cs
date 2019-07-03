@@ -178,8 +178,7 @@ namespace Win10BloatRemover.Utils
 
                 case MenuEntry.DisableAutoUpdates:
                     return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
-                           "This method won't work on Windows 10 Home. " +
-                           "On that version, disable Windows Update service using msconfig instead.";
+                           "This method won't work on Windows 10 Home.";
 
                 case MenuEntry.DisableTelemetry:
                     return "This will backup and remove several telemetry-related services and disable features that " +

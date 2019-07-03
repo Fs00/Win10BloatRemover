@@ -23,19 +23,19 @@ namespace Win10BloatRemover.Operations
             Console.WriteLine();
             OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-OneDrive-Setup");
 
-            Console.WriteLine("If you get an error when launching system programs, just log out and log in again.");
+            ConsoleUtils.WriteLine("\nIf you get an error when launching system programs, just log out and log in again.", ConsoleColor.Cyan);
         }
 
         private void KillProcess(string processName)
         {
-            Console.WriteLine($"\nKilling {processName}...");
-            ShellUtils.ExecuteWindowsCommand($"taskkill /F /IM {processName}");
+            ConsoleUtils.WriteLine($"Killing {processName}...", ConsoleColor.Green);
+            SystemUtils.RunProcessSynchronously("taskkill", $"/F /IM {processName}");
         }
 
         private void RunOneDriveUninstaller()
         {
             string uninstallerPath = RetrieveOneDriveUninstallerPath();
-            Console.WriteLine("Executing OneDrive uninstaller...");
+            ConsoleUtils.WriteLine("Executing OneDrive uninstaller...", ConsoleColor.Green);
             int exitCode = SystemUtils.RunProcessSynchronously(uninstallerPath, "/uninstall");
             if (exitCode != 0)
                 throw new Exception("OneDrive uninstaller terminated with non-zero status.");
@@ -51,7 +51,7 @@ namespace Win10BloatRemover.Operations
 
         private void DisableOneDriveViaGroupPolicies()
         {
-            Console.WriteLine("\nDisabling OneDrive via Group Policies...");
+            ConsoleUtils.WriteLine("Disabling OneDrive via Group Policies...", ConsoleColor.Green);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
                 key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Policies\Microsoft\Windows\OneDrive"))
@@ -60,7 +60,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualFiles()
         {
-            Console.WriteLine("\nRemoving old files...");
+            ConsoleUtils.WriteLine("Removing old files...", ConsoleColor.Green);
             SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
             SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
             SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
@@ -69,7 +69,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualRegistryKeys()
         {
-            Console.WriteLine("\nDeleting old registry keys...");
+            ConsoleUtils.WriteLine("Deleting old registry keys...", ConsoleColor.Green);
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"CLSID", true))
                 key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Wow6432Node\CLSID", true))

@@ -48,8 +48,7 @@
     "\\Microsoft\\Windows\\SettingSync\\NetworkStateChangeTask",
     "\\Microsoft\\Windows\\Diagnosis\\Scheduled",
     "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo",
-    "\\Microsoft\\Windows\\Diagnosis\\RecommendedTroubleshootingScanner",
-    "\\Microsoft\\Windows\\TextServicesFramework\\MsCtfMonitor"
+    "\\Microsoft\\Windows\\Diagnosis\\RecommendedTroubleshootingScanner"
   ],
   "WindowsFeaturesToRemove": [
     "InternetExplorer-Optional-Package",

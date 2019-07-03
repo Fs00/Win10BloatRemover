@@ -113,11 +113,12 @@ namespace Win10BloatRemover.Utils
             {
                 case MenuEntry.MakeSystemAppsRemovable:
                     return "This procedure will edit an internal database to allow the removal of system UWP apps " +
-                           "such as Edge, Security Center, Cortana via normal PowerShell methods.\n" +
+                           "such as Edge, Security Center, Connect via normal PowerShell methods.\n" +
                            "A backup of the database will be saved in the current directory. " +
                            "It will become useless as soon as you install/remove an app, so make sure you don't have " +
                            "any problems with Windows Update or the Store after the operation is completed.\n" +
-                           "Take note that you might not receive any more Windows feature updates after applying these modifications.";
+                           "Take note that you might not receive any more Windows feature updates after applying these modifications.\n" +
+                           "Before starting, make sure that the Store is not installing/updating apps in the background.";
 
                 case MenuEntry.RemoveUWPApps:
                     explanation = "The following groups of UWP apps will be removed:\n";
@@ -125,7 +126,7 @@ namespace Win10BloatRemover.Utils
                         explanation += $"  {app.ToString()}\n";
                     explanation += "Some specific app-related services will also be removed " +
                                    "(but backed up in case you need to restore them).\n" +
-                                   "In order to remove Edge and some components of Xbox, you need to make system apps removable first.";
+                                   "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first.";
 
                     if (Configuration.Instance.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
                         explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
@@ -137,6 +138,7 @@ namespace Win10BloatRemover.Utils
                 case MenuEntry.RemoveWinDefender:
                     return "Important: Before starting, disable Tamper protection in Windows Security " +
                            "under Virus & threat protection settings.\n" +
+                           "Defender will be removed using install-wim-tweak and disabled via Group Policies.\n" +
                            "If you have already made system apps removable, Security Center app will be removed too; " +
                            "otherwise, its menu icon will remain there, but the app won't start anymore.";
 
@@ -147,8 +149,8 @@ namespace Win10BloatRemover.Utils
                            "file, make system apps removable and then use UWP apps removal.";
 
                 case MenuEntry.RemoveOneDrive:
-                    return "This will eradicate OneDrive from the system, preventing the app to be installed for new users " +
-                           "and to return after a reset or a major Windows update.";
+                    return "If you allow the use of install-wim-tweak, this will prevent the app to be installed for " +
+                           "new users and to return after a reset or a major Windows update.";
 
                 case MenuEntry.RemoveWindowsFeatures:
                     explanation = "The following features will be removed:\n";

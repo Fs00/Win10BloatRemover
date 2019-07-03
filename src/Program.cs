@@ -21,6 +21,44 @@ namespace Win10BloatRemover
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en");
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
+            DoPreliminaryChecks();
+
+            string configurationLoadingError = Configuration.Load();
+            if (configurationLoadingError != null)
+            {
+                ConsoleUtils.WriteLine(configurationLoadingError, ConsoleColor.DarkYellow);
+                Console.WriteLine("Press a key to continue to the main menu.");
+                Console.ReadKey();
+            }
+
+            try
+            {
+                if (Configuration.Instance.AllowInstallWimTweak)
+                    ExtractInstallWimTweak();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"Unable to extract install_wim_tweak tool to your temporary directory: {exc.Message}");
+                Console.WriteLine("The application will exit.");
+                Console.ReadKey();
+                Environment.Exit(-1);
+            }
+
+            RunMenuLoop();
+
+            try
+            {
+                DeleteExtractedInstallWimTweak();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"Unable to delete previously extracted install-wim-tweak binary: {exc.Message}");
+                Console.ReadKey();
+            }
+        }
+
+        private static void DoPreliminaryChecks()
+        {
             if (!Program.HasAdministratorRights())
             {
                 ConsoleUtils.WriteLine("This application needs to be run with administrator rights!", ConsoleColor.Red);
@@ -36,38 +74,6 @@ namespace Win10BloatRemover
                 Environment.Exit(-1);
             }
             #endif
-
-            try
-            {
-                ExtractInstallWimTweak();
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine($"Unable to extract install_wim_tweak tool to your temporary directory: {exc.Message}");
-                Console.WriteLine("The application will exit.");
-                Console.ReadKey();
-                Environment.Exit(-1);
-            }
-
-            string configurationLoadingError = Configuration.Load();
-            if (configurationLoadingError != null)
-            {
-                ConsoleUtils.WriteLine(configurationLoadingError, ConsoleColor.DarkYellow);
-                Console.WriteLine("Press a key to continue to the main menu.");
-                Console.ReadKey();
-            }
-
-            RunMenuLoop();
-
-            try
-            {
-                DeleteTempInstallWimTweak();
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine($"Unable to perform exit cleanup: {exc.Message}");
-                Console.ReadKey();
-            }
         }
 
         private static void RunMenuLoop()
@@ -146,7 +152,7 @@ namespace Win10BloatRemover
             File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak"));
         }
 
-        private static void DeleteTempInstallWimTweak()
+        private static void DeleteExtractedInstallWimTweak()
         {
             if (File.Exists(InstallWimTweakPath))
                 File.Delete(InstallWimTweakPath);

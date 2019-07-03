@@ -66,5 +66,8 @@ namespace Win10BloatRemover
 
         [JsonProperty(Required = Required.Always)]
         public string[] WindowsFeaturesToRemove { private set; get; }
+
+        [JsonProperty(Required = Required.Always)]
+        public bool AllowInstallWimTweak { private set; get; }
     }
 }

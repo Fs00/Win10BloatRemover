@@ -56,5 +56,6 @@
     "Hello-Face-Package",
     "QuickAssist-Package"
   ],
-  "UWPAppsRemovalMode": "RemoveProvisionedPackages"
+  "UWPAppsRemovalMode": "RemoveProvisionedPackages",
+  "AllowInstallWimTweak": true
 }

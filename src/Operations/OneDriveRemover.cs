@@ -21,7 +21,7 @@ namespace Win10BloatRemover.Operations
             Process.Start(@"C:\Windows\explorer.exe");
 
             Console.WriteLine();
-            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-OneDrive-Setup");
+            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-OneDrive-Setup");
 
             Console.WriteLine("If you get an error when launching system programs, just log out and log in again.");
         }

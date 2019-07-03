@@ -17,7 +17,7 @@ namespace Win10BloatRemover.Operations
 
             Console.WriteLine();
 
-            OperationUtils.RemoveComponentUsingInstallWimTweak("Windows-Defender");
+            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Windows-Defender");
             TryUninstallSecurityCenter();
         }
 

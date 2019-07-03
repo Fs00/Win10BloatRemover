@@ -62,7 +62,7 @@ namespace Win10BloatRemover.Operations
                     "Microsoft.MixedReality.Portal"
                 }
             },
-            { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
+            { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect", "Microsoft.PPIProjection" } },
             { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
             { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
             { UWPAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
@@ -95,11 +95,11 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
             {
                 UWPAppGroup.Mobile,
-                () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-PPIProjection-Package")   // Connect app
+                () => OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-PPIProjection-Package")   // Connect app
             },
             {
                 UWPAppGroup.HelpAndFeedback,
-                () => OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContactSupport")
+                () => OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-ContactSupport")
             },
             { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UWPAppGroup.Messaging, RemoveMessagingService },
@@ -284,8 +284,8 @@ namespace Win10BloatRemover.Operations
 
         private static void RemoveStoreFeaturesAndServices()
         {
-            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-ContentDeliveryManager");
-            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Store");
+            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-ContentDeliveryManager");
+            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-Store");
 
             Console.WriteLine("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\WindowsStore"))

@@ -7,7 +7,7 @@ namespace Win10BloatRemover.Operations
     {
         public void PerformTask()
         {
-            OperationUtils.RemoveComponentUsingInstallWimTweak("Microsoft-Windows-Internet-Browser");
+            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-Internet-Browser");
             UWPAppRemover.RemoveEdgeResidualFiles();
             Console.WriteLine("A system reboot is recommended.");
         }

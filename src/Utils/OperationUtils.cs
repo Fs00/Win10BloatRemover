@@ -8,8 +8,15 @@ namespace Win10BloatRemover.Utils
          *  Removes the specified component using install-wim-tweak synchronously
          *  Messages from install-wim-tweak process are printed asynchronously (as soon as they are written to stdout/stderr)
          */
-        public static void RemoveComponentUsingInstallWimTweak(string component)
+        public static void RemoveComponentUsingInstallWimTweakIfAllowed(string component)
         {
+            if (!Configuration.Instance.AllowInstallWimTweak)
+            {
+                ConsoleUtils.WriteLine($"Skipped removal of component {component} using install-wim-tweak since " +
+                                       @"option ""AllowInstallWimTweak"" is set to false.", ConsoleColor.DarkYellow);
+                return;
+            }
+
             Console.WriteLine($"Running install-wim-tweak to remove {component}...");
             using (var installWimTweakProcess = SystemUtils.RunProcessWithAsyncOutputPrinting(Program.InstallWimTweakPath, $"/o /c {component} /r"))
             {

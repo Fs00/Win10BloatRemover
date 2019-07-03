@@ -46,8 +46,7 @@
     "\\Microsoft\\Windows\\SettingSync\\BackgroundUploadTask",
     "\\Microsoft\\Windows\\SettingSync\\NetworkStateChangeTask",
     "\\Microsoft\\Windows\\Diagnosis\\Scheduled",
-    "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo",
-    "\\Microsoft\\Windows\\TextServicesFramework\\MsCtfMonitor"
+    "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo"
   ],
   "WindowsFeaturesToRemove": [
     "InternetExplorer-Optional-Package",

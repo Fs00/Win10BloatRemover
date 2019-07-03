@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using Win10BloatRemover.Utils;
+using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations
 {
@@ -101,7 +102,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Messaging, RemoveMessagingService },
             { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
             { UWPAppGroup.Photos, RestoreWindowsPhotoViewer },
-            { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntries },
+            { UWPAppGroup.MixedReality, RemovePrint3DContextMenuEntriesAnd3DObjectsFolder },
             { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
             { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
             { UWPAppGroup.People, RemoveMailAndPeopleService },
@@ -187,7 +188,7 @@ namespace Win10BloatRemover.Operations
         {
             Console.WriteLine("Removing old files...");
             SystemUtils.DeleteDirectoryIfExists(
-                $@"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
+                $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
                 handleErrors: true
             );
         }
@@ -237,12 +238,21 @@ namespace Win10BloatRemover.Operations
                                              @"do (reg delete ""%I"" /f )");
         }
 
-        private static void RemovePrint3DContextMenuEntries()
+        private static void RemovePrint3DContextMenuEntriesAnd3DObjectsFolder()
         {
             Console.WriteLine("Removing 3D Print context menu entries...");
             ShellUtils.ExecuteWindowsCommand(@"echo off & for /f ""tokens=1* delims="" %I in " +
                                               @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
                                              @"do (reg delete ""%I"" /f )");
+
+            Console.WriteLine("Removing 3D Objects folder...");
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                                     @"\Explorer\MyComputer\NameSpace", true))
+                key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}");
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows" +
+                                     @"\CurrentVersion\Explorer\MyComputer\NameSpace", true))
+                key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}");
+            SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects", handleErrors: true);
         }
 
         private static void RestoreWindowsPhotoViewer()

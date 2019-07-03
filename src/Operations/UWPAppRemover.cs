@@ -97,10 +97,6 @@ namespace Win10BloatRemover.Operations
                 UWPAppGroup.Mobile,
                 () => OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-PPIProjection-Package")   // Connect app
             },
-            {
-                UWPAppGroup.HelpAndFeedback,
-                () => OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-ContactSupport")
-            },
             { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UWPAppGroup.Messaging, RemoveMessagingService },
             { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
@@ -109,7 +105,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
             { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
             { UWPAppGroup.People, RemoveMailAndPeopleService },
-            { UWPAppGroup.Store, RemoveStoreFeaturesAndServices }
+            { UWPAppGroup.Store, DisableStoreFeaturesAndServices }
         };
 
         private readonly UWPAppGroup[] appsToRemove;
@@ -280,11 +276,8 @@ namespace Win10BloatRemover.Operations
                 .PerformRemoval();
         }
 
-        private static void RemoveStoreFeaturesAndServices()
+        private static void DisableStoreFeaturesAndServices()
         {
-            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-ContentDeliveryManager");
-            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-Store");
-
             Console.WriteLine("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\WindowsStore"))
             {

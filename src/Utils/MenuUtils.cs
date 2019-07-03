@@ -118,7 +118,8 @@ namespace Win10BloatRemover.Utils
                            "It will become useless as soon as you install/remove an app, so make sure you don't have " +
                            "any problems with Windows Update or the Store after the operation is completed.\n" +
                            "Take note that you might not receive any more Windows feature updates after applying these modifications.\n" +
-                           "Before starting, make sure that the Store is not installing/updating apps in the background.";
+                           @"If you get the error ""attempt to write a readonly database"", try again and make sure that " +
+                           "the Store is not installing/updating apps in the background.";
 
                 case MenuEntry.RemoveUWPApps:
                     explanation = "The following groups of UWP apps will be removed:\n";

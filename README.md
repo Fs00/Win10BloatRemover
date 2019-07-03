@@ -1,9 +1,11 @@
 ﻿# Windows 10 Bloat Remover and Tweaker
-This configurable tool offers a simple CLI to debloat and apply some tweaks to your Windows 10 installation. Here's a comprehensive feature list:
+This configurable tool offers a simple CLI to aggressively debloat and apply some tweaks to your Windows 10 installation. Here's a comprehensive feature list:
 
-* **UWP apps removal**: Uninstalls the specified list of apps from all users and deletes their corresponding provisioned packages (if present), so that apps aren't reinstalled for new users or after feature updates.  
+* **Make system apps removable** by editing a system database. Thanks to this, apps like Edge, Connect and others can be deleted using normal PowerShell methods. Take note that after this modification you might not receive any more Windows major updates via Windows Update.  
+* **UWP apps removal:** Uninstalls the apps specified in configuration file for all users and optionally deletes their corresponding provisioned packages (if present), so that apps aren't reinstalled for new users or after feature updates.  
 Take note that you can't configure the program to remove single UWP packages but only groups of them, to make user configuration less tricky and because some apps are made of multiple packages (e.g. Xbox) which depend on each other. Groups are defined as follows:
-	* *Bing*: Weather and News
+    * ***Edge*** (you need to make system apps removable to uninstall it - can also be removed using install-wim-tweak)
+    * *Bing*: Weather and News
     * *Mobile*: YourPhone, Mobile plans and Connect app
     * *Xbox*: Xbox app, Game Overlay and related services
     * *OfficeHub*: My Office
@@ -20,25 +22,29 @@ Take note that you can't configure the program to remove single UWP packages but
     * *MixedReality*: 3D Viewer, Print 3D and Mixed Reality Portal
     * *Paint3D*
     * *Skype*
-    * *Photos*
+    * *Photos* (after removal, original Photo Viewer will be restored for your convenience)
     * *AlarmsAndClock*
     * *Calculator*
     * *SnipAndSketch*
-	* *Store*
+    * *Store*
 * **Automatic updates disabling:** Prevents automatic download and installing of Windows and Store apps updates through Group Policies. Therefore, this method won't work on Windows 10 Home.
-* **Telemetry disabling:** disables several telemetry and data collection-related features such as Compatibility Telemetry, Inventory, Device Census, SmartScreen and others. It also deletes the services which are responsible for diagnostics and data reporting to Microsoft.
+* **Telemetry disabling:** disables several telemetry and features that collect user data such as Compatibility Telemetry, Inventory, Device Census, SmartScreen and others. It also deletes the services which are responsible for diagnostics and data reporting to Microsoft.
 * **Services removal:** deletes (not just disables) the services specified in configuration after backing them up, so that you can restore them if any feature breaks.
-* **Removal of Windows Defender and Microsoft Edge:** this is accomplished using [install-wim-tweak](https://github.com/shiitake/win6x_registry_tweak) tool. Please take note that Security Center UWP package won't be removed to avoid breaking the system.
-* **OneDrive removal** using stock uninstaller, its folder in Explorer sidebar will also be hidden
-* **Windows features removal:** uninstalls the optional features packages specified in configuration. Take note that these features are the ones listed in Settings app, not the ones in Control Panel. You can find the names of installed features packages with the PowerShell command `Get-WindowsPackage -Online`.
-* **Cortana disabling:** accomplished using Group Policies, since removing it using install-wim-tweak would break Windows search.
+* **Removal of Windows Defender:** this is accomplished using [install-wim-tweak](https://github.com/shiitake/win6x_registry_tweak) tool. If you make system apps removable, Windows Security app will be deleted too.
+* **OneDrive removal** using stock uninstaller, its folder in Explorer sidebar will also be hidden. Furthermore, install-wim-tweak will be used to prevent the app to be re-installed for new users or after major Windows updates.
+* **Windows features removal:** uninstalls the optional features packages specified in configuration. Take note that these features are the ones listed in Settings app, not the ones in Control Panel. You can find the names of feature packages that can be removed with the PowerShell command `Get-WindowsPackage -Online`.
+* **Cortana disabling:** accomplished using Group Policies, since it is too deeply integrated with the system to be removed without consequences.
 * **Windows Tips and Error Reporting disabling** through Registry edits
 * **Scheduled tasks disabling** via schtasks.exe
 
-Warning: most of these operations are **NOT** reversible. If you don't know what you're doing, stay away from this tool.
+Warning: most of these operations are **NOT** reversible (see *Configuration* section below for more detail). If you don't know what you're doing, stay away from this tool.
 
 ## Configuration
-When the program is run for the first time, a configuration file called *config.json* is created containing the default settings. You can easily edit which services, system features, scheduled tasks and UWP app groups will be removed by adding or removing elements from the corresponding arrays. Please take note that `UWPAppsToRemove` array accepts only the values listed above.  
+When the program is run for the first time, a configuration file called *config.json* is created containing the default settings. You can easily edit which services, system features, scheduled tasks and groups of UWP apps (listed above) will be removed by adding or removing elements from the corresponding arrays (respectively `ServicesToRemove`, `WindowsFeaturesToRemove`, `ScheduledTasksToDisable` and `UWPAppsToRemove`).
+
+Furthermore, you have two other options to reduce the aggressiveness of the debloating process: `UWPAppsRemovalMode` and `AllowInstallWimTweak`. The first one allows you to decide not to remove provisioned packages by setting it to *KeepProvisionedPackages* (default is *RemoveProvisionedPackages*), while the latter can be set to *true* or *false* and if it's false, any execution of install-wim-tweak will be skipped.  
+These two settings have been added to make users able to limit the amount of changes made to the online Windows image, since they can't be reverted with system restore and carry over after major Windows updates.
+
 If any parsing error occurs, it will be displayed at application start-up and default settings will be loaded.
 
 ## Release cycle and versions

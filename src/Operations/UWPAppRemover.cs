@@ -111,6 +111,7 @@ namespace Win10BloatRemover.Operations
 
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
+        private PowerShell psInstance;
 
         public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode)
         {
@@ -120,7 +121,7 @@ namespace Win10BloatRemover.Operations
 
         public void PerformTask()
         {
-            using (PowerShell psInstance = PowerShell.Create())
+            using (psInstance = PowerShell.Create())
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
@@ -129,33 +130,7 @@ namespace Win10BloatRemover.Operations
                     bool atLeastOneAppUninstalled = false;
                     foreach (string appName in appNamesForGroup[appGroup])
                     {
-                        // The following script uninstalls the specified app package for all users when it is found
-                        // and removes the package from Windows image (so that new users don't find the removed app)
-                        string appRemovalScript =
-                            $"$package = Get-AppxPackage -AllUsers -Name \"{appName}\";" +
-                            "if ($package) {" +
-                                $"Write-Host \"Removing app {appName}...\";" +
-                                "$package | Remove-AppxPackage -AllUsers;" +
-                            "}" +
-                            "else {" +
-                                $"Write-Host \"App {appName} is not installed.\";" +
-                            "}";
-
-                        if (removalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
-                        {
-                            appRemovalScript +=
-                                "$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq \"" + appName + "\"};" +
-                                "if ($provisionedPackage) {" +
-                                    $"Write-Host \"Removing provisioned package for app {appName}...\";" +
-                                    "Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;" +
-                                "}" +
-                                "else {" +
-                                    $"Write-Host \"No provisioned package found for app {appName}\";" +
-                                "}";
-                        }
-
-                        psInstance.RunScriptAndPrintOutput(appRemovalScript);
-                        Console.WriteLine();
+                        UninstallApp(appName);
 
                         if (!atLeastOneAppUninstalled)
                             atLeastOneAppUninstalled = psInstance.GetVariable("package").IsNotEmpty();
@@ -178,6 +153,35 @@ namespace Win10BloatRemover.Operations
                     }
                 }
             }
+        }
+
+        private void UninstallApp(string appName)
+        {
+            string appRemovalScript =
+                @"$package = Get-AppxPackage -AllUsers -Name """ + appName + @""";
+                if ($package) {
+                    Write-Host ""Removing app " + appName + @"..."";
+                    $package | Remove-AppxPackage -AllUsers;
+                }
+                else {
+                    Write-Host ""App " + appName + @" is not installed."";
+                }";
+
+            if (removalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
+            {
+                appRemovalScript +=
+                    @"$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq """ + appName + @"""};
+                    if ($provisionedPackage) {
+                        Write-Host ""Removing provisioned package for app " + appName + @"..."";
+                        Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;
+                    }
+                    else {
+                        Write-Host ""No provisioned package found for app " + appName + @""";
+                    }";
+            }
+
+            psInstance.RunScriptAndPrintOutput(appRemovalScript);
+            Console.WriteLine();
         }
 
         /**

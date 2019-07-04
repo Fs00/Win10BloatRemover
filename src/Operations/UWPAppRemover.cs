@@ -166,7 +166,15 @@ namespace Win10BloatRemover.Operations
                     if (atLeastOneAppUninstalled && psInstance.Streams.Error.Count == 0)
                     {
                         Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
-                        PerformPostUninstallOperations(appGroup);
+                        try
+                        {
+                            PerformPostUninstallOperations(appGroup);
+                        }
+                        catch (Exception exc)
+                        {
+                            ConsoleUtils.WriteLine("Unable to complete post-uninstall operations " +
+                                                   $"for app group {appGroup}: {exc.Message}", ConsoleColor.Red);
+                        }
                     }
                 }
             }

@@ -44,23 +44,27 @@ namespace Win10BloatRemover.Operations
             {
                 foreach (string serviceName in servicesToRemove)
                 {
-                    // We find all the services that start with the specified service name, in order to include services that end with a random code
+                    // We find all the services that start with the specified service name,
+                    // in order to include services that end with a random code.
                     // Destination file will have the name of the service
                     string backupScript =
-                        "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
+                        "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name | " +
                                     "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
-                        "if ($services) {" +
-                            "foreach ($serviceName in $services) {" +
-                                $"reg export HKLM\\SYSTEM\\CurrentControlSet\\Services\\$serviceName {backupDirectory.FullName}\\$($serviceName).reg;" +
-                                "if ($LASTEXITCODE -ne 0)" +
-                                    "{ Write-Error \"Backup failed for service $serviceName.\" }" +
-                                "else" +
-                                    "{ Write-Host \"Service $serviceName backed up.\" }" +
-                            "}" +
-                        "}" +
-                        "else { Write-Host \"No services found with name " + serviceName + "\" }";
+                        @"if ($services) {
+                            foreach ($serviceName in $services) {
+                                reg export HKLM\SYSTEM\CurrentControlSet\Services\$serviceName " + 
+                                    backupDirectory.FullName + @"\$($serviceName).reg;
+                                if ($LASTEXITCODE -eq 0) {
+                                    Write-Host ""Service $serviceName backed up."";
+                                }
+                            }
+                        } else {
+                            Write-Host ""No services found with name " + serviceName + @""";
+                        }";
 
                     psInstance.RunScriptAndPrintOutput(backupScript);
+                    if (psInstance.HadErrors)
+                        throw new Exception("Could not complete backup for all services.");
                 }
             }
 
@@ -85,17 +89,20 @@ namespace Win10BloatRemover.Operations
                 foreach (string serviceName in servicesToRemove)
                 {
                     string removalScript =
-                        "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name |" +
+                        "$services = Get-ChildItem -Path HKLM:\\SYSTEM\\CurrentControlSet\\Services -Name | " +
                                     "Where-Object {$_ -Match \"^" + serviceName + "\"};" +
                         "foreach ($service in $services) {" +
-                            (removalMode == ServiceRemovalMode.ServiceControl ? 
-                            "sc.exe delete $service;" :
-                            "reg delete HKLM\\SYSTEM\\CurrentControlSet\\Services\\$service /f;") +
-                            "if ($LASTEXITCODE -eq 0)" +
-                                "{ Write-Host \"Service $service removed successfully.\" }" +
-                            "else" +
-                                "{ Write-Error \"Service $service removal failed: exit code $LASTEXITCODE\" }" +
-                        "}";
+                            (
+                                removalMode == ServiceRemovalMode.ServiceControl ? 
+                                    "sc.exe delete $service;" :
+                                    @"reg delete HKLM\SYSTEM\CurrentControlSet\Services\$service /f;"
+                            ) +
+                            @"if ($LASTEXITCODE -eq 0) {
+                                Write-Host ""Service $service removed successfully."";
+                            } else {
+                                Write-Error ""Service $service removal failed: exit code $LASTEXITCODE"";
+                            }
+                        }";
 
                     psInstance.RunScriptAndPrintOutput(removalScript);
                 }

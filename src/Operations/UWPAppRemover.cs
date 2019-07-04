@@ -256,12 +256,12 @@ namespace Win10BloatRemover.Operations
                                              @"do (reg delete ""%I"" /f )");
 
             Console.WriteLine("Removing 3D Objects folder...");
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion" +
-                                     @"\Explorer\MyComputer\NameSpace", true))
-                key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}");
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows" +
-                                     @"\CurrentVersion\Explorer\MyComputer\NameSpace", true))
-                key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}");
+            using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            {
+                using (RegistryKey key = localMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                                         @"\Explorer\MyComputer\NameSpace", true))
+                    key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}");
+            }
             SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects", handleErrors: true);
         }
 

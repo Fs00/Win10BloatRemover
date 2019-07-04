@@ -52,10 +52,11 @@ namespace Win10BloatRemover.Operations
         private void DisableOneDriveViaGroupPolicies()
         {
             ConsoleUtils.WriteLine("Disabling OneDrive via Group Policies...", ConsoleColor.Green);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
-                key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\WOW6432Node\Policies\Microsoft\Windows\OneDrive"))
-                key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
+            using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            {
+                using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
+                    key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
+            }
         }
 
         private void RemoveResidualFiles()
@@ -70,10 +71,11 @@ namespace Win10BloatRemover.Operations
         private void RemoveResidualRegistryKeys()
         {
             ConsoleUtils.WriteLine("Deleting old registry keys...", ConsoleColor.Green);
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"CLSID", true))
-                key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Wow6432Node\CLSID", true))
-                key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+            using (var classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry64))
+            {
+                using (RegistryKey key = classesRoot.OpenSubKey(@"CLSID", true))
+                    key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", false);
+            }
         }
     }
 }

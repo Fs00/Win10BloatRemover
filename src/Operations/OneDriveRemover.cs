@@ -62,10 +62,10 @@ namespace Win10BloatRemover.Operations
         private void RemoveResidualFiles()
         {
             ConsoleUtils.WriteLine("Removing old files...", ConsoleColor.Green);
-            SystemUtils.DeleteDirectoryIfExists(@"C:\OneDriveTemp", handleErrors: true);
-            SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", handleErrors: true);
-            SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", handleErrors: true);
-            SystemUtils.DeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", handleErrors: true);
+            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors(@"C:\OneDriveTemp");
+            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive");
+            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive");
+            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive");
         }
 
         private void RemoveResidualRegistryKeys()

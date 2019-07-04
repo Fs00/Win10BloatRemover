@@ -72,28 +72,26 @@ namespace Win10BloatRemover.Utils
             };
         }
 
-        /**
-         *  Deletes the folder passed recursively
-         *  Can optionally handle exceptions inside its body to avoid propagating of errors
-         */
-        public static void DeleteDirectoryIfExists(string path, bool handleErrors = false)
+        public static void DeleteDirectoryIfExistsAndHandleErrors(string path)
         {
-            if (handleErrors)
+            try
             {
-                try
-                {
-                    if (Directory.Exists(path))
-                        Directory.Delete(path, true);
-                }
-                catch (Exception exc)
-                {
-                    ConsoleUtils.WriteLine($"An error occurred when deleting folder {path}: {exc.Message}", ConsoleColor.Red);
-                }
+                DeleteDirectoryIfExists(path);
             }
-            else
+            catch (Exception exc)
             {
-                if (Directory.Exists(path))
-                    Directory.Delete(path, true);
+                ConsoleUtils.WriteLine($"An error occurred when deleting folder {path}: {exc.Message}", ConsoleColor.Red);
+            }
+        }
+
+        private static void DeleteDirectoryIfExists(string path)
+        {
+            var directoryToDelete = new DirectoryInfo(path);
+            if (directoryToDelete.Exists)
+            {
+                // Reset attributes of the folder (avoid errors if a folder is marked as read-only)
+                directoryToDelete.Attributes = FileAttributes.Directory;
+                directoryToDelete.Delete(recursive: true);
             }
         }
 

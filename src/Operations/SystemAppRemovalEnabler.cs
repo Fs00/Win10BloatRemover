@@ -24,11 +24,11 @@ namespace Win10BloatRemover.Operations
         private void StopAppXServices()
         {
             ConsoleUtils.WriteLine("Stopping AppX-related services...", ConsoleColor.Green);
-            ShellUtils.ExecuteWindowsCommand(
+            SystemUtils.ExecuteWindowsPromptCommand(
                 "sc stop AppXSVC > nul && " +
                 "echo Service AppXSVC stopped successfully."
             );
-            ShellUtils.ExecuteWindowsCommand(
+            SystemUtils.ExecuteWindowsPromptCommand(
                 "sc stop StateRepository > nul && " +
                 "echo Service StateRepository stopped successfully."
             );
@@ -37,7 +37,7 @@ namespace Win10BloatRemover.Operations
         private void RestartAppXServices()
         {
             ConsoleUtils.WriteLine("\nRestarting AppX-related services...", ConsoleColor.Green);
-            ShellUtils.ExecuteWindowsCommand("sc start AppXSVC > nul && echo Services restarted successfully.");
+            SystemUtils.ExecuteWindowsPromptCommand("sc start AppXSVC > nul && echo Services restarted successfully.");
         }
 
         private void GrantPermissionsOnAppRepository()

@@ -9,6 +9,13 @@ namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
+        public static void ExecuteWindowsPromptCommand(string command)
+        {
+            Debug.WriteLine($"Command executed: {command}");
+            using (var cmdProcess = RunProcessWithAsyncOutputPrinting("cmd.exe", $"/c \"{command}\""))
+                cmdProcess.WaitForExit();
+        }
+
         public static RegistryKey OpenSubKeyOrThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
         {
             RegistryKey subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);

@@ -23,7 +23,6 @@ namespace Win10BloatRemover.Operations
         public void PerformTask()
         {
             RemoveTelemetryServices();
-            ConsoleUtils.WriteLine("Performing some registry edits to disable telemetry-related features...", ConsoleColor.Green);
             DisableTelemetryFeaturesViaRegistryEdits();
         }
 
@@ -92,6 +91,8 @@ namespace Win10BloatRemover.Operations
          */
         private void DisableTelemetryFeaturesViaRegistryEdits()
         {
+            ConsoleUtils.WriteLine("Performing some registry edits to disable telemetry-related features...", ConsoleColor.Green);
+
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
                 key.SetValue("Start", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))

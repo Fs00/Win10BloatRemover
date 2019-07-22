@@ -49,7 +49,7 @@ namespace Win10BloatRemover.Operations
             {
                 var actualServicesToRemove = servicesNames.Where(name => name.StartsWith(serviceToRemove));
                 if (!actualServicesToRemove.Any())
-                    Console.WriteLine($"No services found with name {serviceToRemove}");
+                    Console.WriteLine($"No services found with name {serviceToRemove}.");
                 else
                     BackupServices(actualServicesToRemove);
             }
@@ -69,7 +69,7 @@ namespace Win10BloatRemover.Operations
                 );
 
                 if (regExportExitCode == 0)
-                    Console.WriteLine($"Service {service} backed up");
+                    Console.WriteLine($"Service {service} backed up.");
                 else
                     throw new Exception($"Could not backup service {service}.");
             }

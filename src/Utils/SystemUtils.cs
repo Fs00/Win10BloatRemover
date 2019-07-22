@@ -40,6 +40,15 @@ namespace Win10BloatRemover.Utils
             return subKey;
         }
 
+        public static void KillProcess(string processName)
+        {
+            foreach (var processToKill in Process.GetProcessesByName(processName))
+            {
+                processToKill.Kill();
+                processToKill.WaitForExit();
+            }
+        }
+
         public static int RunProcessSynchronously(string name, string args)
         {
             using (var process = CreateProcessInstance(name, args))

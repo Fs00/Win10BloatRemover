@@ -10,32 +10,23 @@ namespace Win10BloatRemover.Operations
     {
         public void PerformTask()
         {
-            KillProcess("onedrive.exe");
+            SystemUtils.KillProcess("onedrive");
             RunOneDriveUninstaller();
             DisableOneDriveViaGroupPolicies();
 
-            KillProcess("explorer.exe");
+            SystemUtils.KillProcess("explorer");
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
-            // Full path is needed otherwise it opens only an explorer window, without restoring the taskbar
-            Process.Start(@"C:\Windows\explorer.exe");
+            Process.Start("explorer");
 
             Console.WriteLine();
             OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-OneDrive-Setup");
-
-            ConsoleUtils.WriteLine("\nIf you get an error when launching system programs, just log out and log in again.", ConsoleColor.Cyan);
-        }
-
-        private void KillProcess(string processName)
-        {
-            ConsoleUtils.WriteLine($"Killing {processName}...", ConsoleColor.Green);
-            SystemUtils.RunProcessSynchronouslyWithConsoleOutput("taskkill", $"/F /IM {processName}");
         }
 
         private void RunOneDriveUninstaller()
         {
             string uninstallerPath = RetrieveOneDriveUninstallerPath();
-            ConsoleUtils.WriteLine("Executing OneDrive uninstaller...", ConsoleColor.Green);
+            Console.WriteLine("Executing OneDrive uninstaller...");
             int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(uninstallerPath, "/uninstall");
             if (exitCode != 0)
                 throw new Exception("OneDrive uninstaller terminated with non-zero status.");
@@ -51,7 +42,7 @@ namespace Win10BloatRemover.Operations
 
         private void DisableOneDriveViaGroupPolicies()
         {
-            ConsoleUtils.WriteLine("Disabling OneDrive via Group Policies...", ConsoleColor.Green);
+            Console.WriteLine("Disabling OneDrive via Group Policies...");
             using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
             {
                 using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
@@ -61,7 +52,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualFiles()
         {
-            ConsoleUtils.WriteLine("Removing old files...", ConsoleColor.Green);
+            Console.WriteLine("Removing old files...");
             SystemUtils.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp");
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive");
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive");
@@ -71,7 +62,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualRegistryKeys()
         {
-            ConsoleUtils.WriteLine("Deleting old registry keys...", ConsoleColor.Green);
+            Console.WriteLine("Deleting old registry keys...");
             using (var classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry64))
             {
                 using (RegistryKey key = classesRoot.OpenSubKey(@"CLSID", true))

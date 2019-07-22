@@ -32,5 +32,5 @@ using Win10BloatRemover;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build
 // usando l'asterisco '*' come illustrato di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(Program.SUPPORTED_WINDOWS_RELEASE_ID + ".1.0.0")]
-[assembly: AssemblyFileVersion(Program.SUPPORTED_WINDOWS_RELEASE_ID + ".1.0.0")]
+[assembly: AssemblyVersion(Program.SUPPORTED_WINDOWS_RELEASE_ID + ".1.1.0")]
+[assembly: AssemblyFileVersion(Program.SUPPORTED_WINDOWS_RELEASE_ID + ".1.1.0")]

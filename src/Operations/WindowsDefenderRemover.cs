@@ -7,7 +7,13 @@ namespace Win10BloatRemover.Operations
 {
     class WindowsDefenderRemover : IOperation
     {
-        private static readonly string[] SECURITY_HEALTH_SERVICES = new[] { "Sense", "SecurityHealthService", "wscsvc" };
+        private static readonly string[] SECURITY_HEALTH_SERVICES = new[] {
+            "SecurityHealthService",
+            "wscsvc",
+            "Sense",
+            "SgrmBroker",
+            "SgrmAgent"
+        };
         private const string SECURITY_CENTER_APP_NAME = "Microsoft.Windows.SecHealthUI";
 
         public void PerformTask()

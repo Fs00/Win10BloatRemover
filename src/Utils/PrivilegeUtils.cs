@@ -48,7 +48,7 @@ namespace Win10BloatRemover.Utils
 
         public static void GrantFullControlOnFile(string path)
         {
-            int takeownExitCode = SystemUtils.RunProcessSynchronously("takeown", $"/F {path}");
+            int takeownExitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput("takeown", $"/F {path}");
             if (takeownExitCode != 0)
                 throw new SecurityException($"Could not take ownership on file {path}.");
 
@@ -65,7 +65,7 @@ namespace Win10BloatRemover.Utils
 
         public static void GrantFullControlOnDirectory(string path)
         {
-            int takeownExitCode = SystemUtils.RunProcessSynchronously("takeown", $"/F {path}");
+            int takeownExitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput("takeown", $"/F {path}");
             if (takeownExitCode != 0)
                 throw new SecurityException($"Could not take ownership on directory {path}.");
 

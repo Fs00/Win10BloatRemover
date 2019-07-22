@@ -3,17 +3,31 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security.AccessControl;
+using System.ServiceProcess;
 using Microsoft.Win32;
 
 namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
+        public static void StartService(string name)
+        {
+            using (var serviceController = new ServiceController(name))
+                if (serviceController.Status == ServiceControllerStatus.Stopped)
+                    serviceController.Start();
+        }
+
+        public static void StopService(string name)
+        {
+            using (var serviceController = new ServiceController(name))
+                if (serviceController.Status == ServiceControllerStatus.Running)
+                    serviceController.Stop();
+        }
+
         public static void ExecuteWindowsPromptCommand(string command)
         {
             Debug.WriteLine($"Command executed: {command}");
-            using (var cmdProcess = RunProcessWithAsyncOutputPrinting("cmd.exe", $"/c \"{command}\""))
-                cmdProcess.WaitForExit();
+            RunProcessSynchronouslyWithConsoleOutput("cmd.exe", $"/c \"{command}\"");
         }
 
         public static RegistryKey OpenSubKeyOrThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
@@ -31,36 +45,32 @@ namespace Win10BloatRemover.Utils
             using (var process = CreateProcessInstance(name, args))
             {
                 process.Start();
-                process.PrintSynchronouslyOutputAndErrors();
                 process.WaitForExit();
                 return process.ExitCode;
             }
         }
 
-        // Locks the thread until the process stops writing on those streams (usually until its end)
-        private static void PrintSynchronouslyOutputAndErrors(this Process process)
+        public static int RunProcessSynchronouslyWithConsoleOutput(string name, string args)
         {
-            Console.Write(process.StandardOutput.ReadToEnd());
-            ConsoleUtils.Write(process.StandardError.ReadToEnd(), ConsoleColor.Red);
-        }
+            using (var process = CreateProcessInstance(name, args))
+            {
+                process.OutputDataReceived += (_, evt) =>
+                {
+                    if (!string.IsNullOrEmpty(evt.Data))
+                        Console.WriteLine(evt.Data);
+                };
+                process.ErrorDataReceived += (_, evt) =>
+                {
+                    if (!string.IsNullOrEmpty(evt.Data))
+                        ConsoleUtils.WriteLine(evt.Data, ConsoleColor.Red);
+                };
 
-        public static Process RunProcessWithAsyncOutputPrinting(string name, string args)
-        {
-            var process = CreateProcessInstance(name, args);
-
-            process.OutputDataReceived += (_, evt) => {
-                if (!string.IsNullOrEmpty(evt.Data))
-                    Console.WriteLine(evt.Data);
-            };
-            process.ErrorDataReceived += (_, evt) => {
-                if (!string.IsNullOrEmpty(evt.Data))
-                    ConsoleUtils.WriteLine(evt.Data, ConsoleColor.Red);
-            };
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            return process;
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+                return process.ExitCode;
+            }
         }
 
         private static Process CreateProcessInstance(string name, string args)
@@ -79,7 +89,7 @@ namespace Win10BloatRemover.Utils
             };
         }
 
-        public static void DeleteDirectoryIfExistsAndHandleErrors(string path)
+        public static void TryDeleteDirectoryIfExists(string path)
         {
             try
             {

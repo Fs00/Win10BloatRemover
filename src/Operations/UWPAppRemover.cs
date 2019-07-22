@@ -202,6 +202,9 @@ namespace Win10BloatRemover.Operations
             SystemUtils.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups"
             );
+            SystemUtils.TryDeleteDirectoryIfExists(
+                $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge"
+            );
         }
 
         private static void RemoveMapsServicesAndTasks()

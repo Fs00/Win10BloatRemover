@@ -44,8 +44,6 @@
     "\\Microsoft\\Windows\\PushToInstall\\Registration",
     "\\Microsoft\\Windows\\Subscription\\EnableLicenseAcquisition",
     "\\Microsoft\\Windows\\Subscription\\LicenseAcquisition",
-    "\\Microsoft\\Windows\\SettingSync\\BackgroundUploadTask",
-    "\\Microsoft\\Windows\\SettingSync\\NetworkStateChangeTask",
     "\\Microsoft\\Windows\\Diagnosis\\Scheduled",
     "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo",
     "\\Microsoft\\Windows\\Diagnosis\\RecommendedTroubleshootingScanner"

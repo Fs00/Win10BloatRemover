@@ -24,20 +24,19 @@ namespace Win10BloatRemover.Operations
         private void StopAppXServices()
         {
             ConsoleUtils.WriteLine("Stopping AppX-related services...", ConsoleColor.Green);
-            SystemUtils.ExecuteWindowsPromptCommand(
-                "sc stop AppXSVC > nul && " +
-                "echo Service AppXSVC stopped successfully."
-            );
-            SystemUtils.ExecuteWindowsPromptCommand(
-                "sc stop StateRepository > nul && " +
-                "echo Service StateRepository stopped successfully."
-            );
+
+            SystemUtils.StopService("AppXSVC");
+            Console.WriteLine("Service AppXSVC stopped successfully.");
+
+            SystemUtils.StopService("StateRepository");
+            Console.WriteLine("Service StateRepository stopped successfully.");
         }
 
         private void RestartAppXServices()
         {
             ConsoleUtils.WriteLine("\nRestarting AppX-related services...", ConsoleColor.Green);
-            SystemUtils.ExecuteWindowsPromptCommand("sc start AppXSVC > nul && echo Services restarted successfully.");
+            SystemUtils.StartService("AppXSVC");
+            Console.WriteLine("Services restarted successfully.");
         }
 
         private void GrantPermissionsOnAppRepository()
@@ -47,7 +46,7 @@ namespace Win10BloatRemover.Operations
             PrivilegeUtils.GrantFullControlOnFile(STATE_REPOSITORY_DB_PATH);
         }
 
-        // If backup fails, the entire operation will stop
+        // Exceptions are not caught so if backup fails, the entire operation will stop
         private void BackupStateRepositoryDatabase()
         {
             ConsoleUtils.WriteLine("\nBacking up state repository database...", ConsoleColor.Green);

@@ -29,14 +29,14 @@ namespace Win10BloatRemover.Operations
         private void KillProcess(string processName)
         {
             ConsoleUtils.WriteLine($"Killing {processName}...", ConsoleColor.Green);
-            SystemUtils.RunProcessSynchronously("taskkill", $"/F /IM {processName}");
+            SystemUtils.RunProcessSynchronouslyWithConsoleOutput("taskkill", $"/F /IM {processName}");
         }
 
         private void RunOneDriveUninstaller()
         {
             string uninstallerPath = RetrieveOneDriveUninstallerPath();
             ConsoleUtils.WriteLine("Executing OneDrive uninstaller...", ConsoleColor.Green);
-            int exitCode = SystemUtils.RunProcessSynchronously(uninstallerPath, "/uninstall");
+            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(uninstallerPath, "/uninstall");
             if (exitCode != 0)
                 throw new Exception("OneDrive uninstaller terminated with non-zero status.");
         }
@@ -62,10 +62,10 @@ namespace Win10BloatRemover.Operations
         private void RemoveResidualFiles()
         {
             ConsoleUtils.WriteLine("Removing old files...", ConsoleColor.Green);
-            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors(@"C:\OneDriveTemp");
-            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive");
-            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive");
-            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive");
+            SystemUtils.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp");
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive");
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive");
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive");
         }
 
         private void RemoveResidualRegistryKeys()

@@ -199,7 +199,7 @@ namespace Win10BloatRemover.Operations
         public static void RemoveEdgeResidualFiles()
         {
             Console.WriteLine("Removing old files...");
-            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors(
+            SystemUtils.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups"
             );
         }
@@ -263,7 +263,7 @@ namespace Win10BloatRemover.Operations
                                          @"\Explorer\MyComputer\NameSpace", true))
                     key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}");
             }
-            SystemUtils.DeleteDirectoryIfExistsAndHandleErrors($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects");
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects");
         }
 
         private static void RestoreWindowsPhotoViewer()

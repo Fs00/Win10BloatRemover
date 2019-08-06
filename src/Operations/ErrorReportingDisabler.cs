@@ -5,7 +5,7 @@ namespace Win10BloatRemover.Operations
 {
     class ErrorReportingDisabler : IOperation
     {
-        private static readonly string[] ERROR_REPORTING_SERVICES = new[] { "WerSvc", "wercplsupport" };
+        private static readonly string[] errorReportingServices = { "WerSvc", "wercplsupport" };
 
         public void PerformTask()
         {
@@ -25,7 +25,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveErrorReportingServices()
         {
             Console.WriteLine("Backing up and removing error reporting services...");
-            new ServiceRemover(ERROR_REPORTING_SERVICES)
+            new ServiceRemover(errorReportingServices)
                 .PerformBackup()
                 .PerformRemoval();
         }

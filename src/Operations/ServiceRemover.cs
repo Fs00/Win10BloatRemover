@@ -13,8 +13,7 @@ namespace Win10BloatRemover.Operations
         Registry
     }
 
-    /**
-     *  ServiceRemover
+    /*
      *  Performs backup (export of registry keys) and removal of those services whose name starts with the service names
      *  passed into the constructor.
      *  This is made in order to include services that end with a random code.
@@ -28,7 +27,7 @@ namespace Win10BloatRemover.Operations
         public ServiceRemover(string[] servicesToRemove)
         {
             this.servicesToRemove = servicesToRemove;
-            backupDirectory = new DirectoryInfo($"servicesBackup_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}");
+            backupDirectory = new DirectoryInfo($"servicesBackup_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}");
         }
 
         public void PerformTask()
@@ -44,10 +43,10 @@ namespace Win10BloatRemover.Operations
             if (backupPerformed)
                 throw new InvalidOperationException("Backup already done!");
 
-            string[] servicesNames = GetAllServicesNames();
+            string[] existingServicesNames = GetAllServicesNames();
             foreach (string serviceToRemove in servicesToRemove)
             {
-                var actualServicesToRemove = servicesNames.Where(name => name.StartsWith(serviceToRemove));
+                var actualServicesToRemove = existingServicesNames.Where(name => name.StartsWith(serviceToRemove));
                 if (!actualServicesToRemove.Any())
                     Console.WriteLine($"No services found with name {serviceToRemove}.");
                 else
@@ -56,6 +55,12 @@ namespace Win10BloatRemover.Operations
 
             backupPerformed = true;
             return this;    // allows chaining with PerformRemoval
+        }
+
+        private string[] GetAllServicesNames()
+        {
+            using (RegistryKey servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services"))
+                return servicesKey.GetSubKeyNames();
         }
 
         private void BackupServices(IEnumerable<string> actualServicesToBackup)
@@ -81,7 +86,7 @@ namespace Win10BloatRemover.Operations
                 backupDirectory.Create();
         }
 
-        /**
+        /*
          *  Performs the removal of the services by using either sc or reg command, according to the passed parameter
          *  (default is sc).
          *  reg command allows to remove unstoppable system services, like Windows Defender ones.
@@ -91,21 +96,15 @@ namespace Win10BloatRemover.Operations
             if (!backupPerformed)
                 throw new InvalidOperationException("Backup services before removing them!");
 
-            string[] servicesNames = GetAllServicesNames();
+            string[] existingServicesNames = GetAllServicesNames();
             foreach (string serviceToRemove in servicesToRemove)
             {
-                var actualServicesToRemove = servicesNames.Where(name => name.StartsWith(serviceToRemove));
+                var actualServicesToRemove = existingServicesNames.Where(name => name.StartsWith(serviceToRemove));
                 if (removalMode == ServiceRemovalMode.ServiceControl)
                     RemoveServicesUsingSC(actualServicesToRemove);
                 else if (removalMode == ServiceRemovalMode.Registry)
                     RemoveServicesByDeletingRegistryKeys(actualServicesToRemove);
             }
-        }
-
-        private string[] GetAllServicesNames()
-        {
-            using (RegistryKey servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services"))
-                return servicesKey.GetSubKeyNames();
         }
 
         private void RemoveServicesUsingSC(IEnumerable<string> actualServicesToRemove)

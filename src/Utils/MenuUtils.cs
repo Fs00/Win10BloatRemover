@@ -23,11 +23,10 @@ namespace Win10BloatRemover.Utils
         Quit
     }
 
-    /**
-     *  MenuUtils
+    /*
      *  Contains helper functions to display the menu
      */
-    class MenuUtils
+    static class MenuUtils
     {
         public static void PrintHeading()
         {

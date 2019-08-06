@@ -7,7 +7,7 @@ namespace Win10BloatRemover.Operations
 {
     class WindowsDefenderRemover : IOperation
     {
-        private static readonly string[] SECURITY_HEALTH_SERVICES = new[] {
+        private static readonly string[] securityHealthServices = {
             "SecurityHealthService",
             "wscsvc",
             "Sense",
@@ -69,7 +69,7 @@ namespace Win10BloatRemover.Operations
         {
             ConsoleUtils.WriteLine("\nRemoving Security Health services...", ConsoleColor.Green);
 
-            new ServiceRemover(SECURITY_HEALTH_SERVICES)
+            new ServiceRemover(securityHealthServices)
                 .PerformBackup()
                 .PerformRemoval(ServiceRemovalMode.Registry);
         }

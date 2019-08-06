@@ -125,34 +125,29 @@ namespace Win10BloatRemover.Operations
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
-                    ConsoleUtils.WriteLine($"Removing {appGroup.ToString()} app(s)...", ConsoleColor.Green);
+                    bool atLeastOneAppUninstalled = UninstallAppsOfGroup(appGroup);
 
-                    bool atLeastOneAppUninstalled = false;
-                    foreach (string appName in appNamesForGroup[appGroup])
-                    {
-                        UninstallApp(appName);
-
-                        if (!atLeastOneAppUninstalled)
-                            atLeastOneAppUninstalled = psInstance.GetVariable("package").IsNotEmpty();
-                    }
-
-                    // We check also if at least one app has been uninstalled to avoid
-                    // performing tasks when app is not installed anymore
+                    // We check if at least one app has been uninstalled to avoid
+                    // performing tasks when no app of the group are installed anymore
                     if (atLeastOneAppUninstalled && psInstance.Streams.Error.Count == 0)
-                    {
-                        Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
-                        try
-                        {
-                            PerformPostUninstallOperations(appGroup);
-                        }
-                        catch (Exception exc)
-                        {
-                            ConsoleUtils.WriteLine("Unable to complete post-uninstall operations " +
-                                                   $"for app group {appGroup}: {exc.Message}", ConsoleColor.Red);
-                        }
-                    }
+                        TryPerformPostUninstallOperations(appGroup);
                 }
             }
+        }
+
+        private bool UninstallAppsOfGroup(UWPAppGroup appGroup)
+        {
+            ConsoleUtils.WriteLine($"Removing {appGroup.ToString()} app(s)...", ConsoleColor.Green);
+
+            bool atLeastOneAppUninstalled = false;
+            foreach (string appName in appNamesForGroup[appGroup])
+            {
+                UninstallApp(appName);
+                if (!atLeastOneAppUninstalled)
+                    atLeastOneAppUninstalled = psInstance.GetVariable("package").IsNotEmpty();
+            }
+
+            return atLeastOneAppUninstalled;
         }
 
         private void UninstallApp(string appName)
@@ -184,9 +179,22 @@ namespace Win10BloatRemover.Operations
             Console.WriteLine();
         }
 
-        /**
-         * Removes any eventual services, scheduled tasks and/or registry keys related to the specified app group.
-         * In certain cases this method is used to remove certain apps that can be removed only by using install-wim-tweak.
+        private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
+        {
+            Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
+            try
+            {
+                PerformPostUninstallOperations(appGroup);
+            }
+            catch (Exception exc)
+            {
+                ConsoleUtils.WriteLine("Unable to complete post-uninstall operations " +
+                                       $"for app group {appGroup}: {exc.Message}", ConsoleColor.Red);
+            }
+        }
+
+        /*
+         * Removes any eventual services, scheduled tasks and/or registry keys related to the specified app group
          */
         private void PerformPostUninstallOperations(UWPAppGroup appGroup)
         {
@@ -262,7 +270,7 @@ namespace Win10BloatRemover.Operations
             );
 
             Console.WriteLine("Removing 3D Objects folder...");
-            using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            using (RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
             {
                 using (RegistryKey key = localMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion" +
                                          @"\Explorer\MyComputer\NameSpace", true))
@@ -279,14 +287,14 @@ namespace Win10BloatRemover.Operations
                 @"%SystemRoot%\System32\rundll32.exe ""%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll"", ImageView_Fullscreen %1";
             const string PHOTO_VIEWER_CLSID = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}";
 
-            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"Applications\photoviewer.dll\shell\open"))
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(@"Applications\photoviewer.dll\shell\open"))
                 key.SetValue("MuiVerb", "@photoviewer.dll,-3043", RegistryValueKind.String);
-            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"Applications\photoviewer.dll\shell\open\command"))
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(@"Applications\photoviewer.dll\shell\open\command"))
                 key.SetValue("(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString);
-            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"Applications\photoviewer.dll\shell\open\DropTarget"))
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(@"Applications\photoviewer.dll\shell\open\DropTarget"))
                 key.SetValue("Clsid", PHOTO_VIEWER_CLSID, RegistryValueKind.String);
 
-            string[] imageTypes = new[] { "Paint.Picture", "giffile", "jpegfile", "pngfile" };
+            string[] imageTypes = { "Paint.Picture", "giffile", "jpegfile", "pngfile" };
             foreach (string type in imageTypes)
             {
                 using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"{type}\shell\open\command"))

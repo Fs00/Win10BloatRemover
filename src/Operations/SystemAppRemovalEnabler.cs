@@ -9,8 +9,9 @@ namespace Win10BloatRemover.Operations
     {
         private const string STATE_REPOSITORY_DB_PATH =
             @"C:\ProgramData\Microsoft\Windows\AppRepository\StateRepository-Machine.srd";
-
         private const string AFTER_PACKAGE_UPDATE_TRIGGER_NAME = "TRG_AFTER_UPDATE_Package_SRJournal";
+
+        private SqliteConnection dbConnection;
 
         public void PerformTask()
         {
@@ -51,7 +52,7 @@ namespace Win10BloatRemover.Operations
         {
             ConsoleUtils.WriteLine("\nBacking up state repository database...", ConsoleColor.Green);
 
-            string backupFilePath = $"./StateRepository-Machine_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.srd";
+            string backupFilePath = $"./StateRepository-Machine_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.srd";
             File.Copy(STATE_REPOSITORY_DB_PATH, backupFilePath);
             Console.WriteLine($"Backup file written to {backupFilePath}.");
         }
@@ -65,19 +66,19 @@ namespace Win10BloatRemover.Operations
         {
             ConsoleUtils.WriteLine("\nEditing state repository database...", ConsoleColor.Green);
 
-            using (SqliteConnection dbConnection = new SqliteConnection($"Data Source={STATE_REPOSITORY_DB_PATH}"))
+            using (dbConnection = new SqliteConnection($"Data Source={STATE_REPOSITORY_DB_PATH}"))
             {
                 dbConnection.Open();
 
-                string triggerCode = RetrieveAfterPackageUpdateTriggerCode(dbConnection);
-                DeleteAfterPackageUpdateTrigger(dbConnection);
-                EditPackageTable(dbConnection);
+                string triggerCode = RetrieveAfterPackageUpdateTriggerCode();
+                DeleteAfterPackageUpdateTrigger();
+                EditPackageTable();
                 if (triggerCode != null)
-                    ReAddAfterPackageUpdateTrigger(triggerCode, dbConnection);
+                    ReAddAfterPackageUpdateTrigger(triggerCode);
             }
         }
 
-        private string RetrieveAfterPackageUpdateTriggerCode(SqliteConnection dbConnection)
+        private string RetrieveAfterPackageUpdateTriggerCode()
         {
             SqliteCommand query = new SqliteCommand(
                 $"SELECT sql FROM sqlite_master WHERE name='{AFTER_PACKAGE_UPDATE_TRIGGER_NAME}'",
@@ -86,7 +87,7 @@ namespace Win10BloatRemover.Operations
             return (string) query.ExecuteScalar();
         }
 
-        private void DeleteAfterPackageUpdateTrigger(SqliteConnection dbConnection)
+        private void DeleteAfterPackageUpdateTrigger()
         {
             SqliteCommand query = new SqliteCommand(
                 $"DROP TRIGGER IF EXISTS {AFTER_PACKAGE_UPDATE_TRIGGER_NAME}",
@@ -95,17 +96,17 @@ namespace Win10BloatRemover.Operations
             query.ExecuteNonQuery();
         }
 
-        private void EditPackageTable(SqliteConnection dbConnection)
+        private void EditPackageTable()
         {
             SqliteCommand query = new SqliteCommand(
                 $"UPDATE Package SET IsInbox=0 WHERE IsInbox=1",
                 dbConnection
             );
             int updatedRows = query.ExecuteNonQuery();
-            Console.WriteLine($"Edited {updatedRows} rows.");
+            Console.WriteLine($"Edited {updatedRows} row(s).");
         }
 
-        private void ReAddAfterPackageUpdateTrigger(string triggerCode, SqliteConnection dbConnection)
+        private void ReAddAfterPackageUpdateTrigger(string triggerCode)
         {
             SqliteCommand query = new SqliteCommand(triggerCode, dbConnection);
             query.ExecuteNonQuery();

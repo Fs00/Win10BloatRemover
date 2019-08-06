@@ -10,10 +10,7 @@ namespace Win10BloatRemover.Utils
 {
     static class PrivilegeUtils
     {
-        public const string RESTORE_PRIVILEGE = "SeRestorePrivilege";
-        public const string TAKE_OWNERSHIP_PRIVILEGE = "SeTakeOwnershipPrivilege";
-
-        // It's up to the caller to obtain the needed privileges (TakeOwnership, Restore) for this operation
+        // It's up to the caller to obtain the needed token privileges (TakeOwnership, Restore) for this operation
         public static void GrantFullControlOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
             using (RegistryKey subKey = registryKey.OpenSubKeyOrThrowIfMissing(subkeyName,
@@ -80,7 +77,10 @@ namespace Win10BloatRemover.Utils
             Directory.SetAccessControl(path, directoryAcl);
         }
 
-        public static void GrantPrivilege(string privilege)
+        public const string RESTORE_TOKEN_PRIVILEGE = "SeRestorePrivilege";
+        public const string TAKE_OWNERSHIP_TOKEN_PRIVILEGE = "SeTakeOwnershipPrivilege";
+
+        public static void GrantTokenPrivilege(string privilege)
         {
             OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle);
             SingleTokenPrivilege tokenPrivilege = new SingleTokenPrivilege {
@@ -91,10 +91,10 @@ namespace Win10BloatRemover.Utils
             LookupPrivilegeValue(null, privilege, out tokenPrivilege.Luid);
             bool successful = AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
             if (!successful)
-                throw new SecurityException($"Can't grant privilege {privilege}");
+                throw new SecurityException($"Can't grant token privilege {privilege}");
         }
 
-        public static void RevokePrivilege(string privilege)
+        public static void RevokeTokenPrivilege(string privilege)
         {
             OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle);
             SingleTokenPrivilege tokenPrivilege = new SingleTokenPrivilege {
@@ -105,9 +105,10 @@ namespace Win10BloatRemover.Utils
             LookupPrivilegeValue(null, privilege, out tokenPrivilege.Luid);
             bool successful = AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
             if (!successful)
-                throw new SecurityException($"Can't revoke privilege {privilege}");
+                throw new SecurityException($"Can't revoke token privilege {privilege}");
         }
 
+        #region P/Invoke methods and constants
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct SingleTokenPrivilege
         {
@@ -137,5 +138,6 @@ namespace Win10BloatRemover.Utils
 
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool LookupPrivilegeValue(string systemName, string privilegeName, out long privilegeLUID);
+        #endregion
     }
 }

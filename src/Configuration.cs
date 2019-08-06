@@ -7,49 +7,67 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
 {
-    /**
-     *  Configuration
+    class ConfigurationException : Exception
+    {
+        public ConfigurationException() {}
+        public ConfigurationException(string message) : base(message) {}
+        public ConfigurationException(string message, Exception inner) : base(message, inner) {}
+    }
+
+    /*
      *  Singleton class that stores user-configurable data, which are loaded from a JSON file
      */
     class Configuration
     {
         public static Configuration Instance { private set; get; }
+        private const string CONFIGURATION_FILE_NAME = "config.json";
 
-        /**
-         *  Initializes the singleton by loading settings from the config.json file found in current directory
-         *  If the file doesn't exist, it is created firstly using default settings
-         */
-        public static string Load()
+        // Singleton initializer: must be called at program startup
+        // Only ConfigurationExceptions thrown by this method should be handled (see below)
+        public static void Load()
         {
-            string errorMessage = null;
-            string configurationFile = "./config.json";
-            var defaultSettings = (string) new ResourceManager("Win10BloatRemover.resources.Resources",
-                                  typeof(Configuration).Assembly).GetObject("config.json");
+            // Failure while parsing default settings should make the program crash
+            string defaultSettingsFileContent = LoadDefaultSettings();
 
-            if (!File.Exists(configurationFile))
-            {
-                try
-                {
-                    File.WriteAllText(configurationFile, defaultSettings);
-                }
-                catch (Exception exc)
-                {
-                    errorMessage += $"Can't write configuration file with default settings: {exc.Message}\n";
-                }
-            }
+            if (File.Exists(CONFIGURATION_FILE_NAME))
+                TryLoadConfigFromFile();
+            else
+                WriteDefaultSettingsToFile(defaultSettingsFileContent);
+        }
 
-            // If loading settings from config.json file fails, default settings are loaded
+        private static string LoadDefaultSettings()
+        {
+            var defaultSettingsFileContent = (string) new ResourceManager("Win10BloatRemover.resources.Resources",
+                                             typeof(Configuration).Assembly).GetObject(CONFIGURATION_FILE_NAME);
+            Instance = JsonConvert.DeserializeObject<Configuration>(defaultSettingsFileContent);
+            return defaultSettingsFileContent;
+        }
+
+        private static void TryLoadConfigFromFile()
+        {
             try
             {
-                Instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationFile),
-                           new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });  // this setting seems not to work (why?)
+                Configuration fileParsingResult =
+                    JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(CONFIGURATION_FILE_NAME));
+                Instance = fileParsingResult;
             }
             catch (Exception exc)
             {
-                errorMessage += $"Error when loading custom settings file: {exc.Message}\nDefault settings have been loaded instead.\n";
-                Instance = JsonConvert.DeserializeObject<Configuration>(defaultSettings);
+                throw new ConfigurationException($"Error when loading custom settings file: {exc.Message}\n" +
+                                                 "Default settings have been loaded instead.\n");
             }
-            return errorMessage;
+        }
+
+        private static void WriteDefaultSettingsToFile(string defaultSettingsFileContent)
+        {
+            try
+            {
+                File.WriteAllText(CONFIGURATION_FILE_NAME, defaultSettingsFileContent);
+            }
+            catch (Exception exc)
+            {
+                throw new ConfigurationException($"Can't write configuration file with default settings: {exc.Message}\n");
+            }
         }
 
         [JsonProperty(Required = Required.Always)]

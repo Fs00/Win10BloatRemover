@@ -22,35 +22,38 @@ namespace Win10BloatRemover.Utils
          */
         public static void RunScriptAndPrintOutput(this PowerShell psInstance, string script)
         {
+            // Streams can be used by the caller to check for errors in the current script execution
             psInstance.Streams.ClearStreams();
 
-            // Make sure that the Runspace uses the current thread to execute commands (avoids wild thread spawning)
+            // By default PowerShell spawns one thread for each command, we must avoid it
             if (psInstance.Runspace.ThreadOptions != PSThreadOptions.UseCurrentThread)
-            {
-                psInstance.Runspace.Dispose();
-                psInstance.Runspace = RunspaceFactory.CreateRunspace();
-                psInstance.Runspace.ThreadOptions = PSThreadOptions.UseCurrentThread;
-                psInstance.Runspace.Open();
-            }
+                psInstance.CreateNewSingleThreadedRunspace();
 
-            AddOutputStreamsEventHandlers(psInstance);
-
+            psInstance.AddOutputStreamsEventHandlers();
             psInstance.AddScript(script);
             psInstance.Invoke();
+            psInstance.RemoveOutputStreamsEventHandlers();
 
-            RemoveOutputStreamsEventHandlers(psInstance);
             // Clear PowerShell pipeline to avoid the script being re-executed the next time we use this instance
             psInstance.Commands.Clear();
         }
 
-        private static void AddOutputStreamsEventHandlers(PowerShell psInstance)
+        private static void CreateNewSingleThreadedRunspace(this PowerShell psInstance)
+        {
+            psInstance.Runspace.Dispose();
+            psInstance.Runspace = RunspaceFactory.CreateRunspace();
+            psInstance.Runspace.ThreadOptions = PSThreadOptions.UseCurrentThread;
+            psInstance.Runspace.Open();
+        }
+
+        private static void AddOutputStreamsEventHandlers(this PowerShell psInstance)
         {
             psInstance.Streams.Information.DataAdded += PrintInformationString;
             psInstance.Streams.Error.DataAdded += PrintErrorString;
             psInstance.Streams.Warning.DataAdded += PrintWarningString;
         }
 
-        private static void RemoveOutputStreamsEventHandlers(PowerShell psInstance)
+        private static void RemoveOutputStreamsEventHandlers(this PowerShell psInstance)
         {
             psInstance.Streams.Information.DataAdded -= PrintInformationString;
             psInstance.Streams.Error.DataAdded -= PrintErrorString;

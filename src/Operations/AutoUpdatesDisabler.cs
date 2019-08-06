@@ -23,9 +23,9 @@ namespace Win10BloatRemover.Operations
 
         private void DisableAutomaticStoreUpdates()
         {
-            using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            using (RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
             {
-                using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsStore"))
+                using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsStore"))
                     key.SetValue("AutoDownload", 2, RegistryValueKind.DWord);
             }
         }

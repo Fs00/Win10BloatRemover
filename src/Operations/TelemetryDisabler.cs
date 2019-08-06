@@ -7,14 +7,14 @@ namespace Win10BloatRemover.Operations
 {
     class TelemetryDisabler : IOperation
     {
-        private static readonly string[] TELEMETRY_SERVICES = new[] {
+        private static readonly string[] telemetryServices = {
             "DiagTrack",
             "diagsvc",
             "diagnosticshub.standardcollector.service",
             "PcaSvc"
         };
 
-        private static readonly string[] PROTECTED_TELEMETRY_SERVICES = new[] {
+        private static readonly string[] protectedTelemetryServices = {
             "DPS",
             "WdiSystemHost",
             "WdiServiceHost"
@@ -29,41 +29,44 @@ namespace Win10BloatRemover.Operations
         private void RemoveTelemetryServices()
         {
             ConsoleUtils.WriteLine("Backing up and removing telemetry services...", ConsoleColor.Green);
-            new ServiceRemover(TELEMETRY_SERVICES)
+            new ServiceRemover(telemetryServices)
                 .PerformBackup()
                 .PerformRemoval();
 
-            new ServiceRemover(PROTECTED_TELEMETRY_SERVICES).PerformBackup();
+            new ServiceRemover(protectedTelemetryServices).PerformBackup();
             RemoveProtectedServices();
         }
 
         private void RemoveProtectedServices()
         {
-            PrivilegeUtils.GrantPrivilege(PrivilegeUtils.RESTORE_PRIVILEGE);
-            PrivilegeUtils.GrantPrivilege(PrivilegeUtils.TAKE_OWNERSHIP_PRIVILEGE);
+            PrivilegeUtils.GrantTokenPrivilege(PrivilegeUtils.RESTORE_TOKEN_PRIVILEGE);
+            PrivilegeUtils.GrantTokenPrivilege(PrivilegeUtils.TAKE_OWNERSHIP_TOKEN_PRIVILEGE);
 
             using (RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
             {
-                foreach (string serviceName in PROTECTED_TELEMETRY_SERVICES)
-                {
-                    try
-                    {
-                        RemoveProtectedService(serviceName, allServicesKey);
-                        Console.WriteLine($"Service {serviceName} removed successfully.");
-                    }
-                    catch (KeyNotFoundException)
-                    {
-                        Console.WriteLine($"Service {serviceName} is not present or its key can't be retrieved.");
-                    }
-                    catch (Exception exc)
-                    {
-                        ConsoleUtils.WriteLine($"Error while trying to delete service {serviceName}: {exc.Message}", ConsoleColor.Red);
-                    }
-                }
+                foreach (string serviceName in protectedTelemetryServices)
+                    TryRemoveProtectedService(serviceName, allServicesKey);
             }
 
-            PrivilegeUtils.RevokePrivilege(PrivilegeUtils.TAKE_OWNERSHIP_PRIVILEGE);
-            PrivilegeUtils.RevokePrivilege(PrivilegeUtils.RESTORE_PRIVILEGE);
+            PrivilegeUtils.RevokeTokenPrivilege(PrivilegeUtils.TAKE_OWNERSHIP_TOKEN_PRIVILEGE);
+            PrivilegeUtils.RevokeTokenPrivilege(PrivilegeUtils.RESTORE_TOKEN_PRIVILEGE);
+        }
+
+        private void TryRemoveProtectedService(string serviceName, RegistryKey allServicesKey)
+        {
+            try
+            {
+                RemoveProtectedService(serviceName, allServicesKey);
+                Console.WriteLine($"Service {serviceName} removed successfully.");
+            }
+            catch (KeyNotFoundException)
+            {
+                Console.WriteLine($"Service {serviceName} is not present or its key can't be retrieved.");
+            }
+            catch (Exception exc)
+            {
+                ConsoleUtils.WriteLine($"Error while trying to delete service {serviceName}: {exc.Message}", ConsoleColor.Red);
+            }
         }
 
         private void RemoveProtectedService(string serviceName, RegistryKey allServicesKey)
@@ -84,9 +87,9 @@ namespace Win10BloatRemover.Operations
             allServicesKey.DeleteSubKeyTree(serviceName);
         }
 
-        /**
-         *  Additional tasks to disable telemetry-related features
-         *  Include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
+        /*
+         *  Additional tasks to disable telemetry-related features.
+         *  They include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
          *   SmartScreen, Steps Recorder, Compatibility Assistant
          */
         private void DisableTelemetryFeaturesViaRegistryEdits()

@@ -4,7 +4,7 @@ namespace Win10BloatRemover.Utils
 {
     static class ConsoleUtils
     {
-        /**
+        /*
          *  Helper methods to print a message with a specific color
          */
         public static void WriteLine(string text, ConsoleColor color)
@@ -21,7 +21,7 @@ namespace Win10BloatRemover.Utils
             Console.ResetColor();
         }
 
-        /**
+        /*
          *  Equivalent of calling Console.ReadKey() after flushing standard input
          */
         public static ConsoleKeyInfo ReadKeyIgnoringBuffer()

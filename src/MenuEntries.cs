@@ -4,14 +4,14 @@ namespace Win10BloatRemover
 {
     abstract class MenuEntry
     {
-        public abstract string Description { get; }
+        public abstract string FullName { get; }
         public virtual string GetExplanation() => string.Empty;
         public virtual IOperation GetOperationInstance() => null;
     }
 
     class SystemAppRemovalEnablingEntry : MenuEntry
     {
-        public override string Description => "Make system apps removable";
+        public override string FullName => "Make system apps removable";
         public override string GetExplanation()
         {
             return "This procedure will edit an internal database to allow the removal of system UWP apps " +
@@ -28,7 +28,7 @@ namespace Win10BloatRemover
 
     class UWPAppRemovalEntry : MenuEntry
     {
-        public override string Description => "UWP apps removal";
+        public override string FullName => "UWP apps removal";
         public override string GetExplanation()
         {
             string explanation = "The following groups of UWP apps will be removed:\n";
@@ -52,7 +52,7 @@ namespace Win10BloatRemover
 
     class WinDefenderRemovalEntry : MenuEntry
     {
-        public override string Description => "Windows Defender removal";
+        public override string FullName => "Windows Defender removal";
         public override string GetExplanation()
         {
             return "Defender will be removed using install-wim-tweak and disabled via Group Policies.\n" +
@@ -64,7 +64,7 @@ namespace Win10BloatRemover
 
     class EdgeRemovalEntry : MenuEntry
     {
-        public override string Description => "Microsoft Edge removal";
+        public override string FullName => "Microsoft Edge removal";
         public override string GetExplanation()
         {
             return "Remember to unpin Edge from your taskbar, otherwise you won't be able to do it!\n" +
@@ -77,7 +77,7 @@ namespace Win10BloatRemover
 
     class OneDriveRemovalEntry : MenuEntry
     {
-        public override string Description => "OneDrive removal";
+        public override string FullName => "OneDrive removal";
         public override string GetExplanation()
         {
             return "If you allow the use of install-wim-tweak, this will prevent the app to be installed for " +
@@ -88,7 +88,7 @@ namespace Win10BloatRemover
 
     class ServicesRemovalEntry : MenuEntry
     {
-        public override string Description => "Miscellaneous services removal";
+        public override string FullName => "Miscellaneous services removal";
         public override string GetExplanation()
         {
             string explanation = "The services starting with the following names will be removed:\n";
@@ -101,7 +101,7 @@ namespace Win10BloatRemover
 
     class WindowsFeaturesRemovalEntry : MenuEntry
     {
-        public override string Description => "Windows features removal";
+        public override string FullName => "Windows features removal";
         public override string GetExplanation()
         {
             string explanation = "The following features will be removed:\n";
@@ -114,7 +114,7 @@ namespace Win10BloatRemover
 
     class TelemetryDisablingEntry : MenuEntry
     {
-        public override string Description => "Telemetry disabling";
+        public override string FullName => "Telemetry disabling";
         public override string GetExplanation()
         {
             return "This will backup and remove several telemetry-related services and disable features that " +
@@ -126,7 +126,7 @@ namespace Win10BloatRemover
 
     class CortanaDisablingEntry : MenuEntry
     {
-        public override string Description => "Cortana disabling";
+        public override string FullName => "Cortana disabling";
         public override string GetExplanation()
         {
             return "This won't remove Cortana (otherwise the system would break), it will only be disabled " +
@@ -137,7 +137,7 @@ namespace Win10BloatRemover
 
     class AutoUpdatesDisablingEntry : MenuEntry
     {
-        public override string Description => "Automatic Windows updates disabling";
+        public override string FullName => "Automatic Windows updates disabling";
         public override string GetExplanation()
         {
             return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
@@ -148,7 +148,7 @@ namespace Win10BloatRemover
 
     class ScheduledTasksDisablingEntry : MenuEntry
     {
-        public override string Description => "Miscellaneous scheduled tasks disabling";
+        public override string FullName => "Miscellaneous scheduled tasks disabling";
         public override string GetExplanation()
         {
             string explanation = "The following scheduled tasks will be disabled:\n";
@@ -163,7 +163,7 @@ namespace Win10BloatRemover
 
     class ErrorReportingDisablingEntry : MenuEntry
     {
-        public override string Description => "Windows Error Reporting disabling";
+        public override string FullName => "Windows Error Reporting disabling";
         public override string GetExplanation()
         {
             return "Windows Error Reporting will disabled by editing Group Policies, as well as by removing " +
@@ -174,13 +174,13 @@ namespace Win10BloatRemover
 
     class TipsAndFeedbackDisablingEntry : MenuEntry
     {
-        public override string Description => "Windows Tips and feedback requests disabling";
+        public override string FullName => "Windows Tips and feedback requests disabling";
         public override IOperation GetOperationInstance() => new WindowsTipsDisabler();
     }
 
     class NewGitHubIssueEntry : MenuEntry
     {
-        public override string Description => "Report an issue/Suggest a feature";
+        public override string FullName => "Report an issue/Suggest a feature";
         public override string GetExplanation()
         {
             return "Your browser will now open on a GitHub page where you will be able to " +
@@ -193,7 +193,7 @@ namespace Win10BloatRemover
 
     class CreditsEntry : MenuEntry
     {
-        public override string Description => "Credits and license";
+        public override string FullName => "Credits and license";
         public override string GetExplanation()
         {
             return "Developed by Fs00\n" +
@@ -206,7 +206,7 @@ namespace Win10BloatRemover
 
     class QuitEntry : MenuEntry
     {
-        public override string Description => "Exit the application";
+        public override string FullName => "Exit the application";
         public override string GetExplanation() => "Are you sure?";
     }
 }

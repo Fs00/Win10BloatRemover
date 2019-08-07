@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Resources;
 using System.Security.Principal;
-using Win10BloatRemover.Operations;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
@@ -12,9 +10,7 @@ namespace Win10BloatRemover
     static class Program
     {
         public const string SUPPORTED_WINDOWS_RELEASE_ID = "1809";
-
         public static string InstallWimTweakPath { get; } = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
-        private static bool exit = false;
 
         private static void Main()
         {
@@ -27,7 +23,7 @@ namespace Win10BloatRemover
             if (Configuration.Instance.AllowInstallWimTweak)
                 TryExtractInstallWimTweak();
 
-            RunMenuLoop();
+            Menu.RunLoopUntilExitRequested();
 
             TryDeleteExtractedInstallWimTweak();
         }
@@ -69,70 +65,6 @@ namespace Win10BloatRemover
                 Console.WriteLine("Press a key to continue to the main menu.");
                 Console.ReadKey();
             }
-        }
-
-        private static void RunMenuLoop()
-        {
-            while (!exit)
-            {
-                Console.Clear();
-                Menu.PrintHeading();
-                Menu.PrintMenu();
-
-                bool userInputIsCorrect = false;
-                MenuEntry chosenEntry = null;
-                while (!userInputIsCorrect)
-                {
-                    Console.Write("Choose an operation: ");
-                    chosenEntry = Menu.ProcessUserInput();
-                    if (chosenEntry == null)
-                        Console.WriteLine("Incorrect input.");
-                    else
-                        userInputIsCorrect = true;
-                }
-
-                Console.Clear();
-                ProcessMenuEntry(chosenEntry);
-            }
-        }
-
-        /*
-         *  Performs actions according to the MenuEntry chosen
-         */
-        private static void ProcessMenuEntry(MenuEntry entry)
-        {
-            ConsoleUtils.WriteLine($"-- {entry.Description} --", ConsoleColor.Green);
-            Console.WriteLine(entry.GetExplanation());
-            Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
-            if (Console.ReadKey().Key != ConsoleKey.Enter)
-                return;
-
-            if (entry is QuitEntry)
-            {
-                exit = true;
-                return;
-            }
-
-            try
-            {
-                Console.WriteLine();
-                IOperation operation = entry.GetOperationInstance();
-                if (operation == null)
-                {
-                    Debug.WriteLine($"Unimplemented operation: {entry}");
-                    return;
-                }
-                operation.PerformTask();
-
-                Console.Write("\nDone! ");
-            }
-            catch (Exception exc)
-            {
-                ConsoleUtils.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
-            }
-
-            Console.WriteLine("Press a key to return to the main menu");
-            ConsoleUtils.ReadKeyIgnoringBuffer();
         }
 
         private static void TryExtractInstallWimTweak()

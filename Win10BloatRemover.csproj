@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Configuration.cs" />
+    <Compile Include="src\MenuEntries.cs" />
     <Compile Include="src\Operations\AutoUpdatesDisabler.cs" />
     <Compile Include="src\Operations\BrowserOpener.cs" />
     <Compile Include="src\Operations\CortanaDisabler.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="src\Operations\WindowsDefenderRemover.cs" />
     <Compile Include="src\Operations\WindowsTipsDisabler.cs" />
     <Compile Include="src\Utils\ConsoleUtils.cs" />
-    <Compile Include="src\Utils\MenuUtils.cs" />
+    <Compile Include="src\Menu.cs" />
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Operations\ServiceRemover.cs" />

@@ -76,15 +76,15 @@ namespace Win10BloatRemover
             while (!exit)
             {
                 Console.Clear();
-                MenuUtils.PrintHeading();
-                MenuUtils.PrintMenu();
+                Menu.PrintHeading();
+                Menu.PrintMenu();
 
                 bool userInputIsCorrect = false;
-                MenuEntry? chosenEntry = null;
+                MenuEntry chosenEntry = null;
                 while (!userInputIsCorrect)
                 {
                     Console.Write("Choose an operation: ");
-                    chosenEntry = MenuUtils.ProcessUserInput();
+                    chosenEntry = Menu.ProcessUserInput();
                     if (chosenEntry == null)
                         Console.WriteLine("Incorrect input.");
                     else
@@ -92,7 +92,7 @@ namespace Win10BloatRemover
                 }
 
                 Console.Clear();
-                ProcessMenuEntry(chosenEntry.Value);
+                ProcessMenuEntry(chosenEntry);
             }
         }
 
@@ -101,13 +101,13 @@ namespace Win10BloatRemover
          */
         private static void ProcessMenuEntry(MenuEntry entry)
         {
-            ConsoleUtils.WriteLine($"-- {MenuUtils.GetMenuEntryDescription(entry)} --", ConsoleColor.Green);
-            Console.WriteLine(MenuUtils.GetMenuEntryExplanation(entry));
+            ConsoleUtils.WriteLine($"-- {entry.Description} --", ConsoleColor.Green);
+            Console.WriteLine(entry.GetExplanation());
             Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
             if (Console.ReadKey().Key != ConsoleKey.Enter)
                 return;
 
-            if (entry == MenuEntry.Quit)
+            if (entry is QuitEntry)
             {
                 exit = true;
                 return;
@@ -116,10 +116,10 @@ namespace Win10BloatRemover
             try
             {
                 Console.WriteLine();
-                IOperation operation = MenuUtils.GetOperationInstanceForMenuEntry(entry);
+                IOperation operation = entry.GetOperationInstance();
                 if (operation == null)
                 {
-                    Debug.WriteLine($"Unimplemented operation: {entry.ToString()}");
+                    Debug.WriteLine($"Unimplemented operation: {entry}");
                     return;
                 }
                 operation.PerformTask();

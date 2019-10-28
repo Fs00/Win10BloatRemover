@@ -1,4 +1,5 @@
-﻿using Win10BloatRemover.Operations;
+﻿using System;
+using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
 {
@@ -192,12 +193,15 @@ namespace Win10BloatRemover
             => new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
     }
 
-    class CreditsEntry : MenuEntry
+    class AboutEntry : MenuEntry
     {
-        public override string FullName => "Credits and license";
+        public override string FullName => "About this program";
         public override string GetExplanation()
         {
-            return "Developed by Fs00\n" +
+            Version programVersion = GetType().Assembly.GetName().Version;
+            return $"Windows 10 Bloat Remover and Tweaker {programVersion.Major}.{programVersion.Minor} " +
+                   $"for Windows version {programVersion.Build}\n\n" +
+                   "Developed by Fs00\n" +
                    "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +
                    "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n\n" +
                    "This software is released under BSD 3-Clause Clear license (continue to read full text).";

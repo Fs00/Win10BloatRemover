@@ -48,7 +48,7 @@ These two settings have been added to make users able to limit the amount of cha
 If any parsing error occurs, it will be displayed at application start-up and default settings will be loaded.
 
 ## Release cycle and versions
-The binaries of this tool are Windows version-specific, so for example there are different executables for version 1809 and 1903. Version numbers of the program start with the number of the supported Windows version, so you can see at a glance if you have the right binary for your system.  
+The binaries of this tool are Windows version-specific (e.g. versions 1809 and 1903 have different executables) to avoid compatibility issues. The third segment of the program version is the supported Windows version (previously it was the first segment), so you can see at a glance if you have the right binary for your system.  
 The tool will be updated whenever there is a new Windows version. The master branch will host the source code for the latest Windows version. Older versions up to one year will receive the latest features (if any) implemented in the master branch.
 
 ## Credits

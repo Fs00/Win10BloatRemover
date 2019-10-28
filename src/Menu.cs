@@ -8,6 +8,7 @@ namespace Win10BloatRemover
     static class Menu
     {
         private static bool exitRequested = false;
+        private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version;
         private static readonly MenuEntry[] orderedMenuEntries = {
             new SystemAppRemovalEnablingEntry(),
             new UWPAppRemovalEntry(),
@@ -23,7 +24,7 @@ namespace Win10BloatRemover
             new ErrorReportingDisablingEntry(),
             new TipsAndFeedbackDisablingEntry(),
             new NewGitHubIssueEntry(),
-            new CreditsEntry(),
+            new AboutEntry(),
             new QuitEntry()
         };
 
@@ -47,7 +48,7 @@ namespace Win10BloatRemover
         {
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine("|    Windows 10 Bloat Remover and Tweaker   |");
-            Console.WriteLine("|             for version " + Program.SUPPORTED_WINDOWS_RELEASE_ID + "              |");
+            Console.WriteLine($"|                version {programVersion.Major}.{programVersion.Minor}                |");
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine();
         }

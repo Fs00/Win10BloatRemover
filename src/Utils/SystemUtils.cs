@@ -17,7 +17,7 @@ namespace Win10BloatRemover.Utils
                     serviceController.Start();
         }
 
-        public static void StopService(string name)
+        public static void StopServiceAndItsDependents(string name)
         {
             using (var serviceController = new ServiceController(name))
                 if (serviceController.Status == ServiceControllerStatus.Running)

@@ -25,17 +25,14 @@ namespace Win10BloatRemover.Operations
         private void StopAppXServices()
         {
             ConsoleUtils.WriteLine("Stopping AppX-related services...", ConsoleColor.Green);
-
-            SystemUtils.StopService("AppXSVC");
-            Console.WriteLine("Service AppXSVC stopped successfully.");
-
-            SystemUtils.StopService("StateRepository");
-            Console.WriteLine("Service StateRepository stopped successfully.");
+            SystemUtils.StopServiceAndItsDependents("StateRepository");
+            Console.WriteLine("AppX-related services stopped successfully.");
         }
 
         private void RestartAppXServices()
         {
             ConsoleUtils.WriteLine("\nRestarting AppX-related services...", ConsoleColor.Green);
+            // AppXSVC depends on StateRepository, so starting the first will automatically start the latter too
             SystemUtils.StartService("AppXSVC");
             Console.WriteLine("Services restarted successfully.");
         }
@@ -58,9 +55,8 @@ namespace Win10BloatRemover.Operations
         }
 
         /*
-         *  Before performing the actual edits, we backup and remove a trigger that runs after
+         *  Before performing the actual edits, we need to "temporary disable" a trigger that runs after
          *  every UPDATE executed on the table we are going to edit, since it causes problems.
-         *  After the modifications, the trigger is added back into the database.
          */
         private void EditStateRepositoryDatabase()
         {

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Security.AccessControl;
 using System.ServiceProcess;
 using Microsoft.Win32;
 
@@ -28,16 +26,6 @@ namespace Win10BloatRemover.Utils
         {
             Debug.WriteLine($"Command executed: {command}");
             RunProcessSynchronouslyWithConsoleOutput("cmd.exe", $"/c \"{command}\"");
-        }
-
-        public static RegistryKey OpenSubKeyOrThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
-        {
-            RegistryKey subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);
-
-            if (subKey == null)
-                throw new KeyNotFoundException($"Subkey {subkeyName} not found.");
-
-            return subKey;
         }
 
         public static void KillProcess(string processName)

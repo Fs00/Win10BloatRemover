@@ -16,18 +16,16 @@ namespace Win10BloatRemover.Operations
 
         public void PerformTask()
         {
-            PrivilegeUtils.GrantTokenPrivilege(PrivilegeUtils.BACKUP_TOKEN_PRIVILEGE);
-            PrivilegeUtils.GrantTokenPrivilege(PrivilegeUtils.RESTORE_TOKEN_PRIVILEGE);
-
-            StopAppXServices();
-            BackupStateRepositoryDatabase();
-            string databaseCopyPath = CopyStateRepositoryDatabase();
-            EditStateRepositoryDatabase(databaseCopyPath);
-            ReplaceStateRepositoryDatabaseWith(databaseCopyPath);
-            RestartAppXServices();
-
-            PrivilegeUtils.RevokeTokenPrivilege(PrivilegeUtils.BACKUP_TOKEN_PRIVILEGE);
-            PrivilegeUtils.RevokeTokenPrivilege(PrivilegeUtils.RESTORE_TOKEN_PRIVILEGE);
+            using (TokenPrivilege.Backup)
+            using (TokenPrivilege.Restore)
+            {
+                StopAppXServices();
+                BackupStateRepositoryDatabase();
+                string databaseCopyPath = CopyStateRepositoryDatabase();
+                EditStateRepositoryDatabase(databaseCopyPath);
+                ReplaceStateRepositoryDatabaseWith(databaseCopyPath);
+                RestartAppXServices();
+            }
         }
 
         private void StopAppXServices()

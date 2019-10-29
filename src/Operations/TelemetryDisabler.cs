@@ -39,17 +39,12 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveProtectedServices()
         {
-            PrivilegeUtils.GrantTokenPrivilege(PrivilegeUtils.RESTORE_TOKEN_PRIVILEGE);
-            PrivilegeUtils.GrantTokenPrivilege(PrivilegeUtils.TAKE_OWNERSHIP_TOKEN_PRIVILEGE);
-
-            using (RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true))
+            using (TokenPrivilege.TakeOwnership)
             {
+                using RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true);
                 foreach (string serviceName in protectedTelemetryServices)
                     TryRemoveProtectedService(serviceName, allServicesKey);
             }
-
-            PrivilegeUtils.RevokeTokenPrivilege(PrivilegeUtils.TAKE_OWNERSHIP_TOKEN_PRIVILEGE);
-            PrivilegeUtils.RevokeTokenPrivilege(PrivilegeUtils.RESTORE_TOKEN_PRIVILEGE);
         }
 
         private void TryRemoveProtectedService(string serviceName, RegistryKey allServicesKey)
@@ -72,7 +67,6 @@ namespace Win10BloatRemover.Operations
         private void RemoveProtectedService(string serviceName, RegistryKey allServicesKey)
         {
             allServicesKey.GrantFullControlOnSubKey(serviceName);
-
             using (RegistryKey serviceKey = allServicesKey.OpenSubKey(serviceName, true))
             {
                 foreach (string subkeyName in serviceKey.GetSubKeyNames())

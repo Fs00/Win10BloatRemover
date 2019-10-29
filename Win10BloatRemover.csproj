@@ -1,105 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{759F045D-ADBF-4867-A0F7-F2D066E0C390}</ProjectGuid>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Win10BloatRemover</RootNamespace>
-    <AssemblyName>Win10BloatRemover</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="src\Configuration.cs" />
-    <Compile Include="src\MenuEntries.cs" />
-    <Compile Include="src\Operations\AutoUpdatesDisabler.cs" />
-    <Compile Include="src\Operations\BrowserOpener.cs" />
-    <Compile Include="src\Operations\CortanaDisabler.cs" />
-    <Compile Include="src\Operations\ErrorReportingDisabler.cs" />
-    <Compile Include="src\Operations\FeaturesRemover.cs" />
-    <Compile Include="src\Operations\IOperation.cs" />
-    <Compile Include="src\Operations\LicensePrinter.cs" />
-    <Compile Include="src\Operations\OneDriveRemover.cs" />
-    <Compile Include="src\Operations\ScheduledTasksDisabler.cs" />
-    <Compile Include="src\Operations\SystemAppRemovalEnabler.cs" />
-    <Compile Include="src\Operations\TelemetryDisabler.cs" />
-    <Compile Include="src\Operations\WindowsDefenderRemover.cs" />
-    <Compile Include="src\Operations\WindowsTipsDisabler.cs" />
-    <Compile Include="src\Utils\ConsoleUtils.cs" />
-    <Compile Include="src\Menu.cs" />
-    <Compile Include="src\Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Operations\ServiceRemover.cs" />
-    <Compile Include="src\Utils\PrivilegeUtils.cs" />
-    <Compile Include="src\Utils\PowerShellExtensions.cs" />
-    <Compile Include="src\Utils\SystemUtils.cs" />
-    <Compile Include="src\Utils\OperationUtils.cs" />
-    <Compile Include="src\Operations\UWPAppRemover.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\Resources.resx">
+    <EmbeddedResource Update="resources\Resources.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\App.manifest" />
-    <None Include="README.md" />
-    <None Include="resources\config.json" />
-    <None Include="resources\install_wim_tweak.exe" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite">
-      <Version>2.2.4</Version>
+      <Version>3.0.0</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.PowerShell.5.1.ReferenceAssemblies">
-      <Version>1.0.0</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.0-preview.4" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\LicenseText.txt" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

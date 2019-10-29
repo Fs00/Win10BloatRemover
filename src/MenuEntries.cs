@@ -20,9 +20,8 @@ namespace Win10BloatRemover
                    "A backup of the database will be saved in the current directory. " +
                    "It will become useless as soon as you install/remove an app, so make sure you don't have " +
                    "any problems with Windows Update or the Store after the operation is completed.\n" +
-                   "Take note that you might not receive any more Windows feature updates after applying these modifications.\n" +
-                   @"If you get the error ""attempt to write a readonly database"", try again and make sure that " +
-                   "the Store is not installing/updating apps in the background.";
+                   "REMOVING SYSTEM APPS CAN PREVENT WINDOWS UPDATES FROM BEING INSTALLED; PROCEED AT YOUR OWN RISK.\n\n" +
+                   "Before starting, make sure that the Store is not installing/updating apps in the background.";
         }
         public override IOperation GetOperationInstance() => new SystemAppRemovalEnabler();
     }

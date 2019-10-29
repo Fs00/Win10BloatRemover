@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.AccessControl;
@@ -43,40 +42,7 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static void GrantFullControlOnFile(string path)
-        {
-            int takeownExitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput("takeown", $"/F {path}");
-            if (takeownExitCode != 0)
-                throw new SecurityException($"Could not take ownership on file {path}.");
-
-            FileSecurity fileAcl = File.GetAccessControl(path);
-            fileAcl.AddAccessRule(new FileSystemAccessRule(
-                WindowsIdentity.GetCurrent().User,
-                FileSystemRights.FullControl,
-                InheritanceFlags.None,
-                PropagationFlags.None,
-                AccessControlType.Allow
-            ));
-            File.SetAccessControl(path, fileAcl);
-        }
-
-        public static void GrantFullControlOnDirectory(string path)
-        {
-            int takeownExitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput("takeown", $"/F {path}");
-            if (takeownExitCode != 0)
-                throw new SecurityException($"Could not take ownership on directory {path}.");
-
-            DirectorySecurity directoryAcl = Directory.GetAccessControl(path);
-            directoryAcl.AddAccessRule(new FileSystemAccessRule(
-                WindowsIdentity.GetCurrent().User,
-                FileSystemRights.FullControl,
-                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                PropagationFlags.None,
-                AccessControlType.Allow
-            ));
-            Directory.SetAccessControl(path, directoryAcl);
-        }
-
+        public const string BACKUP_TOKEN_PRIVILEGE = "SeBackupPrivilege";
         public const string RESTORE_TOKEN_PRIVILEGE = "SeRestorePrivilege";
         public const string TAKE_OWNERSHIP_TOKEN_PRIVILEGE = "SeTakeOwnershipPrivilege";
 
@@ -90,7 +56,7 @@ namespace Win10BloatRemover.Utils
             };
             LookupPrivilegeValue(null, privilege, out tokenPrivilege.Luid);
             bool successful = AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
-            if (!successful)
+            if (!successful || Marshal.GetLastWin32Error() == ERROR_NOT_ALL_ASSIGNED)
                 throw new SecurityException($"Can't grant token privilege {privilege}");
         }
 
@@ -104,11 +70,13 @@ namespace Win10BloatRemover.Utils
             };
             LookupPrivilegeValue(null, privilege, out tokenPrivilege.Luid);
             bool successful = AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivilege, 0, IntPtr.Zero, IntPtr.Zero);
-            if (!successful)
+            if (!successful || Marshal.GetLastWin32Error() == ERROR_NOT_ALL_ASSIGNED)
                 throw new SecurityException($"Can't revoke token privilege {privilege}");
         }
 
         #region P/Invoke methods and constants
+        private const int ERROR_NOT_ALL_ASSIGNED = 1300;
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct SingleTokenPrivilege
         {

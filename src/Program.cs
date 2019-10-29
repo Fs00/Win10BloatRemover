@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Resources;
 using System.Security.Principal;
@@ -14,7 +13,6 @@ namespace Win10BloatRemover
 
         private static void Main()
         {
-            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en");
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
             EnsurePreliminaryChecksAreSuccessful();

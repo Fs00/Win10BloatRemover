@@ -105,7 +105,7 @@ namespace Win10BloatRemover.Utils
         private static extern bool OpenProcessToken(IntPtr processHandle, int desiredAccess, out IntPtr tokenHandle);
 
         [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern bool LookupPrivilegeValue(string systemName, string privilegeName, out Luid privilegeLuid);
+        private static extern bool LookupPrivilegeValue(string? systemName, string privilegeName, out Luid privilegeLuid);
         #endregion
     }
 }

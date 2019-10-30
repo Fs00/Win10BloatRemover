@@ -8,7 +8,7 @@ namespace Win10BloatRemover
     static class Menu
     {
         private static bool exitRequested = false;
-        private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version;
+        private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version!;
         private static readonly MenuEntry[] orderedMenuEntries = {
             new SystemAppRemovalEnablingEntry(),
             new UWPAppRemovalEntry(),
@@ -63,7 +63,7 @@ namespace Win10BloatRemover
 
         private static MenuEntry RequestUserChoice()
         {
-            MenuEntry chosenEntry = null;
+            MenuEntry? chosenEntry = null;
             bool isUserInputCorrect = false;
             while (!isUserInputCorrect)
             {
@@ -74,10 +74,10 @@ namespace Win10BloatRemover
                 else
                     isUserInputCorrect = true;
             }
-            return chosenEntry;
+            return chosenEntry!;
         }
 
-        private static MenuEntry GetEntryCorrespondingToUserInput(string userInput)
+        private static MenuEntry? GetEntryCorrespondingToUserInput(string userInput)
         {
             bool inputIsNumeric = int.TryParse(userInput, out int entryIndex);
             if (inputIsNumeric)
@@ -112,7 +112,7 @@ namespace Win10BloatRemover
             try
             {
                 Console.WriteLine();
-                IOperation operation = entry.GetOperationInstance();
+                IOperation? operation = entry.GetOperationInstance();
                 if (operation == null)
                     return;
 

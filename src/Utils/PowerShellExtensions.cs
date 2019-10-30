@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Win10BloatRemover.Utils
 {
@@ -60,22 +61,31 @@ namespace Win10BloatRemover.Utils
             psInstance.Streams.Warning.DataAdded -= PrintWarningString;
         }
 
-        private static void PrintInformationString(object sender, DataAddedEventArgs eventArgs)
+        private static void PrintInformationString(object? sender, DataAddedEventArgs eventArgs)
         {
+            ThrowIfNull(sender, nameof(sender));
             var powerShellStream = (PSDataCollection<InformationRecord>) sender;
             Console.WriteLine(powerShellStream[eventArgs.Index].ToString());
         }
 
-        private static void PrintErrorString(object sender, DataAddedEventArgs eventArgs)
+        private static void PrintErrorString(object? sender, DataAddedEventArgs eventArgs)
         {
+            ThrowIfNull(sender, nameof(sender));
             var powerShellStream = (PSDataCollection<ErrorRecord>) sender;
             ConsoleUtils.WriteLine(powerShellStream[eventArgs.Index].ToString(), ConsoleColor.Red);
         }
 
-        private static void PrintWarningString(object sender, DataAddedEventArgs eventArgs)
+        private static void PrintWarningString(object? sender, DataAddedEventArgs eventArgs)
         {
+            ThrowIfNull(sender, nameof(sender));
             var powerShellStream = (PSDataCollection<WarningRecord>) sender;
             ConsoleUtils.WriteLine(powerShellStream[eventArgs.Index].ToString(), ConsoleColor.DarkYellow);
+        }
+
+        private static void ThrowIfNull([NotNull] object? variable, string variableName)
+        {
+            if (variable is null)
+                throw new ArgumentNullException(variableName);
         }
     }
 }

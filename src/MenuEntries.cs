@@ -7,7 +7,7 @@ namespace Win10BloatRemover
     {
         public abstract string FullName { get; }
         public virtual string GetExplanation() => string.Empty;
-        public virtual IOperation GetOperationInstance() => null;
+        public virtual IOperation? GetOperationInstance() => null;
     }
 
     class SystemAppRemovalEnablingEntry : MenuEntry
@@ -197,7 +197,7 @@ namespace Win10BloatRemover
         public override string FullName => "About this program";
         public override string GetExplanation()
         {
-            Version programVersion = GetType().Assembly.GetName().Version;
+            Version programVersion = GetType().Assembly.GetName().Version!;
             return $"Windows 10 Bloat Remover and Tweaker {programVersion.Major}.{programVersion.Minor} " +
                    $"for Windows version {programVersion.Build}\n\n" +
                    "Developed by Fs00\n" +

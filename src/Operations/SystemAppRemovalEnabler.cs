@@ -12,7 +12,9 @@ namespace Win10BloatRemover.Operations
             @"C:\ProgramData\Microsoft\Windows\AppRepository\" + STATE_REPOSITORY_DB_NAME;
         private const string AFTER_PACKAGE_UPDATE_TRIGGER_NAME = "TRG_AFTER_UPDATE_Package_SRJournal";
 
-        private SqliteConnection dbConnection;
+        #nullable disable warnings
+        private /*lateinit*/ SqliteConnection dbConnection;
+        #nullable restore warnings
 
         public void PerformTask()
         {

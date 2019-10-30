@@ -113,13 +113,15 @@ namespace Win10BloatRemover.Operations
 
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
-        private PowerShell psInstance;
+        private /*lateinit*/ PowerShell psInstance;
 
+        #nullable disable warnings
         public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;
         }
+        #nullable restore warnings
 
         public void PerformTask()
         {

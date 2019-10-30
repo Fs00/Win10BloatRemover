@@ -70,7 +70,7 @@ namespace Win10BloatRemover
             try
             {
                 var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
-                File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak"));
+                File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak")!);
             }
             catch (Exception exc)
             {

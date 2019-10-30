@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Converters;
 using System;
 using System.IO;
-using System.Resources;
 using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
@@ -22,25 +21,34 @@ namespace Win10BloatRemover
         public static Configuration Instance { private set; get; }
         private const string CONFIGURATION_FILE_NAME = "config.json";
 
-        // Singleton initializer: must be called at program startup
-        // Only ConfigurationExceptions thrown by this method should be handled (see below)
-        public static void Load()
-        {
-            // Failure while parsing default settings should make the program crash
-            string defaultSettingsFileContent = LoadDefaultSettings();
+        #nullable disable warnings
+        [JsonProperty(Required = Required.Always)]
+        public string[] ServicesToRemove { private set; get; }
 
+        [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
+        public UWPAppGroup[] UWPAppsToRemove { private set; get; }
+
+        [JsonProperty(Required = Required.Always)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public UWPAppRemovalMode UWPAppsRemovalMode { private set; get; }
+
+        [JsonProperty(Required = Required.Always)]
+        public string[] ScheduledTasksToDisable { private set; get; }
+
+        [JsonProperty(Required = Required.Always)]
+        public string[] WindowsFeaturesToRemove { private set; get; }
+
+        [JsonProperty(Required = Required.Always)]
+        public bool AllowInstallWimTweak { private set; get; }
+        #nullable restore warnings
+
+        // Only ConfigurationExceptions thrown by this method should be handled
+        public static void Load()
+        { 
             if (File.Exists(CONFIGURATION_FILE_NAME))
                 TryLoadConfigFromFile();
             else
-                WriteDefaultSettingsToFile(defaultSettingsFileContent);
-        }
-
-        private static string LoadDefaultSettings()
-        {
-            var defaultSettingsFileContent = (string) new ResourceManager("Win10BloatRemover.resources.Resources",
-                                             typeof(Configuration).Assembly).GetObject(CONFIGURATION_FILE_NAME);
-            Instance = JsonConvert.DeserializeObject<Configuration>(defaultSettingsFileContent);
-            return defaultSettingsFileContent;
+                WriteSettingsToFile();
         }
 
         private static void TryLoadConfigFromFile()
@@ -58,11 +66,12 @@ namespace Win10BloatRemover
             }
         }
 
-        private static void WriteDefaultSettingsToFile(string defaultSettingsFileContent)
+        private static void WriteSettingsToFile()
         {
             try
             {
-                File.WriteAllText(CONFIGURATION_FILE_NAME, defaultSettingsFileContent);
+                string settingsFileContent = JsonConvert.SerializeObject(Instance, Formatting.Indented);
+                File.WriteAllText(CONFIGURATION_FILE_NAME, settingsFileContent);
             }
             catch (Exception exc)
             {
@@ -70,22 +79,68 @@ namespace Win10BloatRemover
             }
         }
 
-        [JsonProperty(Required = Required.Always)]
-        public string[] ServicesToRemove { private set; get; }
-
-        [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
-        public UWPAppGroup[] UWPAppsToRemove { private set; get; }
-
-        [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
-        public UWPAppRemovalMode UWPAppsRemovalMode { private set; get; }
-
-        [JsonProperty(Required = Required.Always)]
-        public string[] ScheduledTasksToDisable { private set; get; }
-
-        [JsonProperty(Required = Required.Always)]
-        public string[] WindowsFeaturesToRemove { private set; get; }
-
-        [JsonProperty(Required = Required.Always)]
-        public bool AllowInstallWimTweak { private set; get; }
+        #region Singleton initializer (default settings)
+        static Configuration()
+        {
+            Instance = new Configuration {
+                ServicesToRemove = new[] {
+                    "dmwappushservice",
+                    "RetailDemo",
+                    "TroubleshootingSvc"
+                },
+                UWPAppsToRemove = new[] {   
+                    UWPAppGroup.Zune,
+                    UWPAppGroup.MailAndCalendar,
+                    UWPAppGroup.OneNote,
+                    UWPAppGroup.OfficeHub,
+                    UWPAppGroup.Camera,
+                    UWPAppGroup.Maps,
+                    UWPAppGroup.Mobile,
+                    UWPAppGroup.HelpAndFeedback,
+                    UWPAppGroup.Bing,
+                    UWPAppGroup.Messaging,
+                    UWPAppGroup.People,
+                    UWPAppGroup.Skype
+                },
+                WindowsFeaturesToRemove = new[] {
+                    "InternetExplorer-Optional-Package",
+                    "Hello-Face-Package",
+                    "QuickAssist-Package"
+                },
+                ScheduledTasksToDisable = new[] {
+                    @"\Microsoft\Windows\AppID\SmartScreenSpecific",
+                    @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
+                    @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
+                    @"\Microsoft\Windows\Application Experience\StartupAppTask",
+                    @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
+                    @"\Microsoft\Windows\Autochk\Proxy",
+                    @"\Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
+                    @"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
+                    @"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
+                    @"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
+                    @"\Microsoft\Windows\DiskFootprint\Diagnostics",
+                    @"\Microsoft\Windows\Device Information\Device",
+                    @"\Microsoft\Windows\FileHistory\File History (maintenance mode)",
+                    @"\Microsoft\Windows\Maintenance\WinSAT",
+                    @"\Microsoft\Windows\PI\Sqm-Tasks",
+                    @"\Microsoft\Windows\Shell\FamilySafetyMonitor",
+                    @"\Microsoft\Windows\Shell\FamilySafetyRefreshTask",
+                    @"\Microsoft\Windows\Windows Error Reporting\QueueReporting",
+                    @"\Microsoft\Windows\License Manager\TempSignedLicenseExchange",
+                    @"\Microsoft\Windows\Clip\License Validation",
+                    @"\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",
+                    @"\Microsoft\Windows\PushToInstall\LoginCheck",
+                    @"\Microsoft\Windows\PushToInstall\Registration",
+                    @"\Microsoft\Windows\Subscription\EnableLicenseAcquisition",
+                    @"\Microsoft\Windows\Subscription\LicenseAcquisition",
+                    @"\Microsoft\Windows\Diagnosis\Scheduled",
+                    @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
+                    @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
+                },
+                UWPAppsRemovalMode = UWPAppRemovalMode.RemoveProvisionedPackages,
+                AllowInstallWimTweak = true
+            };
+        }
+        #endregion
     }
 }

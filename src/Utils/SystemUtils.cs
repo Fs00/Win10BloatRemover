@@ -12,16 +12,16 @@ namespace Win10BloatRemover.Utils
 
         public static void StartService(string name)
         {
-            using (var serviceController = new ServiceController(name))
-                if (serviceController.Status == ServiceControllerStatus.Stopped)
-                    serviceController.Start();
+            using var serviceController = new ServiceController(name);
+            if (serviceController.Status == ServiceControllerStatus.Stopped)
+                serviceController.Start();
         }
 
         public static void StopServiceAndItsDependents(string name)
         {
-            using (var serviceController = new ServiceController(name))
-                if (serviceController.Status == ServiceControllerStatus.Running)
-                    serviceController.Stop();
+            using var serviceController = new ServiceController(name);
+            if (serviceController.Status == ServiceControllerStatus.Running)
+                serviceController.Stop();
         }
 
         public static void ExecuteWindowsPromptCommand(string command)
@@ -41,43 +41,35 @@ namespace Win10BloatRemover.Utils
 
         public static int RunProcessSynchronously(string name, string args)
         {
-            using (var process = CreateProcessInstance(name, args))
-            {
-                process.Start();
-                process.WaitForExit();
-                return process.ExitCode;
-            }
+            using var process = CreateProcessInstance(name, args);
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode;
         }
 
         public static int RunProcessSynchronouslyWithConsoleOutput(string name, string args)
         {
-            using (var process = CreateProcessInstance(name, args))
-            {
-                process.OutputDataReceived += (_, evt) =>
-                {
-                    if (!string.IsNullOrEmpty(evt.Data))
-                        Console.WriteLine(evt.Data);
-                };
-                process.ErrorDataReceived += (_, evt) =>
-                {
-                    if (!string.IsNullOrEmpty(evt.Data))
-                        ConsoleUtils.WriteLine(evt.Data, ConsoleColor.Red);
-                };
+            using var process = CreateProcessInstance(name, args);
+            process.OutputDataReceived += (_, evt) => {
+                if (!string.IsNullOrEmpty(evt.Data))
+                    Console.WriteLine(evt.Data);
+            };
+            process.ErrorDataReceived += (_, evt) => {
+                if (!string.IsNullOrEmpty(evt.Data))
+                    ConsoleUtils.WriteLine(evt.Data, ConsoleColor.Red);
+            };
 
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                process.WaitForExit();
-                return process.ExitCode;
-            }
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+            return process.ExitCode;
         }
 
         private static Process CreateProcessInstance(string name, string args)
         {
-            return new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
+            return new Process {
+                StartInfo = new ProcessStartInfo {
                     FileName = name,
                     Arguments = args,
                     UseShellExecute = false,

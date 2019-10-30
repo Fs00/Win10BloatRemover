@@ -14,20 +14,16 @@ namespace Win10BloatRemover.Operations
 
         private void DisableAutomaticWindowsUpdates()
         {
-            using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
-            {
-                using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"))
-                    key.SetValue("NoAutoUpdate", 1, RegistryValueKind.DWord);
-            }
+            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU");
+            key.SetValue("NoAutoUpdate", 1, RegistryValueKind.DWord);
         }
 
         private void DisableAutomaticStoreUpdates()
         {
-            using (RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
-            {
-                using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsStore"))
-                    key.SetValue("AutoDownload", 2, RegistryValueKind.DWord);
-            }
+            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsStore");
+            key.SetValue("AutoDownload", 2, RegistryValueKind.DWord);
         }
     }
 }

@@ -51,13 +51,15 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("DontReportInfectionInformation", 1, RegistryValueKind.DWord);
                 key.SetValue("DontOfferThroughWUAU", 1, RegistryValueKind.DWord);
             }
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
-                key.DeleteValue("SecurityHealth", false);
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", writable: true))
+                key.DeleteValue("SecurityHealth", throwOnMissingValue: false);
 
-            using (var localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            using (RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
             {
-                using (RegistryKey key = localMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", true))
-                    key.DeleteValue("SecurityHealth", false);
+                using RegistryKey key = localMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", writable: true
+                );
+                key.DeleteValue("SecurityHealth", throwOnMissingValue: false);
             }
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
@@ -74,21 +76,19 @@ namespace Win10BloatRemover.Operations
         private void TryUninstallSecurityCenter()
         {
             ConsoleUtils.WriteLine("\nAttempting to remove Security Center app...", ConsoleColor.Green);
-            using (PowerShell psInstance = PowerShell.Create())
-            {
-                string removalScript =
-                    $@"$package = Get-AppxPackage -AllUsers -Name ""{SECURITY_CENTER_APP_NAME}"";" +
-                    @"if ($package) {
+            using PowerShell psInstance = PowerShell.Create();
+            string removalScript =
+                $@"$package = Get-AppxPackage -AllUsers -Name ""{SECURITY_CENTER_APP_NAME}"";" +
+                @"if ($package) {
                         $package | Remove-AppxPackage -AllUsers;
                     }
                     else {
                         Write-Host ""Security Center app is not installed."";
                     }";
 
-                psInstance.RunScriptAndPrintOutput(removalScript);
-                if (!psInstance.HadErrors)
-                    Console.WriteLine("Removal performed successfully.");
-            }
+            psInstance.RunScriptAndPrintOutput(removalScript);
+            if (!psInstance.HadErrors)
+                Console.WriteLine("Removal performed successfully.");
         }
     }
 }

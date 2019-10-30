@@ -29,9 +29,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveTelemetryServices()
         {
             ConsoleUtils.WriteLine("Backing up and removing telemetry services...", ConsoleColor.Green);
-            new ServiceRemover(telemetryServices)
-                .PerformBackup()
-                .PerformRemoval();
+            ServiceRemover.BackupAndRemove(telemetryServices);
 
             new ServiceRemover(protectedTelemetryServices).PerformBackup();
             RemoveProtectedServices();

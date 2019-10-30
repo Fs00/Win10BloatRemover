@@ -19,7 +19,7 @@ namespace Win10BloatRemover.Utils
 
             Console.WriteLine($"Running install-wim-tweak to remove {component}...");
             int installWimTweakExitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(Program.InstallWimTweakPath, $"/o /c {component} /r");
-            if (installWimTweakExitCode == 0)
+            if (installWimTweakExitCode == SystemUtils.EXIT_CODE_SUCCESS)
                 Console.WriteLine("Install-wim-tweak executed successfully!");
             else
                 ConsoleUtils.WriteLine($"An error occurred during the removal of {component}: " +

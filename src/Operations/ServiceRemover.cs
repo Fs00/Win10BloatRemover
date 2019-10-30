@@ -20,9 +20,18 @@ namespace Win10BloatRemover.Operations
      */
     class ServiceRemover : IOperation
     {
-        private bool backupPerformed;
         private readonly string[] servicesToRemove;
         private readonly DirectoryInfo backupDirectory;
+
+        private const int SC_EXIT_CODE_MARKED_FOR_DELETION = 1072;
+
+        public static void BackupAndRemove(string[] servicesToRemove,
+                                           ServiceRemovalMode removalMode = ServiceRemovalMode.ServiceControl)
+        {
+            var serviceRemover = new ServiceRemover(servicesToRemove);
+            string[] actualBackuppedServices = serviceRemover.PerformBackup();
+            serviceRemover.PerformRemoval(actualBackuppedServices, removalMode);
+        }
 
         public ServiceRemover(string[] servicesToRemove)
         {
@@ -30,54 +39,54 @@ namespace Win10BloatRemover.Operations
             backupDirectory = new DirectoryInfo($"servicesBackup_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}");
         }
 
-        public void PerformTask()
+        void IOperation.PerformTask()
         {
             ConsoleUtils.WriteLine("Backing up services...", ConsoleColor.Green);
-            PerformBackup();
+            string[] actualBackuppedServices = PerformBackup();
             ConsoleUtils.WriteLine("Removing services...", ConsoleColor.Green);
-            PerformRemoval();
+            PerformRemoval(actualBackuppedServices, ServiceRemovalMode.ServiceControl);
         }
 
-        public ServiceRemover PerformBackup()
+        public string[] PerformBackup()
         {
-            if (backupPerformed)
-                throw new InvalidOperationException("Backup already done!");
+            string[] existingServices = FindExistingServicesWithNames(servicesToRemove);
+            foreach (string service in existingServices)
+                BackupService(service);
+            return existingServices;
+        }
 
-            string[] existingServicesNames = GetAllServicesNames();
-            foreach (string serviceToRemove in servicesToRemove)
+        private string[] FindExistingServicesWithNames(string[] servicesNames)
+        {
+            string[] allExistingServices = GetAllServicesNames();
+            List<string> allMatchingServices = new List<string>();
+            foreach (string serviceName in servicesNames)
             {
-                var actualServicesToRemove = existingServicesNames.Where(name => name.StartsWith(serviceToRemove));
-                if (!actualServicesToRemove.Any())
-                    Console.WriteLine($"No services found with name {serviceToRemove}.");
+                var matchingServices = allExistingServices.Where(name => name.StartsWith(serviceName)).ToArray();
+                if (matchingServices.Length == 0)
+                    Console.WriteLine($"No services found with name {serviceName}.");
                 else
-                    BackupServices(actualServicesToRemove);
+                    allMatchingServices.AddRange(matchingServices);
             }
 
-            backupPerformed = true;
-            return this;    // allows chaining with PerformRemoval
+            return allMatchingServices.ToArray();
         }
 
         private string[] GetAllServicesNames()
         {
-            using (RegistryKey servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services"))
-                return servicesKey.GetSubKeyNames();
+            using RegistryKey servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services");
+            return servicesKey.GetSubKeyNames();
         }
 
-        private void BackupServices(IEnumerable<string> actualServicesToBackup)
+        private void BackupService(string service)
         {
             EnsureBackupDirectoryExists();
-            foreach (string service in actualServicesToBackup)
-            {
-                int regExportExitCode = SystemUtils.RunProcessSynchronously(
-                    "reg", $@"export HKLM\SYSTEM\CurrentControlSet\Services\{service} " +
-                    $@"{backupDirectory.FullName}\{service}.reg"
-                );
-
-                if (regExportExitCode == 0)
-                    Console.WriteLine($"Service {service} backed up.");
-                else
-                    throw new Exception($"Could not backup service {service}.");
-            }
+            int regExportExitCode = SystemUtils.RunProcessSynchronously(
+                "reg", $@"export HKLM\SYSTEM\CurrentControlSet\Services\{service} {backupDirectory.FullName}\{service}.reg"
+            );
+            if (regExportExitCode == 0)
+                Console.WriteLine($"Service {service} backed up.");
+            else
+                throw new Exception($"Could not backup service {service}.");
         }
 
         private void EnsureBackupDirectoryExists()
@@ -91,33 +100,25 @@ namespace Win10BloatRemover.Operations
          *  (default is sc).
          *  reg command allows to remove unstoppable system services, like Windows Defender ones.
          */
-        public void PerformRemoval(ServiceRemovalMode removalMode = ServiceRemovalMode.ServiceControl)
+        private void PerformRemoval(string[] backuppedServices, ServiceRemovalMode removalMode)
         {
-            if (!backupPerformed)
-                throw new InvalidOperationException("Backup services before removing them!");
-
-            string[] existingServicesNames = GetAllServicesNames();
-            foreach (string serviceToRemove in servicesToRemove)
-            {
-                var actualServicesToRemove = existingServicesNames.Where(name => name.StartsWith(serviceToRemove));
-                if (removalMode == ServiceRemovalMode.ServiceControl)
-                    RemoveServicesUsingSC(actualServicesToRemove);
-                else if (removalMode == ServiceRemovalMode.Registry)
-                    RemoveServicesByDeletingRegistryKeys(actualServicesToRemove);
-            }
+            if (removalMode == ServiceRemovalMode.ServiceControl)
+                RemoveServicesUsingSC(backuppedServices);
+            else if (removalMode == ServiceRemovalMode.Registry)
+                RemoveServicesByDeletingRegistryKeys(backuppedServices);
         }
 
-        private void RemoveServicesUsingSC(IEnumerable<string> actualServicesToRemove)
+        private void RemoveServicesUsingSC(string[] actualServicesToRemove)
         {
             foreach (string service in actualServicesToRemove)
             {
                 int scExitCode = SystemUtils.RunProcessSynchronously("sc", $"delete {service}");
                 switch (scExitCode)
                 {
-                    case 0:
+                    case SystemUtils.EXIT_CODE_SUCCESS:
                         Console.WriteLine($"Service {service} removed successfully.");
                         break;
-                    case 1072:
+                    case SC_EXIT_CODE_MARKED_FOR_DELETION:
                         Console.WriteLine($"Service {service} will be removed after reboot.");
                         break;
                     default:
@@ -127,14 +128,14 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private void RemoveServicesByDeletingRegistryKeys(IEnumerable<string> actualServicesToRemove)
+        private void RemoveServicesByDeletingRegistryKeys(string[] actualServicesToRemove)
         {
             foreach (string service in actualServicesToRemove)
             {
                 int regExitCode = SystemUtils.RunProcessSynchronously(
                     "reg", $@"delete HKLM\SYSTEM\CurrentControlSet\Services\{service} /f"
                 );
-                if (regExitCode == 0)
+                if (regExitCode == SystemUtils.EXIT_CODE_SUCCESS)
                     Console.WriteLine($"Service {service} removed, but it may continue to run until the next restart.");
                 else
                     ConsoleUtils.WriteLine($"Service {service} removal failed: couldn't delete its registry keys.", ConsoleColor.Red);

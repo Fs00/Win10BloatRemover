@@ -8,6 +8,8 @@ namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
+        public const int EXIT_CODE_SUCCESS = 0;
+
         public static void StartService(string name)
         {
             using (var serviceController = new ServiceController(name))

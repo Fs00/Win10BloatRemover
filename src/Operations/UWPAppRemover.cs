@@ -225,9 +225,7 @@ namespace Win10BloatRemover.Operations
         private static void RemoveMapsServicesAndTasks()
         {
             Console.WriteLine("Removing app-related services and scheduled tasks...");
-            new ServiceRemover(new[] { "MapsBroker", "lfsvc" })
-                .PerformBackup()
-                .PerformRemoval();
+            ServiceRemover.BackupAndRemove(new[] { "MapsBroker", "lfsvc" });
 
             new ScheduledTasksDisabler(new[] {
                 @"\Microsoft\Windows\Maps\MapsUpdateTask",
@@ -238,9 +236,7 @@ namespace Win10BloatRemover.Operations
         private static void RemoveXboxServicesAndTasks()
         {
             Console.WriteLine("Removing app-related services and scheduled tasks...");
-            new ServiceRemover(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" })
-                .PerformBackup()
-                .PerformRemoval();
+            ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" });
 
             new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" })
                 .PerformTask();
@@ -252,9 +248,7 @@ namespace Win10BloatRemover.Operations
         private static void RemoveMessagingService()
         {
             Console.WriteLine("Removing app-related services...");
-            new ServiceRemover(new[] { "MessagingService" })
-                .PerformBackup()
-                .PerformRemoval();
+            ServiceRemover.BackupAndRemove(new[] { "MessagingService" });
         }
 
         private static void RemovePaint3DContextMenuEntries()
@@ -314,9 +308,7 @@ namespace Win10BloatRemover.Operations
         private static void RemoveMailAndPeopleService()
         {
             Console.WriteLine("Removing app-related services...");
-            new ServiceRemover(new[] { "OneSyncSvc" })
-                .PerformBackup()
-                .PerformRemoval();
+            ServiceRemover.BackupAndRemove(new[] { "OneSyncSvc" });
         }
 
         private static void DisableStoreFeaturesAndServices()
@@ -336,9 +328,7 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("EnableWebContentEvaluation", 0, RegistryValueKind.DWord);
 
             Console.WriteLine("Removing app-related services...");
-            new ServiceRemover(new[] { "PushToInstall" })
-                .PerformBackup()
-                .PerformRemoval();
+            ServiceRemover.BackupAndRemove(new[] { "PushToInstall" });
         }
     }
 }

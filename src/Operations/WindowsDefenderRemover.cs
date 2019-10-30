@@ -68,10 +68,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveSecurityHealthServices()
         {
             ConsoleUtils.WriteLine("\nRemoving Security Health services...", ConsoleColor.Green);
-
-            new ServiceRemover(securityHealthServices)
-                .PerformBackup()
-                .PerformRemoval(ServiceRemovalMode.Registry);
+            ServiceRemover.BackupAndRemove(securityHealthServices);
         }
 
         private void TryUninstallSecurityCenter()

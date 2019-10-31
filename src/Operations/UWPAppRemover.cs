@@ -146,7 +146,7 @@ namespace Win10BloatRemover.Operations
 
         private bool UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
-            ConsoleUtils.WriteLine($"Removing {appGroup.ToString()} app(s)...", ConsoleColor.Green);
+            ConsoleUtils.WriteLine($"\nRemoving {appGroup.ToString()} app(s)...", ConsoleColor.Green);
 
             bool atLeastOneAppUninstalled = false;
             foreach (string appName in appNamesForGroup[appGroup])
@@ -185,12 +185,11 @@ namespace Win10BloatRemover.Operations
             }
 
             psInstance.RunScriptAndPrintOutput(appRemovalScript);
-            Console.WriteLine();
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
         {
-            Console.WriteLine($"Performing post-uninstall operations for app {appGroup}...");
+            Console.WriteLine($"\nPerforming post-uninstall operations for app {appGroup}...");
             try
             {
                 PerformPostUninstallOperations(appGroup);

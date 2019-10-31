@@ -69,11 +69,15 @@ namespace Win10BloatRemover
         public override string FullName => "Microsoft Edge removal";
         public override string GetExplanation()
         {
-            return "Starting from Windows 10 version 1903, install-wim-tweak can no longer be used to remove " +
-                   "Edge since it breaks the installation of cumulative updates.\n" +
-                   @"To accomplish this task, add ""Edge"" to the list ""UWPAppsToRemove"" in configuration " +
-                   "file, make system apps removable and then use UWP apps removal.";
+            return "You need to make system apps removable first, otherwise the uninstallation of Edge will fail.\n" +
+                   @"You can also perform this task using UWP apps removal (""Edge"" must be included in the list " +
+                   "\"UWPAppsToRemove\" in configuration file).\n\n" + 
+                   "REMOVING EDGE CAN BREAK THE INSTALLATION OF WINDOWS CUMULATIVE UPDATES! Proceed only if you " +
+                   "want to take this risk.";
         }
+
+        public override IOperation GetOperationInstance()
+            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.KeepProvisionedPackages);
     }
 
     class OneDriveRemovalEntry : MenuEntry

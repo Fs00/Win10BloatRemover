@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
-using Microsoft.PowerShell;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
 
@@ -127,10 +125,7 @@ namespace Win10BloatRemover.Operations
 
         public void PerformTask()
         {
-            var sessionState = InitialSessionState.Create();
-            sessionState.ExecutionPolicy = ExecutionPolicy.Unrestricted;
-            sessionState.ImportPSModule("AppX");
-            using (psInstance = PowerShell.Create(sessionState))
+            using (psInstance = PowerShellExtensions.CreateWithImportedModules("AppX"))
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
@@ -180,7 +175,7 @@ namespace Win10BloatRemover.Operations
                         Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;
                     }
                     else {
-                        Write-Host ""No provisioned package found for app " + appName + @""";
+                        Write-Host ""No provisioned package found for app " + appName + @"."";
                     }";
             }
 

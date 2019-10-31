@@ -2,11 +2,20 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.PowerShell;
 
 namespace Win10BloatRemover.Utils
 {
     static class PowerShellExtensions
     {
+        public static PowerShell CreateWithImportedModules(params string[] modules)
+        {
+            var sessionState = InitialSessionState.Create();
+            sessionState.ExecutionPolicy = ExecutionPolicy.Unrestricted;
+            sessionState.ImportPSModule(modules);
+            return PowerShell.Create(sessionState);
+        }
+
         public static PSVariable GetVariable(this PowerShell psInstance, string name)
         {
             return psInstance.Runspace.SessionStateProxy.PSVariable.Get(name);

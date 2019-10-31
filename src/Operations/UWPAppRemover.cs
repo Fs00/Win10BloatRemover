@@ -38,12 +38,13 @@ namespace Win10BloatRemover.Operations
         Calculator,
         SnipAndSketch,
         Store,
-        Edge
+        Edge,
+        SecurityCenter
     }
 
     class UWPAppRemover : IOperation
     {
-        // This dictionary contains the exact apps names corresponding to every group in the enum
+        // This dictionary contains the exact apps names corresponding to every defined group
         private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {
             { UWPAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
             { UWPAppGroup.Bing, new[] { "Microsoft.BingNews", "Microsoft.BingWeather" } },
@@ -71,6 +72,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
             { UWPAppGroup.People, new[] { "Microsoft.People" } },
             { UWPAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
+            { UWPAppGroup.SecurityCenter, new[] { "Microsoft.Windows.SecHealthUI" } },
             { UWPAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
             { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.SkreenSketch" } },
             { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },

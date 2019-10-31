@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Management.Automation;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
@@ -14,7 +13,6 @@ namespace Win10BloatRemover.Operations
             "SgrmBroker",
             "SgrmAgent"
         };
-        private const string SECURITY_CENTER_APP_NAME = "Microsoft.Windows.SecHealthUI";
 
         public void PerformTask()
         {
@@ -22,8 +20,9 @@ namespace Win10BloatRemover.Operations
             RemoveSecurityHealthServices();
 
             Console.WriteLine();
-
             OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Windows-Defender");
+
+            Console.WriteLine();
             TryUninstallSecurityCenter();
         }
 
@@ -75,20 +74,8 @@ namespace Win10BloatRemover.Operations
 
         private void TryUninstallSecurityCenter()
         {
-            ConsoleUtils.WriteLine("\nAttempting to remove Security Center app...", ConsoleColor.Green);
-            using PowerShell psInstance = PowerShell.Create();
-            string removalScript =
-                $@"$package = Get-AppxPackage -AllUsers -Name ""{SECURITY_CENTER_APP_NAME}"";" +
-                @"if ($package) {
-                        $package | Remove-AppxPackage -AllUsers;
-                    }
-                    else {
-                        Write-Host ""Security Center app is not installed."";
-                    }";
-
-            psInstance.RunScriptAndPrintOutput(removalScript);
-            if (!psInstance.HadErrors)
-                Console.WriteLine("Removal performed successfully.");
+            new UWPAppRemover(new[] { UWPAppGroup.SecurityCenter }, UWPAppRemovalMode.KeepProvisionedPackages)
+                .PerformTask();
         }
     }
 }

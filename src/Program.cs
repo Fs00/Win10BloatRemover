@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Resources;
 using System.Security.Principal;
@@ -17,6 +18,7 @@ namespace Win10BloatRemover
 
             EnsurePreliminaryChecksAreSuccessful();
             TryLoadConfiguration();
+            RegisterExitEventHandlers();
 
             if (Configuration.Instance.AllowInstallWimTweak)
                 TryExtractInstallWimTweak();
@@ -63,6 +65,26 @@ namespace Win10BloatRemover
                 Console.WriteLine("Press a key to continue to the main menu.");
                 Console.ReadKey();
             }
+        }
+
+        private static void RegisterExitEventHandlers()
+        {
+            #if !DEBUG
+            bool cancelKeyPressedOnce = false;
+            Console.CancelKeyPress += (sender, args) => {
+                if (!cancelKeyPressedOnce)
+                {
+                    ConsoleUtils.WriteLine("Press Ctrl+C again to terminate the program.", ConsoleColor.Red);
+                    cancelKeyPressedOnce = true;
+                    args.Cancel = true;
+                }
+                else
+                    Process.GetCurrentProcess().KillChildProcesses();
+            };
+            #endif
+
+            // Executed when the user closes the window. This handler is not fired when process is terminated with Ctrl+C
+            AppDomain.CurrentDomain.ProcessExit += (sender, args) => Process.GetCurrentProcess().KillChildProcesses();
         }
 
         private static void TryExtractInstallWimTweak()

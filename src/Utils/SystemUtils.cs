@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.ServiceProcess;
 using Microsoft.Win32;
 
@@ -36,6 +37,19 @@ namespace Win10BloatRemover.Utils
             {
                 processToKill.Kill();
                 processToKill.WaitForExit();
+            }
+        }
+
+        public static void KillChildProcesses(this Process process)
+        {
+            var searcher = new ManagementObjectSearcher(
+                $"Select * From Win32_Process Where ParentProcessID={process.Id}"
+            );
+            foreach (var managementObject in searcher.Get())
+            {
+                using var child = Process.GetProcessById(Convert.ToInt32(managementObject["ProcessID"]));
+                child.KillChildProcesses();
+                child.Kill();
             }
         }
 

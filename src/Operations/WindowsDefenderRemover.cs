@@ -22,7 +22,6 @@ namespace Win10BloatRemover.Operations
             Console.WriteLine();
             OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Windows-Defender");
 
-            Console.WriteLine();
             TryUninstallSecurityCenter();
         }
 
@@ -69,7 +68,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveSecurityHealthServices()
         {
             ConsoleUtils.WriteLine("\nRemoving Security Health services...", ConsoleColor.Green);
-            ServiceRemover.BackupAndRemove(securityHealthServices);
+            ServiceRemover.BackupAndRemove(securityHealthServices, ServiceRemovalMode.Registry);
         }
 
         private void TryUninstallSecurityCenter()

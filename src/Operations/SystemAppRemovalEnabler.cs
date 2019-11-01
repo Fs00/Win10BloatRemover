@@ -56,7 +56,8 @@ namespace Win10BloatRemover.Operations
         private string CopyStateRepositoryDatabase()
         {
             var stateRepositoryDatabase = new FileInfo(STATE_REPOSITORY_DB_PATH);
-            return stateRepositoryDatabase.CopyTo(STATE_REPOSITORY_DB_NAME).FullName;
+            FileInfo copiedDatabase = stateRepositoryDatabase.CopyTo(STATE_REPOSITORY_DB_NAME, overwrite: true);
+            return copiedDatabase.FullName;
         }
 
         private void EditStateRepositoryDatabase(string databaseCopyPath)

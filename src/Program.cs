@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Resources;
 using System.Security.Principal;
 using Win10BloatRemover.Utils;
 
@@ -10,7 +8,6 @@ namespace Win10BloatRemover
     static class Program
     {
         public const string SUPPORTED_WINDOWS_RELEASE_ID = "1903";
-        public static string InstallWimTweakPath { get; } = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
 
         private static void Main()
         {
@@ -91,8 +88,7 @@ namespace Win10BloatRemover
         {
             try
             {
-                var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
-                File.WriteAllBytes(InstallWimTweakPath, (byte[]) resources.GetObject("install_wim_tweak")!);
+                InstallWimTweak.ExtractToTempFolder();
             }
             catch (Exception exc)
             {
@@ -107,8 +103,7 @@ namespace Win10BloatRemover
         {
             try
             {
-                if (File.Exists(InstallWimTweakPath))
-                    File.Delete(InstallWimTweakPath);
+                InstallWimTweak.DeleteExtractedExecutableIfExists();
             }
             catch (Exception exc)
             {

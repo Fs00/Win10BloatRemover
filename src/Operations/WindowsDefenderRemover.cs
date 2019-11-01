@@ -20,7 +20,7 @@ namespace Win10BloatRemover.Operations
             RemoveSecurityHealthServices();
 
             Console.WriteLine();
-            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Windows-Defender");
+            InstallWimTweak.RemoveComponentIfAllowed("Windows-Defender");
 
             TryUninstallSecurityCenter();
         }

@@ -98,7 +98,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
             {
                 UWPAppGroup.Mobile,
-                () => OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-PPIProjection-Package")   // Connect app
+                () => InstallWimTweak.RemoveComponentIfAllowed("Microsoft-PPIProjection-Package")   // Connect app
             },
             { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UWPAppGroup.Messaging, RemoveMessagingService },

@@ -20,7 +20,7 @@ namespace Win10BloatRemover.Operations
             Process.Start("explorer");
 
             Console.WriteLine();
-            OperationUtils.RemoveComponentUsingInstallWimTweakIfAllowed("Microsoft-Windows-OneDrive-Setup");
+            InstallWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup");
         }
 
         private void RunOneDriveUninstaller()

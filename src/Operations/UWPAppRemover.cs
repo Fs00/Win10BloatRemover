@@ -7,7 +7,8 @@ using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations
 {
-    public enum UWPAppRemovalMode {
+    public enum UWPAppRemovalMode
+    {
         KeepProvisionedPackages,
         RemoveProvisionedPackages
     }

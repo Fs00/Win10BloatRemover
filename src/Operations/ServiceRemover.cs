@@ -8,7 +8,8 @@ using Win10BloatRemover.Utils;
 namespace Win10BloatRemover.Operations
 {
     // ServiceRemover can remove services using sc or reg commands (see below)
-    public enum ServiceRemovalMode {
+    public enum ServiceRemovalMode
+    {
         ServiceControl,
         Registry
     }

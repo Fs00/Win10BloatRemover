@@ -122,7 +122,7 @@ namespace Win10BloatRemover.Operations
                         Console.WriteLine($"Service {service} will be removed after reboot.");
                         break;
                     default:
-                        ConsoleUtils.WriteLine($"Service {service} removal failed: exit code {scExitCode}.", ConsoleColor.Red);
+                        ConsoleUtils.WriteLine($"Service {service} removal failed: sc exited with code {scExitCode}.", ConsoleColor.Red);
                         break;
                 }
             }

@@ -220,25 +220,25 @@ namespace Win10BloatRemover.Operations
 
         private static void RemoveMapsServicesAndTasks()
         {
-            Console.WriteLine("Removing app-related services and scheduled tasks...");
-            ServiceRemover.BackupAndRemove(new[] { "MapsBroker", "lfsvc" });
-
+            Console.WriteLine("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] {
                 @"\Microsoft\Windows\Maps\MapsUpdateTask",
                 @"\Microsoft\Windows\Maps\MapsToastTask"
             }).PerformTask();
+
+            ServiceRemover.BackupAndRemove(new[] { "MapsBroker", "lfsvc" });
         }
 
         private static void RemoveXboxServicesAndTasks()
         {
-            Console.WriteLine("Removing app-related services and scheduled tasks...");
-            ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" });
-
+            Console.WriteLine("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" })
                 .PerformTask();
 
             using RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR");
             key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
+
+            ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" });
         }
 
         private static void RemoveMessagingService()

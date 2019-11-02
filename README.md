@@ -1,7 +1,7 @@
 # Windows 10 Bloat Remover and Tweaker
 This configurable tool offers a simple CLI to aggressively debloat and apply some tweaks to your Windows 10 installation. Here's a comprehensive feature list:
 
-* **Make system apps removable** by editing a system database. Thanks to this, apps like Edge, Connect and others can be deleted using normal PowerShell methods. Take note that after this modification you might not receive any more Windows major updates via Windows Update.  
+* **Make system apps removable** by editing a system database. Thanks to this, apps like Edge, Connect and others can be deleted using normal PowerShell methods. Take note that usually system apps get reinstalled by Windows cumulative updates.  
 * **UWP apps removal:** Uninstalls the apps specified in configuration file for all users and optionally deletes their corresponding provisioned packages (if present), so that apps aren't reinstalled for new users or after feature updates.  
 Take note that you can't configure the program to remove single UWP packages but only groups of them, to make user configuration less tricky and because some apps are made of multiple packages (e.g. Xbox) which depend on each other. Groups are defined as follows:
     * ***Edge*** (you need to make system apps removable to uninstall it)
@@ -37,12 +37,16 @@ Take note that you can't configure the program to remove single UWP packages but
 * **Windows Tips and Error Reporting disabling** through Registry edits
 * **Scheduled tasks disabling** via schtasks.exe
 
-Warning: most of these operations are **NOT** reversible (see *Configuration* section below for more detail). If you don't know what you're doing, stay away from this tool.
+**Most of these operations are NOT reversible**. If you don't know what you're doing, stay away from this tool.
 
 ## Configuration
 When the program is run for the first time, a configuration file called *config.json* is created containing the default settings. You can easily edit which services, system features, scheduled tasks and groups of UWP apps (listed above) will be removed by adding or removing elements from the corresponding arrays (respectively `ServicesToRemove`, `WindowsFeaturesToRemove`, `ScheduledTasksToDisable` and `UWPAppsToRemove`).
 
-Furthermore, you have two other options to reduce the aggressiveness of the debloating process: `UWPAppsRemovalMode` and `AllowInstallWimTweak`. The first one allows you to decide not to remove provisioned packages by setting it to *KeepProvisionedPackages* (default is *RemoveProvisionedPackages*), while the latter can be set to *true* or *false* and if it's false, any execution of install-wim-tweak will be skipped.  
+Furthermore, you have two other options to reduce the aggressiveness of the debloating process:
+
+* `UWPAppsRemovalMode`: allows you to decide not to remove provisioned packages by setting it to *KeepProvisionedPackages* (default is *RemoveProvisionedPackages*)
+* `AllowInstallWimTweak`: can be set to *true* or *false* and if it's false, any execution of install-wim-tweak will be skipped
+
 These two settings have been added to make users able to limit the amount of changes made to the online Windows image, since they can't be reverted with system restore and carry over after major Windows updates.
 
 If any parsing error occurs, it will be displayed at application start-up and default settings will be loaded.

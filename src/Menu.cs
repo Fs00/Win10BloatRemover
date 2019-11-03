@@ -94,11 +94,8 @@ namespace Win10BloatRemover
 
         private static bool UserWantsToProceed()
         {
-            Console.WriteLine("Press enter to continue, or another key to go back to the menu.");
-            if (Console.ReadKey().Key == ConsoleKey.Enter)
-                return true;
-
-            return false;
+            Console.WriteLine("\nPress enter to continue, or another key to go back to the menu.");
+            return Console.ReadKey().Key == ConsoleKey.Enter;
         }
 
         private static void TryPerformEntryOperation(MenuEntry entry)

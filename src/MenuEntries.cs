@@ -6,7 +6,7 @@ namespace Win10BloatRemover
     abstract class MenuEntry
     {
         public abstract string FullName { get; }
-        public virtual string GetExplanation() => string.Empty;
+        public abstract string GetExplanation();
         public virtual IOperation? GetOperationInstance() => null;
     }
 
@@ -19,8 +19,9 @@ namespace Win10BloatRemover
                    "such as Edge, Security Center, Connect via normal PowerShell methods.\n" +
                    "A backup of the database will be saved in the current directory. " +
                    "It will become useless as soon as you install/remove an app, so make sure you don't have " +
-                   "any problems with Windows Update or the Store after the operation is completed.\n" +
-                   "REMOVING SYSTEM APPS CAN PREVENT WINDOWS UPDATES FROM BEING INSTALLED; PROCEED AT YOUR OWN RISK.\n\n" +
+                   "any problems with Windows Update or the Store after the operation is completed.\n\n" +
+                   "REMOVING SYSTEM APPS CAN PREVENT WINDOWS UPDATES FROM BEING INSTALLED; PROCEED AT YOUR OWN RISK.\n" +
+                   "Remember also that certain apps are reinstalled after any Windows cumulative update.\n" +
                    "Before starting, make sure that the Store is not installing/updating apps in the background.";
         }
         public override IOperation GetOperationInstance() => new SystemAppRemovalEnabler();
@@ -45,7 +46,6 @@ namespace Win10BloatRemover
                                @"To prevent this behaviour, change UWPAppsRemovalMode option to ""KeepProvisionedPackages"".";
             return explanation;
         }
-
         public override IOperation GetOperationInstance()
             => new UWPAppRemover(Configuration.Instance.UWPAppsToRemove, Configuration.Instance.UWPAppsRemovalMode);
     }
@@ -57,9 +57,10 @@ namespace Win10BloatRemover
         {
             return "Important: Before starting, disable Tamper protection in Windows Security " +
                    "under Virus & threat protection settings.\n" +
-                   "Defender will be removed using install-wim-tweak and disabled via Group Policies.\n" +
+                   "Defender will be removed using install-wim-tweak and disabled via Group Policies.\n\n" +
                    "If you have already made system apps removable, Security Center app will be removed too; " +
-                   "otherwise, its menu icon will remain there, but the app won't start anymore.";
+                   "otherwise, its menu icon will remain there, but the app won't start anymore.\n" +
+                   "Remember that any Windows cumulative update is likely to reinstall the app.";
         }
         public override IOperation GetOperationInstance() => new WindowsDefenderRemover();
     }
@@ -69,13 +70,12 @@ namespace Win10BloatRemover
         public override string FullName => "Microsoft Edge removal";
         public override string GetExplanation()
         {
-            return "You need to make system apps removable first, otherwise the uninstallation of Edge will fail.\n" +
+            return "You need to make system apps removable first, otherwise the uninstallation will fail.\n" +
                    @"You can also perform this task using UWP apps removal (""Edge"" must be included in the list " +
-                   "\"UWPAppsToRemove\" in configuration file).\n\n" + 
-                   "REMOVING EDGE CAN BREAK THE INSTALLATION OF WINDOWS CUMULATIVE UPDATES! Proceed only if you " +
-                   "want to take this risk.";
+                   "\"UWPAppsToRemove\" in configuration file).\n" + 
+                   "Take note that this app will likely be reinstalled after any Windows cumulative update. Proceed " +
+                   "ONLY if you know the consequences and risks of uninstalling system apps.";
         }
-
         public override IOperation GetOperationInstance()
             => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.KeepProvisionedPackages);
     }
@@ -109,9 +109,9 @@ namespace Win10BloatRemover
         public override string FullName => "Windows features removal";
         public override string GetExplanation()
         {
-            string explanation = "The following features will be removed:\n";
+            string explanation = "The following features will be removed:";
             foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)
-                explanation += $"  {feature}\n";
+                explanation += $"\n  {feature}";
             return explanation;
         }
         public override IOperation GetOperationInstance() => new FeaturesRemover(Configuration.Instance.WindowsFeaturesToRemove);
@@ -156,12 +156,11 @@ namespace Win10BloatRemover
         public override string FullName => "Miscellaneous scheduled tasks disabling";
         public override string GetExplanation()
         {
-            string explanation = "The following scheduled tasks will be disabled:\n";
+            string explanation = "The following scheduled tasks will be disabled:";
             foreach (string task in Configuration.Instance.ScheduledTasksToDisable)
-                explanation += $"  {task}\n";
+                explanation += $"\n  {task}";
             return explanation;
         }
-
         public override IOperation GetOperationInstance()
             => new ScheduledTasksDisabler(Configuration.Instance.ScheduledTasksToDisable);
     }
@@ -180,6 +179,11 @@ namespace Win10BloatRemover
     class TipsAndFeedbackDisablingEntry : MenuEntry
     {
         public override string FullName => "Windows Tips and feedback requests disabling";
+        public override string GetExplanation()
+        {
+            return "These features will be turned off by setting Group Policies accordingly and by disabling " +
+                   "some related scheduled tasks.";
+        }
         public override IOperation GetOperationInstance() => new WindowsTipsDisabler();
     }
 
@@ -191,7 +195,6 @@ namespace Win10BloatRemover
             return "Your browser will now open on a GitHub page where you will be able to " +
                    "open an issue to report a bug or suggest a new feature.";
         }
-
         public override IOperation GetOperationInstance()
             => new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
     }

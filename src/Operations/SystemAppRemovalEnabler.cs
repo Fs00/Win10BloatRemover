@@ -113,13 +113,16 @@ namespace Win10BloatRemover.Operations
 
         private void ReplaceStateRepositoryDatabaseWith(string databaseCopyPath)
         {
+            // File.Copy can't be used to replace the file because it fails with access denied
+            // even though we have Restore privilege, so we need to use File.Move instead
             try
             {
-                File.Copy(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
+                File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
             }
-            finally
+            catch
             {
                 File.Delete(databaseCopyPath);
+                throw;
             }
         }
     }

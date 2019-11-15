@@ -22,7 +22,10 @@ namespace Win10BloatRemover.Utils
         {
             using var serviceController = new ServiceController(name);
             if (serviceController.Status == ServiceControllerStatus.Running)
+            {
                 serviceController.Stop();
+                serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(5));
+            }
         }
 
         public static void ExecuteWindowsPromptCommand(string command)

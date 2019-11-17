@@ -11,13 +11,6 @@ namespace Win10BloatRemover.Utils
     {
         public const int EXIT_CODE_SUCCESS = 0;
 
-        public static void StartService(string name)
-        {
-            using var service = new ServiceController(name);
-            if (service.Status != ServiceControllerStatus.Running && service.Status != ServiceControllerStatus.StartPending)
-                service.Start();
-        }
-
         public static void StopServiceAndItsDependents(string name)
         {
             using var service = new ServiceController(name);

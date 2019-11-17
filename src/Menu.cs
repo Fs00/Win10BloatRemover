@@ -10,7 +10,7 @@ namespace Win10BloatRemover
         private static bool exitRequested = false;
         private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version!;
         private static readonly MenuEntry[] orderedMenuEntries = {
-            new SystemAppRemovalEnablingEntry(),
+            new SystemAppsRemovalEnablingEntry(),
             new UWPAppRemovalEntry(),
             new WinDefenderRemovalEntry(),
             new EdgeRemovalEntry(),

@@ -10,7 +10,7 @@ namespace Win10BloatRemover
         public virtual IOperation? GetOperationInstance() => null;
     }
 
-    class SystemAppRemovalEnablingEntry : MenuEntry
+    class SystemAppsRemovalEnablingEntry : MenuEntry
     {
         public override string FullName => "Make system apps removable";
         public override string GetExplanation()
@@ -24,7 +24,7 @@ namespace Win10BloatRemover
                    "Remember also that certain apps are reinstalled after any Windows cumulative update.\n" +
                    "Before starting, make sure that the Store is not installing/updating apps in the background.";
         }
-        public override IOperation GetOperationInstance() => new SystemAppRemovalEnabler();
+        public override IOperation GetOperationInstance() => new SystemAppsRemovalEnabler();
     }
 
     class UWPAppRemovalEntry : MenuEntry

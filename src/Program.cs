@@ -88,7 +88,7 @@ namespace Win10BloatRemover
         {
             try
             {
-                InstallWimTweak.ExtractToTempFolder();
+                InstallWimTweak.ExtractToTempFolderAndLockFile();
             }
             catch (Exception exc)
             {

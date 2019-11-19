@@ -108,7 +108,6 @@ namespace Win10BloatRemover
                     "QuickAssist-Package"
                 },
                 ScheduledTasksToDisable = new[] {
-                    @"\Microsoft\Windows\AppID\SmartScreenSpecific",
                     @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
                     @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
                     @"\Microsoft\Windows\Application Experience\StartupAppTask",

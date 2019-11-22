@@ -15,7 +15,7 @@ namespace Win10BloatRemover.Operations
 
     public enum UWPAppGroup
     {
-        Bing,               // Weather and News
+        Bing,               // Weather, News, Finance and Sports
         Mobile,             // YourPhone, OneConnect (aka Mobile plans) and Connect app
         Xbox,
         OfficeHub,
@@ -46,11 +46,19 @@ namespace Win10BloatRemover.Operations
         // This dictionary contains the exact apps names corresponding to every defined group
         private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {
             { UWPAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
-            { UWPAppGroup.Bing, new[] { "Microsoft.BingNews", "Microsoft.BingWeather" } },
+            {
+                UWPAppGroup.Bing, new[] {
+                    "Microsoft.BingNews",
+                    "Microsoft.BingWeather",
+                    "Microsoft.BingFinance",
+                    "Microsoft.BingSports"
+                }
+            },
             { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
             { UWPAppGroup.Edge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
-            { UWPAppGroup.HelpAndFeedback, new[] {
+            {
+                UWPAppGroup.HelpAndFeedback, new[] {
                     "Microsoft.WindowsFeedbackHub",
                     "Microsoft.GetHelp",
                     "Microsoft.Getstarted"
@@ -59,7 +67,8 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.MailAndCalendar, new[] { "microsoft.windowscommunicationsapps" } },
             { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
             { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
-            { UWPAppGroup.MixedReality, new[] {
+            {
+                UWPAppGroup.MixedReality, new[] {
                     "Microsoft.Microsoft3DViewer",
                     "Microsoft.Print3D",
                     "Microsoft.MixedReality.Portal"
@@ -76,13 +85,15 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.SkreenSketch" } },
             { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
             { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
-            { UWPAppGroup.Store, new[] {
+            {
+                UWPAppGroup.Store, new[] {
                     "Microsoft.WindowsStore",
                     "Microsoft.StorePurchaseApp",
                     "Microsoft.Services.Store.Engagement",
                 }
             },
-            { UWPAppGroup.Xbox, new[] {
+            {
+                UWPAppGroup.Xbox, new[] {
                     "Microsoft.XboxGameCallableUI",
                     "Microsoft.XboxSpeechToTextOverlay",
                     "Microsoft.XboxApp",

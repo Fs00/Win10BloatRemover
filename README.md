@@ -5,7 +5,7 @@ This configurable tool offers a simple CLI to aggressively debloat and apply som
 * **UWP apps removal:** Uninstalls the apps specified in configuration file for all users and optionally deletes their corresponding provisioned packages (if present), so that apps aren't reinstalled for new users or after feature updates.  
 Take note that you can't configure the program to remove single UWP packages but only groups of them, to make user configuration less tricky and because some apps are made of multiple packages (e.g. Xbox) which depend on each other. Groups are defined as follows:
     * ***Edge*** (you need to make system apps removable to uninstall it)
-    * *Bing*: Weather and News
+    * *Bing*: Weather, News, Finance and Sports
     * *Mobile*: YourPhone, Mobile plans and Connect app
     * *Xbox*: Xbox app, Game Overlay and related services
     * *OfficeHub*: My Office

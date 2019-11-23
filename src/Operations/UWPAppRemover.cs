@@ -24,8 +24,7 @@ namespace Win10BloatRemover.Operations
         HelpAndFeedback,
         Maps,
         Zune,               // Groove Music and Movies
-        People,
-        MailAndCalendar,
+        CommunicationsApps,
         Messaging,
         SolitaireCollection,
         StickyNotes,
@@ -56,6 +55,7 @@ namespace Win10BloatRemover.Operations
             },
             { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
+            { UWPAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
             { UWPAppGroup.Edge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             {
                 UWPAppGroup.HelpAndFeedback, new[] {
@@ -64,7 +64,6 @@ namespace Win10BloatRemover.Operations
                     "Microsoft.Getstarted"
                 }
             },
-            { UWPAppGroup.MailAndCalendar, new[] { "microsoft.windowscommunicationsapps" } },
             { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
             { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
             {
@@ -78,7 +77,6 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
             { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
             { UWPAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
-            { UWPAppGroup.People, new[] { "Microsoft.People" } },
             { UWPAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
             { UWPAppGroup.SecurityCenter, new[] { "Microsoft.Windows.SecHealthUI" } },
             { UWPAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
@@ -107,6 +105,7 @@ namespace Win10BloatRemover.Operations
         };
 
         private static readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
+            { UWPAppGroup.CommunicationsApps, RemoveSyncHostService },
             { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
             {
                 UWPAppGroup.Mobile,
@@ -118,8 +117,6 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Photos, RestoreWindowsPhotoViewer },
             { UWPAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
             { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
-            { UWPAppGroup.MailAndCalendar, RemoveMailAndPeopleService },
-            { UWPAppGroup.People, RemoveMailAndPeopleService },
             { UWPAppGroup.Store, DisableStoreFeaturesAndServices }
         };
 
@@ -322,9 +319,9 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private static void RemoveMailAndPeopleService()
+        private static void RemoveSyncHostService()
         {
-            Console.WriteLine("Removing app-related services...");
+            Console.WriteLine("Removing sync host service...");
             ServiceRemover.BackupAndRemove(new[] { "OneSyncSvc" });
         }
 

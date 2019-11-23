@@ -14,8 +14,7 @@ Take note that you can't configure the program to remove single UWP packages but
     * *HelpAndFeedback*: Feedback Hub, Get Help and Microsoft Tips
     * *Maps*
     * *Zune*: Groove Music and Movies
-    * *People*
-    * *MailAndCalendar* (they belong to the same package)
+    * *CommunicationsApps*: Mail, Calendar and People (they all depend on a common service)
     * *Messaging*
     * *SolitaireCollection*
     * *StickyNotes*

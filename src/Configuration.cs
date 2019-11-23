@@ -90,7 +90,7 @@ namespace Win10BloatRemover
                 },
                 UWPAppsToRemove = new[] {   
                     UWPAppGroup.Zune,
-                    UWPAppGroup.MailAndCalendar,
+                    UWPAppGroup.CommunicationsApps,
                     UWPAppGroup.OneNote,
                     UWPAppGroup.OfficeHub,
                     UWPAppGroup.Camera,
@@ -99,7 +99,6 @@ namespace Win10BloatRemover
                     UWPAppGroup.HelpAndFeedback,
                     UWPAppGroup.Bing,
                     UWPAppGroup.Messaging,
-                    UWPAppGroup.People,
                     UWPAppGroup.Skype
                 },
                 WindowsFeaturesToRemove = new[] {

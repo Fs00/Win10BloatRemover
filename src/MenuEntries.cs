@@ -20,7 +20,7 @@ namespace Win10BloatRemover
                    "A backup of the database will be saved in the current directory. " +
                    "It will become useless as soon as you install/remove an app, so make sure you don't have " +
                    "any problems with Windows Update or the Store after the operation is completed.\n\n" +
-                   "REMOVING SYSTEM APPS CAN PREVENT WINDOWS UPDATES FROM BEING INSTALLED; PROCEED AT YOUR OWN RISK.\n" +
+                   "REMOVING SYSTEM APPS MAY POSSIBLY BREAK SOME FUNCTIONALITY; PROCEED AT YOUR OWN RISK.\n" +
                    "Remember also that certain apps are reinstalled after any Windows cumulative update.\n" +
                    "Before starting, make sure that the Store is not installing/updating apps in the background.";
         }
@@ -74,7 +74,7 @@ namespace Win10BloatRemover
                    @"You can also perform this task using UWP apps removal (""Edge"" must be included in the list " +
                    "\"UWPAppsToRemove\" in configuration file).\n" + 
                    "Take note that this app will likely be reinstalled after any Windows cumulative update. Proceed " +
-                   "ONLY if you know the consequences and risks of uninstalling system apps.";
+                   "only if you know the consequences and risks of uninstalling system apps.";
         }
         public override IOperation GetOperationInstance()
             => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.KeepProvisionedPackages);

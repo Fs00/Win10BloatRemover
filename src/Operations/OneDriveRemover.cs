@@ -8,31 +8,60 @@ namespace Win10BloatRemover.Operations
 {
     class OneDriveRemover : IOperation
     {
+        private enum UninstallationOutcome
+        {
+            Successful,
+            Failed
+        }
+
         public void PerformTask()
         {
-            SystemUtils.KillProcess("onedrive");
-            RunOneDriveUninstaller();
-            DisableOneDriveViaGroupPolicies();
+            DisableOneDriveViaRegistryEdits();
 
-            SystemUtils.KillProcess("explorer");
-            RemoveResidualFiles();
-            RemoveResidualRegistryKeys();
-            Process.Start("explorer");
+            SystemUtils.KillProcess("onedrive");
+            var uninstallationOutcome = RunOneDriveUninstaller();
+            if (uninstallationOutcome == UninstallationOutcome.Failed)
+                ThrowIfUserWantsToAbort();
+
+            RemoveOneDriveLeftovers();
 
             Console.WriteLine();
             InstallWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup");
         }
 
-        private void RunOneDriveUninstaller()
+        private void DisableOneDriveViaRegistryEdits()
         {
-            string uninstallerPath = RetrieveOneDriveUninstallerPath();
-            Console.WriteLine("Executing OneDrive uninstaller...");
-            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(uninstallerPath, "/uninstall");
-            if (exitCode != 0)
-                throw new Exception("OneDrive uninstaller terminated with non-zero status.");
+            ConsoleUtils.WriteLine("Disabling OneDrive via registry edits...", ConsoleColor.Green);
+            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
+                key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
+            using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Microsoft\OneDrive"))
+                key.SetValue("PreventNetworkTrafficPreUserSignIn", 1, RegistryValueKind.DWord);
         }
 
-        private string RetrieveOneDriveUninstallerPath()
+        private void ThrowIfUserWantsToAbort()
+        {
+            ConsoleUtils.Write(
+                "Uninstallation failed due to an unknown error. Do you still want to continue the process by " +
+                "removing all leftover OneDrive files (including its application files for the current user) " +
+                "and registry keys? (y/N) ",
+                ConsoleColor.DarkYellow
+            );
+            if (Console.ReadKey().Key != ConsoleKey.Y)
+                throw new Exception("The user aborted the operation.");
+        }
+
+        private UninstallationOutcome RunOneDriveUninstaller()
+        {
+            ConsoleUtils.WriteLine("\nExecuting OneDrive uninstaller...", ConsoleColor.Green);
+            string installerPath = RetrieveOneDriveInstallerPath();
+            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(installerPath, "/uninstall");
+            if (exitCode == 0)
+                Console.WriteLine("Uninstallation completed succesfully.");
+            return exitCode == 0 ? UninstallationOutcome.Successful : UninstallationOutcome.Failed;
+        }
+
+        private string RetrieveOneDriveInstallerPath()
         {
             if (Env.Is64BitOperatingSystem)
                 return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe";
@@ -40,12 +69,13 @@ namespace Win10BloatRemover.Operations
                 return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\System32\OneDriveSetup.exe";
         }
 
-        private void DisableOneDriveViaGroupPolicies()
+        private void RemoveOneDriveLeftovers()
         {
-            Console.WriteLine("Disabling OneDrive via Group Policies...");
-            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive");
-            key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
+            ConsoleUtils.WriteLine("\nRemoving OneDrive leftovers...", ConsoleColor.Green);
+            SystemUtils.KillProcess("explorer");
+            RemoveResidualFiles();
+            RemoveResidualRegistryKeys();
+            Process.Start("explorer");
         }
 
         private void RemoveResidualFiles()

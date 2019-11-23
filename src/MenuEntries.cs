@@ -85,8 +85,9 @@ namespace Win10BloatRemover
         public override string FullName => "OneDrive removal";
         public override string GetExplanation()
         {
-            return "If you allow the use of install-wim-tweak, this will prevent the app to be installed for " +
-                   "new users and to return after a reset or a major Windows update.";
+            return "OneDrive will be first disabled using Group Policies, and then uninstalled using its setup program.\n" +
+                   "If you allow the use of install-wim-tweak, the setup program will also be removed from the " +
+                   "system so that the app won't be installed for new users.";
         }
         public override IOperation GetOperationInstance() => new OneDriveRemover();
     }

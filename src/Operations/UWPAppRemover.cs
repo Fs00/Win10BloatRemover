@@ -193,7 +193,7 @@ namespace Win10BloatRemover.Operations
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
         {
-            Console.WriteLine($"\nPerforming post-uninstall operations for app {appGroup}...");
+            ConsoleUtils.WriteLine($"\nPerforming post-uninstall operations for app {appGroup}...", ConsoleColor.DarkGreen);
             try
             {
                 PerformPostUninstallOperations(appGroup);

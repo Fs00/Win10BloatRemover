@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    class WindowsTipsDisabler : IOperation
+    class TipsDisabler : IOperation
     {
         public void PerformTask()
         {
@@ -14,6 +14,7 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("DisableSoftLanding", 1, RegistryValueKind.DWord);
                 key.SetValue("DisableWindowsSpotlightFeatures", 1, RegistryValueKind.DWord);
                 key.SetValue("DisableWindowsConsumerFeatures", 1, RegistryValueKind.DWord);
+                key.SetValue("DisableTailoredExperiencesWithDiagnosticData", 1, RegistryValueKind.DWord);
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection"))
                 key.SetValue("DoNotShowFeedbackNotifications", 1, RegistryValueKind.DWord);

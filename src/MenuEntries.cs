@@ -181,10 +181,11 @@ namespace Win10BloatRemover
         public override string FullName => "Windows Tips and feedback requests disabling";
         public override string GetExplanation()
         {
-            return "These features will be turned off by setting Group Policies accordingly and by disabling " +
+            return "Feedback notifications/requests, apps suggestions, tips and Spotlight (including dynamic lock " +
+                   "screen backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
                    "some related scheduled tasks.";
         }
-        public override IOperation GetOperationInstance() => new WindowsTipsDisabler();
+        public override IOperation GetOperationInstance() => new TipsDisabler();
     }
 
     class NewGitHubIssueEntry : MenuEntry

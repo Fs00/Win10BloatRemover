@@ -7,7 +7,7 @@ namespace Win10BloatRemover
 {
     static class Program
     {
-        public const string SUPPORTED_WINDOWS_RELEASE_ID = "1903";
+        public const string SUPPORTED_WINDOWS_RELEASE_ID = "1909";
 
         private static void Main()
         {

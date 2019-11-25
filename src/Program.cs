@@ -8,6 +8,7 @@ namespace Win10BloatRemover
     static class Program
     {
         public const string SUPPORTED_WINDOWS_RELEASE_ID = "1909";
+        private const string SUPPORTED_WINDOWS_RELEASE_NAME = "November 2019 Update";
 
         private static void Main()
         {
@@ -37,7 +38,7 @@ namespace Win10BloatRemover
             #if !DEBUG
             if (!SystemUtils.IsWindowsReleaseId(SUPPORTED_WINDOWS_RELEASE_ID))
             {
-                ConsoleUtils.WriteLine("This application is compatible only with Windows 10 May 2019 Update!", ConsoleColor.Red);
+                ConsoleUtils.WriteLine($"This application is compatible only with Windows 10 {SUPPORTED_WINDOWS_RELEASE_NAME}!", ConsoleColor.Red);
                 Console.ReadKey();
                 Environment.Exit(-1);
             }

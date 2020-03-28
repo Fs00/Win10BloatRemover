@@ -29,7 +29,7 @@ Take note that you can't configure the program to remove single UWP packages but
 * **Automatic updates disabling:** Prevents automatic download and installing of Windows and Store apps updates through Group Policies. Therefore, this method won't work on Windows 10 Home.
 * **Telemetry disabling:** disables several telemetry and features that collect user data such as Compatibility Telemetry, Inventory, Device Census, SmartScreen and others. It also deletes the services which are responsible for diagnostics and data reporting to Microsoft.
 * **Services removal:** deletes (not just disables) the services specified in configuration after backing them up, so that you can restore them if any feature breaks.
-* **Removal of Windows Defender:** this is accomplished using [install-wim-tweak](https://github.com/shiitake/win6x_registry_tweak) tool. If you make system apps removable, Windows Security app will be deleted too.
+* **Disabling and removal of Windows Defender:** the latter is accomplished using [install-wim-tweak](https://github.com/shiitake/win6x_registry_tweak) tool. If you make system apps removable, Windows Security app will be deleted too.
 * **OneDrive removal** using stock uninstaller, its folder in Explorer sidebar will also be hidden. Furthermore, install-wim-tweak will be used to prevent the app to be re-installed for new users or after major Windows updates.
 * **Windows features removal:** uninstalls the optional features packages specified in configuration. Take note that these features are the ones listed in Settings app, not the ones in Control Panel. You can find the names of feature packages that can be removed with the PowerShell command `Get-WindowsPackage -Online`.
 * **Cortana disabling:** accomplished using Group Policies, since it is too deeply integrated with the system to be removed without consequences.
@@ -44,7 +44,7 @@ When the program is run for the first time, a configuration file called *config.
 Furthermore, you have two other options to reduce the aggressiveness of the debloating process:
 
 * `UWPAppsRemovalMode`: allows you to decide not to remove provisioned packages by setting it to *KeepProvisionedPackages* (default is *RemoveProvisionedPackages*)
-* `AllowInstallWimTweak`: can be set to *true* or *false* and if it's false, any execution of install-wim-tweak will be skipped
+* `AllowInstallWimTweak`: can be set to *true* or *false* and if it's false, any execution of install-wim-tweak will be skipped (default is *false*)
 
 These two settings have been added to make users able to limit the amount of changes made to the online Windows image, since they can't be reverted with system restore and carry over after major Windows updates.
 

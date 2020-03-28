@@ -136,7 +136,7 @@ namespace Win10BloatRemover
                     @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
                 },
                 UWPAppsRemovalMode = UWPAppRemovalMode.RemoveProvisionedPackages,
-                AllowInstallWimTweak = true
+                AllowInstallWimTweak = false
             };
         }
         #endregion

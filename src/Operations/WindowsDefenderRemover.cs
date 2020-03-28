@@ -14,13 +14,20 @@ namespace Win10BloatRemover.Operations
             "SgrmAgent"
         };
 
+        private readonly InstallWimTweak installWimTweak;
+
+        public WindowsDefenderRemover(InstallWimTweak installWimTweak)
+        {
+            this.installWimTweak = installWimTweak;
+        }
+
         public void PerformTask()
         {
             EditWindowsRegistryKeys();
             RemoveSecurityHealthServices();
 
             Console.WriteLine();
-            InstallWimTweak.RemoveComponentIfAllowed("Windows-Defender");
+            installWimTweak.RemoveComponentIfAllowed("Windows-Defender");
 
             TryUninstallSecurityCenter();
         }
@@ -73,8 +80,11 @@ namespace Win10BloatRemover.Operations
 
         private void TryUninstallSecurityCenter()
         {
-            new UWPAppRemover(new[] { UWPAppGroup.SecurityCenter }, UWPAppRemovalMode.KeepProvisionedPackages)
-                .PerformTask();
+            new UWPAppRemover(
+                new[] { UWPAppGroup.SecurityCenter },
+                UWPAppRemovalMode.KeepProvisionedPackages,
+                installWimTweak
+            ).PerformTask();
         }
     }
 }

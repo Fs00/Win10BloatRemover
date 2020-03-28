@@ -1,11 +1,13 @@
 ﻿using System;
 using Win10BloatRemover.Operations;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
 {
     abstract class MenuEntry
     {
         public abstract string FullName { get; }
+        public virtual bool ShouldQuit => false;
         public abstract string GetExplanation();
         public virtual IOperation? GetOperationInstance() => null;
     }
@@ -29,17 +31,26 @@ namespace Win10BloatRemover
 
     class UWPAppRemovalEntry : MenuEntry
     {
+        private readonly Configuration configuration;
+        private readonly InstallWimTweak installWimTweak;
+
+        public UWPAppRemovalEntry(Configuration configuration, InstallWimTweak installWimTweak)
+        {
+            this.configuration = configuration;
+            this.installWimTweak = installWimTweak;
+        }
+
         public override string FullName => "UWP apps removal";
         public override string GetExplanation()
         {
             string explanation = "The following groups of UWP apps will be removed:\n";
-            foreach (UWPAppGroup app in Configuration.Instance.UWPAppsToRemove)
-                explanation += $"  {app.ToString()}\n";
+            foreach (UWPAppGroup app in configuration.UWPAppsToRemove)
+                explanation += $"  {app}\n";
             explanation += "Some specific app-related services will also be removed " +
                            "(but backed up in case you need to restore them).\n" +
                            "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first.";
             
-            if (Configuration.Instance.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
+            if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
                 explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
                                "aforementioned apps will be removed too (if available).\n" +
                                "This means that those apps won't be installed to new users when they log in for the first time.\n" +
@@ -47,11 +58,14 @@ namespace Win10BloatRemover
             return explanation;
         }
         public override IOperation GetOperationInstance()
-            => new UWPAppRemover(Configuration.Instance.UWPAppsToRemove, Configuration.Instance.UWPAppsRemovalMode);
+            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, installWimTweak);
     }
 
     class WinDefenderRemovalEntry : MenuEntry
     {
+        private readonly InstallWimTweak installWimTweak;
+        public WinDefenderRemovalEntry(InstallWimTweak installWimTweak) => this.installWimTweak = installWimTweak;
+
         public override string FullName => "Windows Defender removal";
         public override string GetExplanation()
         {
@@ -62,7 +76,7 @@ namespace Win10BloatRemover
                    "otherwise, its menu icon will remain there, but the app won't start anymore.\n" +
                    "Remember that any Windows cumulative update is likely to reinstall the app.";
         }
-        public override IOperation GetOperationInstance() => new WindowsDefenderRemover();
+        public override IOperation GetOperationInstance() => new WindowsDefenderRemover(installWimTweak);
     }
 
     class EdgeRemovalEntry : MenuEntry
@@ -77,11 +91,14 @@ namespace Win10BloatRemover
                    "only if you know the consequences and risks of uninstalling system apps.";
         }
         public override IOperation GetOperationInstance()
-            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.KeepProvisionedPackages);
+            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.KeepProvisionedPackages, installWimTweak: null!);
     }
 
     class OneDriveRemovalEntry : MenuEntry
     {
+        private readonly InstallWimTweak installWimTweak;
+        public OneDriveRemovalEntry(InstallWimTweak installWimTweak) => this.installWimTweak = installWimTweak;
+
         public override string FullName => "OneDrive removal";
         public override string GetExplanation()
         {
@@ -89,33 +106,39 @@ namespace Win10BloatRemover
                    "If you allow the use of install-wim-tweak, the setup program will also be removed from the " +
                    "system so that the app won't be installed for new users.";
         }
-        public override IOperation GetOperationInstance() => new OneDriveRemover();
+        public override IOperation GetOperationInstance() => new OneDriveRemover(installWimTweak);
     }
 
     class ServicesRemovalEntry : MenuEntry
     {
+        private readonly Configuration configuration;
+        public ServicesRemovalEntry(Configuration configuration) => this.configuration = configuration;
+
         public override string FullName => "Miscellaneous services removal";
         public override string GetExplanation()
         {
             string explanation = "The services starting with the following names will be removed:\n";
-            foreach (string service in Configuration.Instance.ServicesToRemove)
+            foreach (string service in configuration.ServicesToRemove)
                 explanation += $"  {service}\n";
             return explanation + "Services will be backed up in the same folder as this program executable.";
         }
-        public override IOperation GetOperationInstance() => new ServiceRemover(Configuration.Instance.ServicesToRemove);
+        public override IOperation GetOperationInstance() => new ServiceRemover(configuration.ServicesToRemove);
     }
 
     class WindowsFeaturesRemovalEntry : MenuEntry
     {
+        private readonly Configuration configuration;
+        public WindowsFeaturesRemovalEntry(Configuration configuration) => this.configuration = configuration;
+
         public override string FullName => "Windows features removal";
         public override string GetExplanation()
         {
             string explanation = "The following features will be removed:";
-            foreach (string feature in Configuration.Instance.WindowsFeaturesToRemove)
+            foreach (string feature in configuration.WindowsFeaturesToRemove)
                 explanation += $"\n  {feature}";
             return explanation;
         }
-        public override IOperation GetOperationInstance() => new FeaturesRemover(Configuration.Instance.WindowsFeaturesToRemove);
+        public override IOperation GetOperationInstance() => new FeaturesRemover(configuration.WindowsFeaturesToRemove);
     }
 
     class TelemetryDisablingEntry : MenuEntry
@@ -155,16 +178,19 @@ namespace Win10BloatRemover
 
     class ScheduledTasksDisablingEntry : MenuEntry
     {
+        private readonly Configuration configuration;
+        public ScheduledTasksDisablingEntry(Configuration configuration) => this.configuration = configuration;
+
         public override string FullName => "Miscellaneous scheduled tasks disabling";
         public override string GetExplanation()
         {
             string explanation = "The following scheduled tasks will be disabled:";
-            foreach (string task in Configuration.Instance.ScheduledTasksToDisable)
+            foreach (string task in configuration.ScheduledTasksToDisable)
                 explanation += $"\n  {task}";
             return explanation;
         }
         public override IOperation GetOperationInstance()
-            => new ScheduledTasksDisabler(Configuration.Instance.ScheduledTasksToDisable);
+            => new ScheduledTasksDisabler(configuration.ScheduledTasksToDisable);
     }
 
     class ErrorReportingDisablingEntry : MenuEntry
@@ -221,6 +247,7 @@ namespace Win10BloatRemover
     class QuitEntry : MenuEntry
     {
         public override string FullName => "Exit the application";
+        public override bool ShouldQuit => true;
         public override string GetExplanation() => "Are you sure?";
     }
 }

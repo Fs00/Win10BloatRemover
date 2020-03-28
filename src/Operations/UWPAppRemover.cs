@@ -104,31 +104,31 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Zune, new[] {"Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
-        private static readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
-            { UWPAppGroup.CommunicationsApps, RemoveSyncHostService },
-            { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
-            {
-                UWPAppGroup.Mobile,
-                () => InstallWimTweak.RemoveComponentIfAllowed("Microsoft-PPIProjection-Package")   // Connect app
-            },
-            { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
-            { UWPAppGroup.Messaging, RemoveMessagingService },
-            { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
-            { UWPAppGroup.Photos, RestoreWindowsPhotoViewer },
-            { UWPAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
-            { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
-            { UWPAppGroup.Store, DisableStoreFeaturesAndServices }
-        };
-
+        private readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup;
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
+        private readonly InstallWimTweak installWimTweak;
         private /*lateinit*/ PowerShell psInstance;
 
         #nullable disable warnings
-        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode)
+        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, InstallWimTweak installWimTweak)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;
+            this.installWimTweak = installWimTweak;
+
+            postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
+                { UWPAppGroup.CommunicationsApps, RemoveSyncHostService },
+                { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
+                { UWPAppGroup.Mobile, RemoveConnectApp },
+                { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
+                { UWPAppGroup.Messaging, RemoveMessagingService },
+                { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
+                { UWPAppGroup.Photos, RestoreWindowsPhotoViewer },
+                { UWPAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
+                { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
+                { UWPAppGroup.Store, DisableStoreFeaturesAndServices }
+            };
         }
         #nullable restore warnings
 
@@ -150,7 +150,7 @@ namespace Win10BloatRemover.Operations
 
         private bool UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
-            ConsoleUtils.WriteLine($"\nRemoving {appGroup.ToString()} app(s)...", ConsoleColor.Green);
+            ConsoleUtils.WriteLine($"\nRemoving {appGroup} app(s)...", ConsoleColor.Green);
 
             bool atLeastOneAppUninstalled = false;
             foreach (string appName in appNamesForGroup[appGroup])
@@ -225,6 +225,11 @@ namespace Win10BloatRemover.Operations
             SystemUtils.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge"
             );
+        }
+
+        private void RemoveConnectApp()
+        {
+            installWimTweak.RemoveComponentIfAllowed("Microsoft-PPIProjection-Package");
         }
 
         private static void RemoveMapsServicesAndTasks()

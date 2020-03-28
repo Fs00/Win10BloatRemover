@@ -5,30 +5,19 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
 {
-    static class Menu
+    class Menu
     {
-        private static bool exitRequested = false;
-        private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version!;
-        private static readonly MenuEntry[] orderedMenuEntries = {
-            new SystemAppsRemovalEnablingEntry(),
-            new UWPAppRemovalEntry(),
-            new WinDefenderRemovalEntry(),
-            new EdgeRemovalEntry(),
-            new OneDriveRemovalEntry(),
-            new ServicesRemovalEntry(),
-            new WindowsFeaturesRemovalEntry(),
-            new TelemetryDisablingEntry(),
-            new CortanaDisablingEntry(),
-            new AutoUpdatesDisablingEntry(),
-            new ScheduledTasksDisablingEntry(),
-            new ErrorReportingDisablingEntry(),
-            new TipsAndFeedbackDisablingEntry(),
-            new NewGitHubIssueEntry(),
-            new AboutEntry(),
-            new QuitEntry()
-        };
+        private bool exitRequested = false;
+        private readonly MenuEntry[] entries;
 
-        public static void RunLoopUntilExitRequested()
+        private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version!;
+
+        public Menu(MenuEntry[] entries)
+        {
+            this.entries = entries;
+        }
+
+        public void RunLoopUntilExitRequested()
         {
             while (!exitRequested)
             {
@@ -44,7 +33,7 @@ namespace Win10BloatRemover
             }
         }
 
-        private static void PrintHeading()
+        private void PrintHeading()
         {
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine("|    Windows 10 Bloat Remover and Tweaker   |");
@@ -53,15 +42,15 @@ namespace Win10BloatRemover
             Console.WriteLine();
         }
 
-        private static void PrintMenuEntries()
+        private void PrintMenuEntries()
         {
             Console.WriteLine("-- MENU --");
-            for (int i = 0; i < orderedMenuEntries.Length; i++)
-                Console.WriteLine($"{i}: {orderedMenuEntries[i].FullName}");
+            for (int i = 0; i < entries.Length; i++)
+                Console.WriteLine($"{i}: {entries[i].FullName}");
             Console.WriteLine();
         }
 
-        private static MenuEntry RequestUserChoice()
+        private MenuEntry RequestUserChoice()
         {
             MenuEntry? chosenEntry = null;
             bool isUserInputCorrect = false;
@@ -77,30 +66,30 @@ namespace Win10BloatRemover
             return chosenEntry!;
         }
 
-        private static MenuEntry? GetEntryCorrespondingToUserInput(string userInput)
+        private MenuEntry? GetEntryCorrespondingToUserInput(string userInput)
         {
             bool inputIsNumeric = int.TryParse(userInput, out int entryIndex);
             if (inputIsNumeric)
-                return orderedMenuEntries.ElementAtOrDefault(entryIndex);
+                return entries.ElementAtOrDefault(entryIndex);
 
             return null;
         }
 
-        private static void PrintTitleAndExplanation(MenuEntry entry)
+        private void PrintTitleAndExplanation(MenuEntry entry)
         {
             ConsoleUtils.WriteLine($"-- {entry.FullName} --", ConsoleColor.Green);
             Console.WriteLine(entry.GetExplanation());
         }
 
-        private static bool UserWantsToProceed()
+        private bool UserWantsToProceed()
         {
             Console.WriteLine("\nPress enter to continue, or another key to go back to the menu.");
             return Console.ReadKey().Key == ConsoleKey.Enter;
         }
 
-        private static void TryPerformEntryOperation(MenuEntry entry)
+        private void TryPerformEntryOperation(MenuEntry entry)
         {
-            if (entry is QuitEntry)
+            if (entry.ShouldQuit)
             {
                 exitRequested = true;
                 return;

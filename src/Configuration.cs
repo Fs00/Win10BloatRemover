@@ -13,12 +13,8 @@ namespace Win10BloatRemover
         public ConfigurationException(string message, Exception inner) : base(message, inner) {}
     }
 
-    /*
-     *  Singleton class that stores user-configurable data, which are loaded from a JSON file
-     */
     class Configuration
     {
-        public static Configuration Instance { private set; get; }
         private const string CONFIGURATION_FILE_NAME = "config.json";
 
         #nullable disable warnings
@@ -42,22 +38,22 @@ namespace Win10BloatRemover
         public bool AllowInstallWimTweak { private set; get; }
         #nullable restore warnings
 
-        // Only ConfigurationExceptions thrown by this method should be handled
-        public static void Load()
+        public static Configuration LoadFromFileOrDefault()
         { 
             if (File.Exists(CONFIGURATION_FILE_NAME))
-                TryLoadConfigFromFile();
-            else
-                WriteSettingsToFile();
+                return ParseConfigFile();
+
+            Default.WriteToFile();
+            return Default;
         }
 
-        private static void TryLoadConfigFromFile()
+        private static Configuration ParseConfigFile()
         {
             try
             {
-                Configuration fileParsingResult =
+                var parsedConfiguration =
                     JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(CONFIGURATION_FILE_NAME));
-                Instance = fileParsingResult;
+                return parsedConfiguration;
             }
             catch (Exception exc)
             {
@@ -66,11 +62,11 @@ namespace Win10BloatRemover
             }
         }
 
-        private static void WriteSettingsToFile()
+        private void WriteToFile()
         {
             try
             {
-                string settingsFileContent = JsonConvert.SerializeObject(Instance, Formatting.Indented);
+                string settingsFileContent = JsonConvert.SerializeObject(this, Formatting.Indented);
                 File.WriteAllText(CONFIGURATION_FILE_NAME, settingsFileContent);
             }
             catch (Exception exc)
@@ -79,66 +75,61 @@ namespace Win10BloatRemover
             }
         }
 
-        #region Singleton initializer (default settings)
-        static Configuration()
-        {
-            Instance = new Configuration {
-                ServicesToRemove = new[] {
-                    "dmwappushservice",
-                    "RetailDemo",
-                    "TroubleshootingSvc"
-                },
-                UWPAppsToRemove = new[] {   
-                    UWPAppGroup.Zune,
-                    UWPAppGroup.CommunicationsApps,
-                    UWPAppGroup.OneNote,
-                    UWPAppGroup.OfficeHub,
-                    UWPAppGroup.Camera,
-                    UWPAppGroup.Maps,
-                    UWPAppGroup.Mobile,
-                    UWPAppGroup.HelpAndFeedback,
-                    UWPAppGroup.Bing,
-                    UWPAppGroup.Messaging,
-                    UWPAppGroup.Skype
-                },
-                WindowsFeaturesToRemove = new[] {
-                    "InternetExplorer-Optional-Package",
-                    "Hello-Face-Package",
-                    "QuickAssist-Package"
-                },
-                ScheduledTasksToDisable = new[] {
-                    @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
-                    @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
-                    @"\Microsoft\Windows\Application Experience\StartupAppTask",
-                    @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
-                    @"\Microsoft\Windows\Autochk\Proxy",
-                    @"\Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
-                    @"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
-                    @"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
-                    @"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
-                    @"\Microsoft\Windows\DiskFootprint\Diagnostics",
-                    @"\Microsoft\Windows\Device Information\Device",
-                    @"\Microsoft\Windows\FileHistory\File History (maintenance mode)",
-                    @"\Microsoft\Windows\Maintenance\WinSAT",
-                    @"\Microsoft\Windows\PI\Sqm-Tasks",
-                    @"\Microsoft\Windows\Shell\FamilySafetyMonitor",
-                    @"\Microsoft\Windows\Shell\FamilySafetyRefreshTask",
-                    @"\Microsoft\Windows\Windows Error Reporting\QueueReporting",
-                    @"\Microsoft\Windows\License Manager\TempSignedLicenseExchange",
-                    @"\Microsoft\Windows\Clip\License Validation",
-                    @"\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",
-                    @"\Microsoft\Windows\PushToInstall\LoginCheck",
-                    @"\Microsoft\Windows\PushToInstall\Registration",
-                    @"\Microsoft\Windows\Subscription\EnableLicenseAcquisition",
-                    @"\Microsoft\Windows\Subscription\LicenseAcquisition",
-                    @"\Microsoft\Windows\Diagnosis\Scheduled",
-                    @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
-                    @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
-                },
-                UWPAppsRemovalMode = UWPAppRemovalMode.RemoveProvisionedPackages,
-                AllowInstallWimTweak = false
-            };
-        }
-        #endregion
+        public static readonly Configuration Default = new Configuration {
+            ServicesToRemove = new[] {
+                "dmwappushservice",
+                "RetailDemo",
+                "TroubleshootingSvc"
+            },
+            UWPAppsToRemove = new[] {   
+                UWPAppGroup.Zune,
+                UWPAppGroup.CommunicationsApps,
+                UWPAppGroup.OneNote,
+                UWPAppGroup.OfficeHub,
+                UWPAppGroup.Camera,
+                UWPAppGroup.Maps,
+                UWPAppGroup.Mobile,
+                UWPAppGroup.HelpAndFeedback,
+                UWPAppGroup.Bing,
+                UWPAppGroup.Messaging,
+                UWPAppGroup.Skype
+            },
+            WindowsFeaturesToRemove = new[] {
+                "InternetExplorer-Optional-Package",
+                "Hello-Face-Package",
+                "QuickAssist-Package"
+            },
+            ScheduledTasksToDisable = new[] {
+                @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
+                @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
+                @"\Microsoft\Windows\Application Experience\StartupAppTask",
+                @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
+                @"\Microsoft\Windows\Autochk\Proxy",
+                @"\Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
+                @"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
+                @"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
+                @"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
+                @"\Microsoft\Windows\DiskFootprint\Diagnostics",
+                @"\Microsoft\Windows\Device Information\Device",
+                @"\Microsoft\Windows\FileHistory\File History (maintenance mode)",
+                @"\Microsoft\Windows\Maintenance\WinSAT",
+                @"\Microsoft\Windows\PI\Sqm-Tasks",
+                @"\Microsoft\Windows\Shell\FamilySafetyMonitor",
+                @"\Microsoft\Windows\Shell\FamilySafetyRefreshTask",
+                @"\Microsoft\Windows\Windows Error Reporting\QueueReporting",
+                @"\Microsoft\Windows\License Manager\TempSignedLicenseExchange",
+                @"\Microsoft\Windows\Clip\License Validation",
+                @"\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",
+                @"\Microsoft\Windows\PushToInstall\LoginCheck",
+                @"\Microsoft\Windows\PushToInstall\Registration",
+                @"\Microsoft\Windows\Subscription\EnableLicenseAcquisition",
+                @"\Microsoft\Windows\Subscription\LicenseAcquisition",
+                @"\Microsoft\Windows\Diagnosis\Scheduled",
+                @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
+                @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
+            },
+            UWPAppsRemovalMode = UWPAppRemovalMode.RemoveProvisionedPackages,
+            AllowInstallWimTweak = false
+        };
     }
 }

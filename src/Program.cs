@@ -13,17 +13,37 @@ namespace Win10BloatRemover
         private static void Main()
         {
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
-
             EnsurePreliminaryChecksAreSuccessful();
-            TryLoadConfiguration();
+
+            var configuration = LoadConfigurationFromFileOrDefault();
+
             RegisterExitEventHandlers();
 
-            if (Configuration.Instance.AllowInstallWimTweak)
-                TryExtractInstallWimTweak();
+            var installWimTweak = new InstallWimTweak(configuration);
+            var menu = new Menu(CreateMenuEntries(configuration, installWimTweak));
+            menu.RunLoopUntilExitRequested();
+        }
 
-            Menu.RunLoopUntilExitRequested();
-
-            TryDeleteExtractedInstallWimTweak();
+        private static MenuEntry[] CreateMenuEntries(Configuration configuration, InstallWimTweak installWimTweak)
+        {
+            return new MenuEntry[] {
+                new SystemAppsRemovalEnablingEntry(),
+                new UWPAppRemovalEntry(configuration, installWimTweak),
+                new WinDefenderRemovalEntry(installWimTweak),
+                new EdgeRemovalEntry(),
+                new OneDriveRemovalEntry(installWimTweak),
+                new ServicesRemovalEntry(configuration),
+                new WindowsFeaturesRemovalEntry(configuration),
+                new TelemetryDisablingEntry(),
+                new CortanaDisablingEntry(),
+                new AutoUpdatesDisablingEntry(),
+                new ScheduledTasksDisablingEntry(configuration),
+                new ErrorReportingDisablingEntry(),
+                new TipsAndFeedbackDisablingEntry(),
+                new NewGitHubIssueEntry(),
+                new AboutEntry(),
+                new QuitEntry()
+            };
         }
 
         private static void EnsurePreliminaryChecksAreSuccessful()
@@ -51,17 +71,18 @@ namespace Win10BloatRemover
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
         
-        private static void TryLoadConfiguration()
+        private static Configuration LoadConfigurationFromFileOrDefault()
         {
             try
             {
-                Configuration.Load();
+                return Configuration.LoadFromFileOrDefault();
             }
             catch (ConfigurationException exc)
             {
                 ConsoleUtils.WriteLine(exc.Message, ConsoleColor.DarkYellow);
                 Console.WriteLine("Press a key to continue to the main menu.");
                 Console.ReadKey();
+                return Configuration.Default;
             }
         }
 
@@ -83,34 +104,6 @@ namespace Win10BloatRemover
 
             // Executed when the user closes the window. This handler is not fired when process is terminated with Ctrl+C
             AppDomain.CurrentDomain.ProcessExit += (sender, args) => Process.GetCurrentProcess().KillChildProcesses();
-        }
-
-        private static void TryExtractInstallWimTweak()
-        {
-            try
-            {
-                InstallWimTweak.ExtractToTempFolderAndLockFile();
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine($"Unable to extract install_wim_tweak tool to your temporary directory: {exc.Message}");
-                Console.WriteLine("The application will exit.");
-                Console.ReadKey();
-                Environment.Exit(-1);
-            }
-        }
-
-        private static void TryDeleteExtractedInstallWimTweak()
-        {
-            try
-            {
-                InstallWimTweak.DeleteExtractedExecutableIfExists();
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine($"Unable to delete previously extracted install-wim-tweak binary: {exc.Message}");
-                Console.ReadKey();
-            }
         }
     }
 }

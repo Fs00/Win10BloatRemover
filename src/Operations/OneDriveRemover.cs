@@ -14,6 +14,13 @@ namespace Win10BloatRemover.Operations
             Failed
         }
 
+        private readonly InstallWimTweak installWimTweak;
+
+        public OneDriveRemover(InstallWimTweak installWimTweak)
+        {
+            this.installWimTweak = installWimTweak;
+        }
+
         public void PerformTask()
         {
             DisableOneDriveViaRegistryEdits();
@@ -26,7 +33,7 @@ namespace Win10BloatRemover.Operations
             RemoveOneDriveLeftovers();
 
             Console.WriteLine();
-            InstallWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup");
+            installWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup");
         }
 
         private void DisableOneDriveViaRegistryEdits()

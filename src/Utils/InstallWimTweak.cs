@@ -1,34 +1,44 @@
 ﻿using System;
 using System.IO;
 using System.Resources;
+using System.Runtime.Loader;
 
 namespace Win10BloatRemover.Utils
 {
-    static class InstallWimTweak
+    class InstallWimTweak
     {
-        private static readonly string executableFilePath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
-        #nullable disable warnings
-        private static /*lateinit*/ FileStream executableFileStreamForLocking;
-        #nullable restore warnings
+        private static readonly string extractedFilePath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
 
-        public static void ExtractToTempFolderAndLockFile()
+        private /*lateinit*/ FileStream executableFileStreamForLocking = default!;
+        private readonly bool isAllowed;
+
+        public InstallWimTweak(Configuration configuration)
         {
-            var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
-            File.WriteAllBytes(executableFilePath, (byte[]) resources.GetObject("install_wim_tweak")!);
-            executableFileStreamForLocking = File.Open(executableFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            isAllowed = configuration.AllowInstallWimTweak;
+            AssemblyLoadContext.Default.Unloading += _ => CleanupExtractedExecutable();
         }
 
-        public static void RemoveComponentIfAllowed(string component)
+        private void ExtractAndLock()
         {
-            if (!Configuration.Instance.AllowInstallWimTweak)
+            var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
+            File.WriteAllBytes(extractedFilePath, (byte[]) resources.GetObject("install_wim_tweak")!);
+            executableFileStreamForLocking = File.Open(extractedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        }
+
+        public void RemoveComponentIfAllowed(string component)
+        {
+            if (!isAllowed)
             {
                 ConsoleUtils.WriteLine($"Skipped removal of {component} component(s) using install-wim-tweak since " +
                                        @"option ""AllowInstallWimTweak"" is set to false.", ConsoleColor.DarkYellow);
                 return;
             }
 
+            if (!File.Exists(extractedFilePath))
+                ExtractAndLock();
+
             Console.WriteLine($"Running install-wim-tweak to remove {component}...");
-            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(executableFilePath, $"/o /c {component} /r");
+            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(extractedFilePath, $"/o /c {component} /r");
             if (exitCode == SystemUtils.EXIT_CODE_SUCCESS)
                 Console.WriteLine("Install-wim-tweak executed successfully!");
             else
@@ -36,12 +46,12 @@ namespace Win10BloatRemover.Utils
                                         "install-wim-tweak exited with a non-zero status.", ConsoleColor.Red);
         }
 
-        public static void DeleteExtractedExecutableIfExists()
+        private void CleanupExtractedExecutable()
         {
-            if (File.Exists(executableFilePath))
+            if (File.Exists(extractedFilePath))
             {
                 executableFileStreamForLocking.Close();
-                File.Delete(executableFilePath);
+                File.Delete(extractedFilePath);
             }
         }
     }

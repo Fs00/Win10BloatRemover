@@ -108,6 +108,9 @@ namespace Win10BloatRemover
             catch (Exception exc)
             {
                 ConsoleHelpers.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
+                #if DEBUG
+                ConsoleHelpers.WriteLine(exc.StackTrace, ConsoleColor.Red);
+                #endif
             }
 
             ConsoleHelpers.FlushStandardInput();

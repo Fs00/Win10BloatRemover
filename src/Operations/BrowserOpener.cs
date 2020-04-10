@@ -13,7 +13,11 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            Process.Start(url);
+            var startInfo = new ProcessStartInfo {
+                FileName = url,
+                UseShellExecute = true
+            };
+            Process.Start(startInfo);
         }
     }
 }

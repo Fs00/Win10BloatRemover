@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security.Principal;
+using Win10BloatRemover.Operations;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
@@ -20,28 +21,29 @@ namespace Win10BloatRemover
             RegisterExitEventHandlers();
 
             var installWimTweak = new InstallWimTweak(configuration);
-            var menu = new Menu(CreateMenuEntries(configuration, installWimTweak));
+            var menu = new ConsoleMenu(CreateMenuEntries(configuration, installWimTweak));
             menu.RunLoopUntilExitRequested();
         }
 
         private static MenuEntry[] CreateMenuEntries(Configuration configuration, InstallWimTweak installWimTweak)
         {
+            IUserInterface ui = new ConsoleUserInterface();
             return new MenuEntry[] {
-                new SystemAppsRemovalEnablingEntry(),
-                new UWPAppRemovalEntry(configuration, installWimTweak),
-                new WinDefenderRemovalEntry(installWimTweak),
-                new EdgeRemovalEntry(),
-                new OneDriveRemovalEntry(installWimTweak),
-                new ServicesRemovalEntry(configuration),
-                new WindowsFeaturesRemovalEntry(configuration),
-                new TelemetryDisablingEntry(),
-                new CortanaDisablingEntry(),
-                new AutoUpdatesDisablingEntry(),
-                new ScheduledTasksDisablingEntry(configuration),
-                new ErrorReportingDisablingEntry(),
-                new TipsAndFeedbackDisablingEntry(),
+                new SystemAppsRemovalEnablingEntry(ui),
+                new UWPAppRemovalEntry(ui, configuration, installWimTweak),
+                new WinDefenderRemovalEntry(ui, installWimTweak),
+                new EdgeRemovalEntry(ui),
+                new OneDriveRemovalEntry(ui, installWimTweak),
+                new ServicesRemovalEntry(ui, configuration),
+                new WindowsFeaturesRemovalEntry(ui, configuration),
+                new TelemetryDisablingEntry(ui),
+                new CortanaDisablingEntry(ui),
+                new AutoUpdatesDisablingEntry(ui),
+                new ScheduledTasksDisablingEntry(ui, configuration),
+                new ErrorReportingDisablingEntry(ui),
+                new TipsAndFeedbackDisablingEntry(ui),
                 new NewGitHubIssueEntry(),
-                new AboutEntry(),
+                new AboutEntry(ui),
                 new QuitEntry()
             };
         }
@@ -50,7 +52,7 @@ namespace Win10BloatRemover
         {
             if (!Program.HasAdministratorRights())
             {
-                ConsoleUtils.WriteLine("This application needs to be run with administrator rights!", ConsoleColor.Red);
+                ConsoleHelpers.WriteLine("This application needs to be run with administrator rights!", ConsoleColor.Red);
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
@@ -58,7 +60,7 @@ namespace Win10BloatRemover
             #if !DEBUG
             if (!SystemUtils.IsWindowsReleaseId(SUPPORTED_WINDOWS_RELEASE_ID))
             {
-                ConsoleUtils.WriteLine($"This application is compatible only with Windows 10 {SUPPORTED_WINDOWS_RELEASE_NAME}!", ConsoleColor.Red);
+                ConsoleHelpers.WriteLine($"This application is compatible only with Windows 10 {SUPPORTED_WINDOWS_RELEASE_NAME}!", ConsoleColor.Red);
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
@@ -79,7 +81,7 @@ namespace Win10BloatRemover
             }
             catch (ConfigurationException exc)
             {
-                ConsoleUtils.WriteLine(exc.Message, ConsoleColor.DarkYellow);
+                ConsoleHelpers.WriteLine(exc.Message, ConsoleColor.DarkYellow);
                 Console.WriteLine("Press a key to continue to the main menu.");
                 Console.ReadKey();
                 return Configuration.Default;
@@ -93,7 +95,7 @@ namespace Win10BloatRemover
             Console.CancelKeyPress += (sender, args) => {
                 if (!cancelKeyPressedOnce)
                 {
-                    ConsoleUtils.WriteLine("Press Ctrl+C again to terminate the program.", ConsoleColor.Red);
+                    ConsoleHelpers.WriteLine("Press Ctrl+C again to terminate the program.", ConsoleColor.Red);
                     cancelKeyPressedOnce = true;
                     args.Cancel = true;
                 }

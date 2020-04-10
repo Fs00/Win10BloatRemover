@@ -8,37 +8,37 @@ namespace Win10BloatRemover.Operations
 {
     class OneDriveRemover : IOperation
     {
-        private enum UninstallationOutcome
-        {
-            Successful,
-            Failed
-        }
-
+        private readonly IUserInterface ui;
         private readonly InstallWimTweak installWimTweak;
 
-        public OneDriveRemover(InstallWimTweak installWimTweak)
+        public OneDriveRemover(IUserInterface ui, InstallWimTweak installWimTweak)
         {
+            this.ui = ui;
             this.installWimTweak = installWimTweak;
         }
 
-        public void PerformTask()
+        public void Run()
         {
-            DisableOneDriveViaRegistryEdits();
+            EditRegistryKeysToDisableOneDrive();
 
-            SystemUtils.KillProcess("onedrive");
-            var uninstallationOutcome = RunOneDriveUninstaller();
-            if (uninstallationOutcome == UninstallationOutcome.Failed)
+            var uninstallationExitCode = RunOneDriveUninstaller();
+            if (uninstallationExitCode == SystemUtils.EXIT_CODE_SUCCESS)
+                ui.PrintMessage("Uninstallation completed succesfully.");
+            else
+            {
+                ui.PrintError("Uninstallation failed due to an unknown error.");
                 ThrowIfUserWantsToAbort();
+            }
 
             RemoveOneDriveLeftovers();
 
-            Console.WriteLine();
-            installWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup");
+            ui.PrintEmptySpace();
+            installWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup", ui);
         }
 
-        private void DisableOneDriveViaRegistryEdits()
+        private void EditRegistryKeysToDisableOneDrive()
         {
-            ConsoleUtils.WriteLine("Disabling OneDrive via registry edits...", ConsoleColor.Green);
+            ui.PrintHeading("Disabling OneDrive via registry edits...");
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
                 key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
@@ -48,24 +48,20 @@ namespace Win10BloatRemover.Operations
 
         private void ThrowIfUserWantsToAbort()
         {
-            ConsoleUtils.Write(
-                "Uninstallation failed due to an unknown error. Do you still want to continue the process by " +
-                "removing all leftover OneDrive files (including its application files for the current user) " +
-                "and registry keys? (y/N) ",
-                ConsoleColor.DarkYellow
+            var choice = ui.AskUserConsent(
+                "Do you still want to continue the process by removing all leftover OneDrive files (including its " +
+                "application files for the current user) and registry keys?"
             );
-            if (Console.ReadKey().Key != ConsoleKey.Y)
+            if (choice == IUserInterface.UserChoice.No)
                 throw new Exception("The user aborted the operation.");
         }
 
-        private UninstallationOutcome RunOneDriveUninstaller()
+        private int RunOneDriveUninstaller()
         {
-            ConsoleUtils.WriteLine("\nExecuting OneDrive uninstaller...", ConsoleColor.Green);
+            ui.PrintHeading("\nExecuting OneDrive uninstaller...");
+            SystemUtils.KillProcess("onedrive");
             string installerPath = RetrieveOneDriveInstallerPath();
-            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(installerPath, "/uninstall");
-            if (exitCode == 0)
-                Console.WriteLine("Uninstallation completed succesfully.");
-            return exitCode == 0 ? UninstallationOutcome.Successful : UninstallationOutcome.Failed;
+            return SystemUtils.RunProcessBlockingWithOutput(installerPath, "/uninstall", ui);
         }
 
         private string RetrieveOneDriveInstallerPath()
@@ -78,7 +74,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveOneDriveLeftovers()
         {
-            ConsoleUtils.WriteLine("\nRemoving OneDrive leftovers...", ConsoleColor.Green);
+            ui.PrintHeading("\nRemoving OneDrive leftovers...");
             SystemUtils.KillProcess("explorer");
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
@@ -87,17 +83,17 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualFiles()
         {
-            Console.WriteLine("Removing old files...");
-            SystemUtils.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp");
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive");
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive");
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive");
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive");
+            ui.PrintMessage("Removing old files...");
+            SystemUtils.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp", ui);
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive", ui);
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", ui);
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.CommonApplicationData)}\Microsoft\OneDrive", ui);
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", ui);
         }
 
         private void RemoveResidualRegistryKeys()
         {
-            Console.WriteLine("Deleting old registry keys...");
+            ui.PrintMessage("Deleting old registry keys...");
             using RegistryKey classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry64);
             using RegistryKey key = classesRoot.OpenSubKey(@"CLSID", writable: true);
             key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", throwOnMissingSubKey: false);

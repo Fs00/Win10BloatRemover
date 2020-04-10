@@ -5,14 +5,14 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
 {
-    class Menu
+    class ConsoleMenu
     {
         private bool exitRequested = false;
         private readonly MenuEntry[] entries;
 
-        private static readonly Version programVersion = typeof(Menu).Assembly.GetName().Version!;
+        private static readonly Version programVersion = typeof(ConsoleMenu).Assembly.GetName().Version!;
 
-        public Menu(MenuEntry[] entries)
+        public ConsoleMenu(MenuEntry[] entries)
         {
             this.entries = entries;
         }
@@ -77,7 +77,7 @@ namespace Win10BloatRemover
 
         private void PrintTitleAndExplanation(MenuEntry entry)
         {
-            ConsoleUtils.WriteLine($"-- {entry.FullName} --", ConsoleColor.Green);
+            ConsoleHelpers.WriteLine($"-- {entry.FullName} --", ConsoleColor.Green);
             Console.WriteLine(entry.GetExplanation());
         }
 
@@ -98,20 +98,21 @@ namespace Win10BloatRemover
             try
             {
                 Console.WriteLine();
-                IOperation? operation = entry.GetOperationInstance();
+                IOperation? operation = entry.CreateNewOperation();
                 if (operation == null)
                     return;
 
-                operation.PerformTask();
+                operation.Run();
                 Console.Write("\nDone! ");
             }
             catch (Exception exc)
             {
-                ConsoleUtils.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
+                ConsoleHelpers.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
             }
 
+            ConsoleHelpers.FlushStandardInput();
             Console.WriteLine("Press a key to return to the main menu");
-            ConsoleUtils.ReadKeyIgnoringBuffer();
+            Console.ReadKey();
         }
     }
 }

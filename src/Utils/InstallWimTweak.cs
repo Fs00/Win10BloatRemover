@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Resources;
 using System.Runtime.Loader;
+using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.Utils
 {
@@ -32,25 +32,25 @@ namespace Win10BloatRemover.Utils
             executableFileStreamForLocking = File.Open(extractedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        public void RemoveComponentIfAllowed(string component)
+        public void RemoveComponentIfAllowed(string component, IMessagePrinter printer)
         {
             if (!isAllowed)
             {
-                ConsoleUtils.WriteLine($"Skipped removal of {component} component(s) using install-wim-tweak since " +
-                                       @"option ""AllowInstallWimTweak"" is set to false.", ConsoleColor.DarkYellow);
+                printer.PrintWarning($"Skipped removal of {component} component(s) using install-wim-tweak since " +
+                                     @"option ""AllowInstallWimTweak"" is set to false.");
                 return;
             }
 
             if (!HasBeenExtracted())
                 ExtractAndLock();
 
-            Console.WriteLine($"Running install-wim-tweak to remove {component}...");
-            int exitCode = SystemUtils.RunProcessSynchronouslyWithConsoleOutput(extractedFilePath, $"/o /c {component} /r");
+            printer.PrintMessage($"Running install-wim-tweak to remove {component}...");
+            int exitCode = SystemUtils.RunProcessBlockingWithOutput(extractedFilePath, $"/o /c {component} /r", printer);
             if (exitCode == SystemUtils.EXIT_CODE_SUCCESS)
-                Console.WriteLine("Install-wim-tweak executed successfully!");
+                printer.PrintMessage("Install-wim-tweak executed successfully!");
             else
-                ConsoleUtils.WriteLine($"An error occurred during the removal of {component}: " +
-                                        "install-wim-tweak exited with a non-zero status.", ConsoleColor.Red);
+                printer.PrintError($"An error occurred during the removal of {component}: " +
+                                    "install-wim-tweak exited with a non-zero status.");
         }
 
         private void RemoveExtractedExecutable()

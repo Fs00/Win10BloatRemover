@@ -2,6 +2,6 @@
 {
     public interface IOperation
     {
-        void PerformTask();
+        void Run();
     }
 }

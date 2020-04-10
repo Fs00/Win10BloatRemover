@@ -1,13 +1,15 @@
 ﻿using Microsoft.Win32;
-using System;
 
 namespace Win10BloatRemover.Operations
 {
     class AutoUpdatesDisabler : IOperation
     {
-        public void PerformTask()
+        private readonly IUserInterface ui;
+        public AutoUpdatesDisabler(IUserInterface ui) => this.ui = ui;
+
+        public void Run()
         {
-            Console.WriteLine("Writing values into the Registry...");
+            ui.PrintMessage("Writing values into the Registry...");
             DisableAutomaticWindowsUpdates();
             DisableAutomaticStoreUpdates();
         }

@@ -108,13 +108,15 @@ namespace Win10BloatRemover.Operations
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
         private readonly InstallWimTweak installWimTweak;
+        private readonly IUserInterface ui;
         private /*lateinit*/ PowerShell psInstance;
 
         #nullable disable warnings
-        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, InstallWimTweak installWimTweak)
+        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, InstallWimTweak installWimTweak)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;
+            this.ui = ui;
             this.installWimTweak = installWimTweak;
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
@@ -132,7 +134,7 @@ namespace Win10BloatRemover.Operations
         }
         #nullable restore warnings
 
-        public void PerformTask()
+        public void Run()
         {
             using (psInstance = PowerShellExtensions.CreateWithImportedModules("AppX"))
             {
@@ -150,7 +152,7 @@ namespace Win10BloatRemover.Operations
 
         private bool UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
-            ConsoleUtils.WriteLine($"\nRemoving {appGroup} app(s)...", ConsoleColor.Green);
+            ui.PrintHeading($"\nRemoving {appGroup} app(s)...");
 
             bool atLeastOneAppUninstalled = false;
             foreach (string appName in appNamesForGroup[appGroup])
@@ -188,20 +190,19 @@ namespace Win10BloatRemover.Operations
                     }";
             }
 
-            psInstance.RunScriptAndPrintOutput(appRemovalScript);
+            psInstance.RunScriptAndPrintOutput(appRemovalScript, ui);
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
         {
-            ConsoleUtils.WriteLine($"\nPerforming post-uninstall operations for app {appGroup}...", ConsoleColor.DarkGreen);
+            ui.PrintSubHeading($"\nPerforming post-uninstall operations for app {appGroup}...");
             try
             {
                 PerformPostUninstallOperations(appGroup);
             }
             catch (Exception exc)
             {
-                ConsoleUtils.WriteLine("Unable to complete post-uninstall operations " +
-                                       $"for app group {appGroup}: {exc.Message}", ConsoleColor.Red);
+                ui.PrintError($"Unable to complete post-uninstall operations for app group {appGroup}: {exc.Message}");
             }
         }
 
@@ -216,68 +217,70 @@ namespace Win10BloatRemover.Operations
                 Console.WriteLine("Nothing to do.");
         }
 
-        private static void RemoveEdgeResidualFiles()
+        private void RemoveEdgeResidualFiles()
         {
             Console.WriteLine("Removing old files...");
             SystemUtils.TryDeleteDirectoryIfExists(
-                $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups"
+                $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
+                ui
             );
             SystemUtils.TryDeleteDirectoryIfExists(
-                $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge"
+                $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge",
+                ui
             );
         }
 
         private void RemoveConnectApp()
         {
-            installWimTweak.RemoveComponentIfAllowed("Microsoft-PPIProjection-Package");
+            installWimTweak.RemoveComponentIfAllowed("Microsoft-PPIProjection-Package", ui);
         }
 
-        private static void RemoveMapsServicesAndTasks()
+        private void RemoveMapsServicesAndTasks()
         {
             Console.WriteLine("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] {
                 @"\Microsoft\Windows\Maps\MapsUpdateTask",
                 @"\Microsoft\Windows\Maps\MapsToastTask"
-            }).PerformTask();
+            }, ui).Run();
 
-            ServiceRemover.BackupAndRemove(new[] { "MapsBroker", "lfsvc" });
+            ServiceRemover.BackupAndRemove(new[] { "MapsBroker", "lfsvc" }, ui);
         }
 
-        private static void RemoveXboxServicesAndTasks()
+        private void RemoveXboxServicesAndTasks()
         {
             Console.WriteLine("Removing app-related scheduled tasks and services...");
-            new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" })
-                .PerformTask();
+            new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" }, ui).Run();
 
             using RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR");
             key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
 
-            ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" });
+            ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" }, ui);
         }
 
-        private static void RemoveMessagingService()
+        private void RemoveMessagingService()
         {
             Console.WriteLine("Removing app-related services...");
-            ServiceRemover.BackupAndRemove(new[] { "MessagingService" });
+            ServiceRemover.BackupAndRemove(new[] { "MessagingService" }, ui);
         }
 
-        private static void RemovePaint3DContextMenuEntries()
+        private void RemovePaint3DContextMenuEntries()
         {
             Console.WriteLine("Removing Paint 3D context menu entries...");
             SystemUtils.ExecuteWindowsPromptCommand(
                 @"echo off & for /f ""tokens=1* delims="" %I in " +
                  @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " +
-                @"do (reg delete ""%I"" /f )"
+                @"do (reg delete ""%I"" /f )",
+                ui
             );
         }
 
-        private static void RemoveMixedRealityAppsLeftovers()
+        private void RemoveMixedRealityAppsLeftovers()
         {
             Remove3DObjectsFolder();
             Remove3DPrintContextMenuEntries();
         }
 
-        private static void Remove3DObjectsFolder()
+        private void Remove3DObjectsFolder()
         {
             Console.WriteLine("Removing 3D Objects folder...");
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
@@ -286,20 +289,21 @@ namespace Win10BloatRemover.Operations
             );
             key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}", throwOnMissingSubKey: false);
 
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects");
+            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects", ui);
         }
 
-        private static void Remove3DPrintContextMenuEntries()
+        private void Remove3DPrintContextMenuEntries()
         {
             Console.WriteLine("Removing 3D Print context menu entries...");
             SystemUtils.ExecuteWindowsPromptCommand(
                 @"echo off & for /f ""tokens=1* delims="" %I in " +
                 @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
-                @"do (reg delete ""%I"" /f )"
+                @"do (reg delete ""%I"" /f )",
+                ui
             );
         }
 
-        private static void RestoreWindowsPhotoViewer()
+        private void RestoreWindowsPhotoViewer()
         {
             Console.WriteLine("Setting file association with original photo viewer for BMP, GIF, JPEG, PNG and TIFF pictures...");
 
@@ -324,13 +328,13 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private static void RemoveSyncHostService()
+        private void RemoveSyncHostService()
         {
             Console.WriteLine("Removing sync host service...");
-            ServiceRemover.BackupAndRemove(new[] { "OneSyncSvc" });
+            ServiceRemover.BackupAndRemove(new[] { "OneSyncSvc" }, ui);
         }
 
-        private static void DisableStoreFeaturesAndServices()
+        private void DisableStoreFeaturesAndServices()
         {
             Console.WriteLine("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\WindowsStore"))
@@ -347,7 +351,7 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("EnableWebContentEvaluation", 0, RegistryValueKind.DWord);
 
             Console.WriteLine("Removing app-related services...");
-            ServiceRemover.BackupAndRemove(new[] { "PushToInstall" });
+            ServiceRemover.BackupAndRemove(new[] { "PushToInstall" }, ui);
         }
     }
 }

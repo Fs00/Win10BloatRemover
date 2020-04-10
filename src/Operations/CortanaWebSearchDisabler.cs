@@ -1,15 +1,17 @@
 ﻿using Microsoft.Win32;
-using System;
 
 namespace Win10BloatRemover.Operations
 {
     class CortanaWebSearchDisabler : IOperation
     {
-        public void PerformTask()
+        private readonly IUserInterface ui;
+        public CortanaWebSearchDisabler(IUserInterface ui) => this.ui = ui;
+
+        public void Run()
         {
             DisableCortanaAndWebSearchViaGroupPolicies();
             AddFirewallRuleForCortana();
-            Console.WriteLine("A system reboot is recommended.");
+            ui.PrintMessage("A system reboot is recommended.");
         }
 
         private void DisableCortanaAndWebSearchViaGroupPolicies()

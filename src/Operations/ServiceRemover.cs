@@ -23,28 +23,31 @@ namespace Win10BloatRemover.Operations
     {
         private readonly string[] servicesToRemove;
         private readonly DirectoryInfo backupDirectory;
+        private readonly IUserInterface ui;
 
         private const int SC_EXIT_CODE_MARKED_FOR_DELETION = 1072;
 
         public static void BackupAndRemove(string[] servicesToRemove,
+                                           IUserInterface ui,
                                            ServiceRemovalMode removalMode = ServiceRemovalMode.ServiceControl)
         {
-            var serviceRemover = new ServiceRemover(servicesToRemove);
+            var serviceRemover = new ServiceRemover(servicesToRemove, ui);
             string[] actualBackuppedServices = serviceRemover.PerformBackup();
             serviceRemover.PerformRemoval(actualBackuppedServices, removalMode);
         }
 
-        public ServiceRemover(string[] servicesToRemove)
+        public ServiceRemover(string[] servicesToRemove, IUserInterface ui)
         {
             this.servicesToRemove = servicesToRemove;
+            this.ui = ui;
             backupDirectory = new DirectoryInfo($"servicesBackup_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}");
         }
 
-        void IOperation.PerformTask()
+        void IOperation.Run()
         {
-            ConsoleUtils.WriteLine("Backing up services...", ConsoleColor.Green);
+            ui.PrintHeading("Backing up services...");
             string[] actualBackuppedServices = PerformBackup();
-            ConsoleUtils.WriteLine("Removing services...", ConsoleColor.Green);
+            ui.PrintHeading("Removing services...");
             PerformRemoval(actualBackuppedServices, ServiceRemovalMode.ServiceControl);
         }
 
@@ -64,7 +67,7 @@ namespace Win10BloatRemover.Operations
             {
                 var matchingServices = allExistingServices.Where(name => name.StartsWith(serviceName)).ToArray();
                 if (matchingServices.Length == 0)
-                    Console.WriteLine($"No services found with name {serviceName}.");
+                    ui.PrintMessage($"No services found with name {serviceName}.");
                 else
                     allMatchingServices.AddRange(matchingServices);
             }
@@ -81,11 +84,11 @@ namespace Win10BloatRemover.Operations
         private void BackupService(string service)
         {
             EnsureBackupDirectoryExists();
-            int regExportExitCode = SystemUtils.RunProcessSynchronously(
+            int regExportExitCode = SystemUtils.RunProcessBlocking(
                 "reg", $@"export HKLM\SYSTEM\CurrentControlSet\Services\{service} {backupDirectory.FullName}\{service}.reg"
             );
             if (regExportExitCode == 0)
-                Console.WriteLine($"Service {service} backed up.");
+                ui.PrintMessage($"Service {service} backed up.");
             else
                 throw new Exception($"Could not backup service {service}.");
         }
@@ -113,17 +116,17 @@ namespace Win10BloatRemover.Operations
         {
             foreach (string service in actualServicesToRemove)
             {
-                int scExitCode = SystemUtils.RunProcessSynchronously("sc", $"delete {service}");
+                int scExitCode = SystemUtils.RunProcessBlocking("sc", $"delete {service}");
                 switch (scExitCode)
                 {
                     case SystemUtils.EXIT_CODE_SUCCESS:
-                        Console.WriteLine($"Service {service} removed successfully.");
+                        ui.PrintMessage($"Service {service} removed successfully.");
                         break;
                     case SC_EXIT_CODE_MARKED_FOR_DELETION:
-                        Console.WriteLine($"Service {service} will be removed after reboot.");
+                        ui.PrintMessage($"Service {service} will be removed after reboot.");
                         break;
                     default:
-                        ConsoleUtils.WriteLine($"Service {service} removal failed: sc exited with code {scExitCode}.", ConsoleColor.Red);
+                        ui.PrintError($"Service {service} removal failed: sc exited with code {scExitCode}.");
                         break;
                 }
             }
@@ -133,13 +136,13 @@ namespace Win10BloatRemover.Operations
         {
             foreach (string service in actualServicesToRemove)
             {
-                int regExitCode = SystemUtils.RunProcessSynchronously(
+                int regExitCode = SystemUtils.RunProcessBlocking(
                     "reg", $@"delete HKLM\SYSTEM\CurrentControlSet\Services\{service} /f"
                 );
                 if (regExitCode == SystemUtils.EXIT_CODE_SUCCESS)
-                    Console.WriteLine($"Service {service} removed, but it may continue to run until the next restart.");
+                    ui.PrintMessage($"Service {service} removed, but it may continue to run until the next restart.");
                 else
-                    ConsoleUtils.WriteLine($"Service {service} removal failed: couldn't delete its registry keys.", ConsoleColor.Red);
+                    ui.PrintError($"Service {service} removal failed: couldn't delete its registry keys.");
             }
         }
     }

@@ -11,7 +11,7 @@ namespace Win10BloatRemover.Operations
             this.url = url;
         }
 
-        public void PerformTask()
+        public void Run()
         {
             Process.Start(url);
         }

@@ -7,10 +7,10 @@ namespace Win10BloatRemover.Operations
 {
     class SystemAppsRemovalEnabler : IOperation
     {
-        private enum DatabaseEditingOutcome
+        private enum EditingOutcome
         {
-            NoRowsUpdated,
-            SomeRowsUpdated
+            NoChangesMade,
+            ContentWasUpdated
         }
 
         private const string STATE_REPOSITORY_DB_NAME = "StateRepository-Machine.srd";
@@ -18,22 +18,25 @@ namespace Win10BloatRemover.Operations
             @"C:\ProgramData\Microsoft\Windows\AppRepository\" + STATE_REPOSITORY_DB_NAME;
         private const string AFTER_PACKAGE_UPDATE_TRIGGER_NAME = "TRG_AFTER_UPDATE_Package_SRJournal";
 
-        #nullable disable warnings
         private /*lateinit*/ SqliteConnection dbConnection;
+        private readonly IUserInterface ui;
+
+        #nullable disable warnings
+        public SystemAppsRemovalEnabler(IUserInterface ui) => this.ui = ui;
         #nullable restore warnings
 
-        public void PerformTask()
+        public void Run()
         {
             using (TokenPrivilege.Backup)
             using (TokenPrivilege.Restore)
             {
                 var (databaseBackupCopy, databaseCopyForEditing) = CreateStateRepositoryDatabaseCopies();
                 var outcome = EditStateRepositoryDatabase(databaseCopyForEditing);
-                if (outcome == DatabaseEditingOutcome.SomeRowsUpdated)
+                if (outcome == EditingOutcome.ContentWasUpdated)
                     ReplaceStateRepositoryDatabaseWith(databaseCopyForEditing);
                 else
                 {
-                    ConsoleUtils.WriteLine("\nOriginal database doesn't need to be replaced: nothing has changed.", ConsoleColor.Cyan);
+                    ui.PrintNotice("\nOriginal database doesn't need to be replaced: nothing has changed.");
                     DeleteDatabaseCopies(databaseBackupCopy, databaseCopyForEditing);
                 }
             }
@@ -41,7 +44,7 @@ namespace Win10BloatRemover.Operations
 
         private void EnsureAppXServicesAreStopped()
         {
-            Console.WriteLine("Making sure AppX-related services are stopped before proceeding...");
+            ui.PrintMessage("Making sure AppX-related services are stopped before proceeding...");
             SystemUtils.StopServiceAndItsDependents("StateRepository");
         }
 
@@ -55,10 +58,10 @@ namespace Win10BloatRemover.Operations
 
         private string BackupStateRepositoryDatabase()
         {
-            ConsoleUtils.WriteLine("\nBacking up state repository database...", ConsoleColor.Green);
+            ui.PrintHeading("\nBacking up state repository database...");
             string backupCopyFileName = $"StateRepository-Machine_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.srd.bak";
             string backupCopyPath = CopyStateRepositoryDatabaseTo(backupCopyFileName);
-            Console.WriteLine($"Backup copy written to {backupCopyPath}.");
+            ui.PrintMessage($"Backup copy written to {backupCopyPath}.");
             return backupCopyPath;
         }
 
@@ -69,9 +72,27 @@ namespace Win10BloatRemover.Operations
             return copiedDatabase.FullName;
         }
 
-        private DatabaseEditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)
+        private void ReplaceStateRepositoryDatabaseWith(string databaseCopyPath)
         {
-            ConsoleUtils.WriteLine("\nEditing a temporary copy of state repository database...", ConsoleColor.Green);
+            ui.PrintHeading("\nReplacing original state repository database with the edited copy...");
+            EnsureAppXServicesAreStopped();
+            try
+            {
+                // File.Copy can't be used to replace the file because it fails with access denied
+                // even though we have Restore privilege, so we need to use File.Move instead
+                File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
+                ui.PrintMessage("Replacement successful.");
+            }
+            catch
+            {
+                File.Delete(databaseCopyPath);
+                throw;
+            }
+        }
+
+        private EditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)
+        {
+            ui.PrintHeading("\nEditing a temporary copy of state repository database...");
             using (dbConnection = new SqliteConnection($"Data Source={databaseCopyPath}"))
             {
                 dbConnection.Open();
@@ -81,10 +102,11 @@ namespace Win10BloatRemover.Operations
                 string? createTriggerCode = RetrieveAfterPackageUpdateTriggerCode();
                 DeleteAfterPackageUpdateTrigger();
                 int updatedRows = EditPackageTable();
+                ui.PrintMessage($"Edited {updatedRows} row(s).");
                 if (createTriggerCode != null)
                     ReAddAfterPackageUpdateTrigger(createTriggerCode);
 
-                return updatedRows == 0 ? DatabaseEditingOutcome.NoRowsUpdated : DatabaseEditingOutcome.SomeRowsUpdated;
+                return updatedRows == 0 ? EditingOutcome.NoChangesMade : EditingOutcome.ContentWasUpdated;
             }
         }
 
@@ -113,7 +135,6 @@ namespace Win10BloatRemover.Operations
                 dbConnection
             );
             int updatedRows = query.ExecuteNonQuery();
-            Console.WriteLine($"Edited {updatedRows} row(s).");
             return updatedRows;
         }
 
@@ -123,30 +144,12 @@ namespace Win10BloatRemover.Operations
             query.ExecuteNonQuery();
         }
 
-        private void ReplaceStateRepositoryDatabaseWith(string databaseCopyPath)
-        {
-            ConsoleUtils.WriteLine("\nReplacing original state repository database with the edited copy...", ConsoleColor.Green);
-            EnsureAppXServicesAreStopped();
-            try
-            {
-                // File.Copy can't be used to replace the file because it fails with access denied
-                // even though we have Restore privilege, so we need to use File.Move instead
-                File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
-                Console.WriteLine("Replacement successful.");
-            }
-            catch
-            {
-                File.Delete(databaseCopyPath);
-                throw;
-            }
-        }
-
         private void DeleteDatabaseCopies(params string[] databaseCopiesPaths)
         {
             foreach (string databaseCopy in databaseCopiesPaths)
                 File.Delete(databaseCopy);
             
-            ConsoleUtils.WriteLine("Database backup copy was unnecessary and therefore has been removed.", ConsoleColor.Cyan);
+            ui.PrintNotice("Database backup copy was unnecessary and therefore has been removed.");
         }
     }
 }

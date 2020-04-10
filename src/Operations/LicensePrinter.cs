@@ -1,15 +1,16 @@
-﻿using System;
-using System.Resources;
-using Win10BloatRemover.Utils;
+﻿using System.Resources;
 
 namespace Win10BloatRemover.Operations
 {
     class LicensePrinter : IOperation
     {
-        public void PerformTask()
+        private readonly IUserInterface ui;
+        public LicensePrinter(IUserInterface ui) => this.ui = ui;
+
+        public void Run()
         {
             var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
-            ConsoleUtils.WriteLine(resources.GetString("LicenseText"), ConsoleColor.Cyan);
+            ui.PrintNotice(resources.GetString("LicenseText")!);
         }
     }
 }

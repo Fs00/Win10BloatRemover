@@ -1,5 +1,4 @@
-﻿using System;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
@@ -7,13 +6,15 @@ namespace Win10BloatRemover.Operations
     class FeaturesRemover : IOperation
     {
         private readonly string[] featuresToRemove;
+        private readonly IUserInterface ui;
 
-        public FeaturesRemover(string[] featuresToRemove)
+        public FeaturesRemover(string[] featuresToRemove, IUserInterface ui)
         {
             this.featuresToRemove = featuresToRemove;
+            this.ui = ui;
         }
 
-        public void PerformTask()
+        public void Run()
         {
             string removalScript = "";
             foreach (string featureName in featuresToRemove)
@@ -31,9 +32,9 @@ namespace Win10BloatRemover.Operations
             }
 
             using PowerShell psInstance = PowerShellExtensions.CreateWithImportedModules("Dism");
-            psInstance.RunScriptAndPrintOutput(removalScript);
+            psInstance.RunScriptAndPrintOutput(removalScript, ui);
 
-            Console.WriteLine("A system reboot is recommended.");
+            ui.PrintMessage("A system reboot is recommended.");
         }
     }
 }

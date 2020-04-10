@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using System;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
@@ -15,26 +14,28 @@ namespace Win10BloatRemover.Operations
         };
 
         private readonly InstallWimTweak installWimTweak;
+        private readonly IUserInterface ui;
 
-        public WindowsDefenderRemover(InstallWimTweak installWimTweak)
+        public WindowsDefenderRemover(IUserInterface ui, InstallWimTweak installWimTweak)
         {
+            this.ui = ui;
             this.installWimTweak = installWimTweak;
         }
 
-        public void PerformTask()
+        public void Run()
         {
             EditWindowsRegistryKeys();
             RemoveSecurityHealthServices();
 
-            Console.WriteLine();
-            installWimTweak.RemoveComponentIfAllowed("Windows-Defender");
+            ui.PrintEmptySpace();
+            installWimTweak.RemoveComponentIfAllowed("Windows-Defender", ui);
 
             TryUninstallSecurityCenter();
         }
 
         private void EditWindowsRegistryKeys()
         {
-            ConsoleUtils.WriteLine("Editing keys in Windows Registry...", ConsoleColor.Green);
+            ui.PrintHeading("Editing keys in Windows Registry...");
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"))
                 key.SetValue("SmartScreenEnabled", "Off", RegistryValueKind.String);
@@ -74,17 +75,17 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveSecurityHealthServices()
         {
-            ConsoleUtils.WriteLine("\nRemoving Security Health services...", ConsoleColor.Green);
-            ServiceRemover.BackupAndRemove(securityHealthServices, ServiceRemovalMode.Registry);
+            ui.PrintHeading("\nRemoving Security Health services...");
+            ServiceRemover.BackupAndRemove(securityHealthServices, ui, ServiceRemovalMode.Registry);
         }
 
         private void TryUninstallSecurityCenter()
         {
             new UWPAppRemover(
                 new[] { UWPAppGroup.SecurityCenter },
-                UWPAppRemovalMode.KeepProvisionedPackages,
+                UWPAppRemovalMode.KeepProvisionedPackages, ui,
                 installWimTweak
-            ).PerformTask();
+            ).Run();
         }
     }
 }

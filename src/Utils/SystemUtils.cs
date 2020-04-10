@@ -4,6 +4,7 @@ using System.IO;
 using System.Management;
 using System.ServiceProcess;
 using Microsoft.Win32;
+using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.Utils
 {
@@ -22,10 +23,10 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static void ExecuteWindowsPromptCommand(string command)
+        public static void ExecuteWindowsPromptCommand(string command, IMessagePrinter printer)
         {
             Debug.WriteLine($"Command executed: {command}");
-            RunProcessSynchronouslyWithConsoleOutput("cmd.exe", $"/c \"{command}\"");
+            RunProcessBlockingWithOutput("cmd.exe", $@"/c ""{command}""", printer);
         }
 
         public static void KillProcess(string processName)
@@ -50,7 +51,7 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static int RunProcessSynchronously(string name, string args)
+        public static int RunProcessBlocking(string name, string args)
         {
             using var process = CreateProcessInstance(name, args);
             process.Start();
@@ -58,16 +59,16 @@ namespace Win10BloatRemover.Utils
             return process.ExitCode;
         }
 
-        public static int RunProcessSynchronouslyWithConsoleOutput(string name, string args)
+        public static int RunProcessBlockingWithOutput(string name, string args, IMessagePrinter printer)
         {
             using var process = CreateProcessInstance(name, args);
             process.OutputDataReceived += (_, evt) => {
                 if (!string.IsNullOrEmpty(evt.Data))
-                    Console.WriteLine(evt.Data);
+                    printer.PrintMessage(evt.Data);
             };
             process.ErrorDataReceived += (_, evt) => {
                 if (!string.IsNullOrEmpty(evt.Data))
-                    ConsoleUtils.WriteLine(evt.Data, ConsoleColor.Red);
+                    printer.PrintError(evt.Data);
             };
 
             process.Start();
@@ -91,7 +92,7 @@ namespace Win10BloatRemover.Utils
             };
         }
 
-        public static void TryDeleteDirectoryIfExists(string path)
+        public static void TryDeleteDirectoryIfExists(string path, IMessagePrinter printer)
         {
             try
             {
@@ -99,7 +100,7 @@ namespace Win10BloatRemover.Utils
             }
             catch (Exception exc)
             {
-                ConsoleUtils.WriteLine($"An error occurred when deleting folder {path}: {exc.Message}", ConsoleColor.Red);
+                printer.PrintError($"An error occurred when deleting folder {path}: {exc.Message}");
             }
         }
 
@@ -117,7 +118,7 @@ namespace Win10BloatRemover.Utils
         public static bool IsWindowsReleaseId(string expectedId)
         {
             string? releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion",
-                                                  "ReleaseId", "").ToString();
+                                                  "ReleaseId", "")?.ToString();
             return releaseId == expectedId;
         }
     }

@@ -1,14 +1,26 @@
 ﻿using Microsoft.Win32;
-using System;
-using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
     class TipsDisabler : IOperation
     {
-        public void PerformTask()
+        private readonly IUserInterface ui;
+        public TipsDisabler(IUserInterface ui) => this.ui = ui;
+
+        public void Run()
         {
-            ConsoleUtils.WriteLine("Writing values into the Registry...", ConsoleColor.Green);
+            ui.PrintHeading("Writing values into the Registry...");
+            EditRegistryKeysToDisableTips();
+
+            ui.PrintHeading("\nDisabling feedback-related scheduled tasks...");
+            new ScheduledTasksDisabler(new[] {
+                @"\Microsoft\Windows\Feedback\Siuf\DmClient",
+                @"\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload"
+            }, ui).Run();
+        }
+
+        private void EditRegistryKeysToDisableTips()
+        {
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\CloudContent"))
             {
                 key.SetValue("DisableSoftLanding", 1, RegistryValueKind.DWord);
@@ -22,12 +34,6 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Siuf\Rules"))
                 key.SetValue("NumberOfSIUFInPeriod", 0, RegistryValueKind.DWord);
-
-            ConsoleUtils.WriteLine("\nDisabling feedback-related scheduled tasks...", ConsoleColor.Green);
-            new ScheduledTasksDisabler(new[] {
-                @"\Microsoft\Windows\Feedback\Siuf\DmClient",
-                @"\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload"
-            }).PerformTask();
         }
     }
 }

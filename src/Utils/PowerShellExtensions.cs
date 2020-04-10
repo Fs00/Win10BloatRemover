@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.PowerShell;
+using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.Utils
 {
@@ -30,7 +30,7 @@ namespace Win10BloatRemover.Utils
          *  Runs a script on the given PowerShell instance and prints the messages written to info,
          *  error and warning streams asynchronously.
          */
-        public static void RunScriptAndPrintOutput(this PowerShell psInstance, string script)
+        public static void RunScriptAndPrintOutput(this PowerShell psInstance, string script, IMessagePrinter printer)
         {
             // Streams can be used by the caller to check for errors in the current script execution
             psInstance.Streams.ClearStreams();
@@ -39,10 +39,10 @@ namespace Win10BloatRemover.Utils
             if (psInstance.Runspace.ThreadOptions != PSThreadOptions.UseCurrentThread)
                 psInstance.CreateNewSingleThreadedRunspace();
 
-            psInstance.AddOutputStreamsEventHandlers();
+            var handlers = psInstance.AddOutputStreamsEventHandlers(printer);
             psInstance.AddScript(script);
             psInstance.Invoke();
-            psInstance.RemoveOutputStreamsEventHandlers();
+            psInstance.RemoveOutputStreamsEventHandlers(handlers);
 
             // Clear PowerShell pipeline to avoid the script being re-executed the next time we use this instance
             psInstance.Commands.Clear();
@@ -56,45 +56,30 @@ namespace Win10BloatRemover.Utils
             psInstance.Runspace.Open();
         }
 
-        private static void AddOutputStreamsEventHandlers(this PowerShell psInstance)
+        private static EventHandler<DataAddedEventArgs>[] AddOutputStreamsEventHandlers(this PowerShell psInstance, IMessagePrinter printer)
         {
-            psInstance.Streams.Information.DataAdded += PrintInformationString;
-            psInstance.Streams.Error.DataAdded += PrintErrorString;
-            psInstance.Streams.Warning.DataAdded += PrintWarningString;
+            var handlers = new EventHandler<DataAddedEventArgs>[] {
+                (sender, eventArgs) => printer.PrintMessage(GetMessageToPrint<InformationRecord>(sender!, eventArgs)),
+                (sender, eventArgs) => printer.PrintWarning(GetMessageToPrint<ErrorRecord>(sender!, eventArgs)),
+                (sender, eventArgs) => printer.PrintMessage(GetMessageToPrint<WarningRecord>(sender!, eventArgs))
+            };
+            psInstance.Streams.Information.DataAdded += handlers[0];
+            psInstance.Streams.Error.DataAdded += handlers[1];
+            psInstance.Streams.Warning.DataAdded += handlers[2];
+            return handlers;
         }
 
-        private static void RemoveOutputStreamsEventHandlers(this PowerShell psInstance)
+        private static void RemoveOutputStreamsEventHandlers(this PowerShell psInstance, EventHandler<DataAddedEventArgs>[] handlers)
         {
-            psInstance.Streams.Information.DataAdded -= PrintInformationString;
-            psInstance.Streams.Error.DataAdded -= PrintErrorString;
-            psInstance.Streams.Warning.DataAdded -= PrintWarningString;
+            psInstance.Streams.Information.DataAdded -= handlers[0];
+            psInstance.Streams.Error.DataAdded -= handlers[1];
+            psInstance.Streams.Warning.DataAdded -= handlers[2];
         }
 
-        private static void PrintInformationString(object? sender, DataAddedEventArgs eventArgs)
+        private static string GetMessageToPrint<TRecord>(object sender, DataAddedEventArgs eventArgs)
         {
-            ThrowIfNull(sender, nameof(sender));
-            var powerShellStream = (PSDataCollection<InformationRecord>) sender;
-            Console.WriteLine(powerShellStream[eventArgs.Index].ToString());
-        }
-
-        private static void PrintErrorString(object? sender, DataAddedEventArgs eventArgs)
-        {
-            ThrowIfNull(sender, nameof(sender));
-            var powerShellStream = (PSDataCollection<ErrorRecord>) sender;
-            ConsoleUtils.WriteLine(powerShellStream[eventArgs.Index].ToString(), ConsoleColor.Red);
-        }
-
-        private static void PrintWarningString(object? sender, DataAddedEventArgs eventArgs)
-        {
-            ThrowIfNull(sender, nameof(sender));
-            var powerShellStream = (PSDataCollection<WarningRecord>) sender;
-            ConsoleUtils.WriteLine(powerShellStream[eventArgs.Index].ToString(), ConsoleColor.DarkYellow);
-        }
-
-        private static void ThrowIfNull([NotNull] object? variable, string variableName)
-        {
-            if (variable is null)
-                throw new ArgumentNullException(variableName);
+            var powerShellCollection = (PSDataCollection<TRecord>) sender;
+            return powerShellCollection[eventArgs.Index]!.ToString()!;
         }
     }
 }

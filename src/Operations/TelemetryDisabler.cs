@@ -20,18 +20,21 @@ namespace Win10BloatRemover.Operations
             "WdiServiceHost"
         };
 
-        public void PerformTask()
+        private readonly IUserInterface ui;
+        public TelemetryDisabler(IUserInterface ui) => this.ui = ui;
+
+        public void Run()
         {
             RemoveTelemetryServices();
-            DisableTelemetryFeaturesViaRegistryEdits();
+            EditRegistryKeysToDisableTelemetryFeatures();
         }
 
         private void RemoveTelemetryServices()
         {
-            ConsoleUtils.WriteLine("Backing up and removing telemetry services...", ConsoleColor.Green);
-            ServiceRemover.BackupAndRemove(telemetryServices);
+            ui.PrintHeading("Backing up and removing telemetry services...");
+            ServiceRemover.BackupAndRemove(telemetryServices, ui);
 
-            new ServiceRemover(protectedTelemetryServices).PerformBackup();
+            new ServiceRemover(protectedTelemetryServices, ui).PerformBackup();
             RemoveProtectedServices();
         }
 
@@ -50,15 +53,15 @@ namespace Win10BloatRemover.Operations
             try
             {
                 RemoveProtectedService(serviceName, allServicesKey);
-                Console.WriteLine($"Service {serviceName} removed successfully.");
+                ui.PrintMessage($"Service {serviceName} removed successfully.");
             }
             catch (KeyNotFoundException)
             {
-                Console.WriteLine($"Service {serviceName} is not present or its key can't be retrieved.");
+                ui.PrintMessage($"Service {serviceName} is not present or its key can't be retrieved.");
             }
             catch (Exception exc)
             {
-                ConsoleUtils.WriteLine($"Error while trying to delete service {serviceName}: {exc.Message}", ConsoleColor.Red);
+                ui.PrintError($"Error while trying to delete service {serviceName}: {exc.Message}");
             }
         }
 
@@ -81,9 +84,9 @@ namespace Win10BloatRemover.Operations
          *  They include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
          *   SmartScreen, Steps Recorder, Compatibility Assistant
          */
-        private void DisableTelemetryFeaturesViaRegistryEdits()
+        private void EditRegistryKeysToDisableTelemetryFeatures()
         {
-            ConsoleUtils.WriteLine("Performing some registry edits to disable telemetry-related features...", ConsoleColor.Green);
+            ui.PrintHeading("Performing some registry edits to disable telemetry-related features...");
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
                 key.SetValue("Start", 0, RegistryValueKind.DWord);

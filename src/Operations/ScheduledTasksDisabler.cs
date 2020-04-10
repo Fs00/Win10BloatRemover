@@ -5,16 +5,18 @@ namespace Win10BloatRemover.Operations
     class ScheduledTasksDisabler : IOperation
     {
         private readonly string[] scheduledTasksToDisable;
+        private readonly IUserInterface ui;
 
-        public ScheduledTasksDisabler(string[] scheduledTasksToDisable)
+        public ScheduledTasksDisabler(string[] scheduledTasksToDisable, IUserInterface ui)
         {
+            this.ui = ui;
             this.scheduledTasksToDisable = scheduledTasksToDisable;
         }
 
-        public void PerformTask()
+        public void Run()
         {
             foreach (string task in scheduledTasksToDisable)
-                SystemUtils.ExecuteWindowsPromptCommand($@"schtasks /Change /TN ""{task}"" /disable");
+                SystemUtils.ExecuteWindowsPromptCommand($@"schtasks /Change /TN ""{task}"" /disable", ui);
         }
     }
 }

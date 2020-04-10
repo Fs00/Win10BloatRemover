@@ -3,7 +3,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    class WindowsDefenderRemover : IOperation
+    public class WindowsDefenderRemover : IOperation
     {
         private static readonly string[] securityHealthServices = {
             "SecurityHealthService",

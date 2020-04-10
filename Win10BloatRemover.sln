@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28218.60
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win10BloatRemover", "Win10BloatRemover.csproj", "{759F045D-ADBF-4867-A0F7-F2D066E0C390}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win10BloatRemover", "src\Win10BloatRemover.csproj", "{759F045D-ADBF-4867-A0F7-F2D066E0C390}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win10BloatRemover.Tests", "tests\Win10BloatRemover.Tests.csproj", "{9EDE6950-B6EA-4A68-BA44-FB79C21A6D7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{759F045D-ADBF-4867-A0F7-F2D066E0C390}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{759F045D-ADBF-4867-A0F7-F2D066E0C390}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{759F045D-ADBF-4867-A0F7-F2D066E0C390}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EDE6950-B6EA-4A68-BA44-FB79C21A6D7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EDE6950-B6EA-4A68-BA44-FB79C21A6D7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EDE6950-B6EA-4A68-BA44-FB79C21A6D7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EDE6950-B6EA-4A68-BA44-FB79C21A6D7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    class SystemAppsRemovalEnabler : IOperation
+    public class SystemAppsRemovalEnabler : IOperation
     {
         private enum EditingOutcome
         {

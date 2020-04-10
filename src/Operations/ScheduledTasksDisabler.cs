@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class ScheduledTasksDisabler : IOperation
+    public class ScheduledTasksDisabler : IOperation
     {
         private readonly string[] scheduledTasksToDisable;
         private readonly IUserInterface ui;

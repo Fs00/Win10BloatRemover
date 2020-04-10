@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class BrowserOpener : IOperation
+    public class BrowserOpener : IOperation
     {
         private readonly string url;
 

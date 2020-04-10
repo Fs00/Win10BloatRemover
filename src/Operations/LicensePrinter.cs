@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class LicensePrinter : IOperation
+    public class LicensePrinter : IOperation
     {
         private readonly IUserInterface ui;
         public LicensePrinter(IUserInterface ui) => this.ui = ui;

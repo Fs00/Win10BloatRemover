@@ -13,7 +13,7 @@ namespace Win10BloatRemover
         public ConfigurationException(string message, Exception inner) : base(message, inner) {}
     }
 
-    class Configuration
+    public class Configuration
     {
         private const string CONFIGURATION_FILE_NAME = "config.json";
 

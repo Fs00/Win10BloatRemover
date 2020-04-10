@@ -40,7 +40,7 @@ namespace Win10BloatRemover.Operations
         SecurityCenter
     }
 
-    class UWPAppRemover : IOperation
+    public class UWPAppRemover : IOperation
     {
         // This dictionary contains the exact apps names corresponding to every defined group
         private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {

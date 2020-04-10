@@ -3,7 +3,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    class FeaturesRemover : IOperation
+    public class FeaturesRemover : IOperation
     {
         private readonly string[] featuresToRemove;
         private readonly IUserInterface ui;

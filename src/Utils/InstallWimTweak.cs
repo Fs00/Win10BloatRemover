@@ -5,7 +5,7 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.Utils
 {
-    class InstallWimTweak
+    public class InstallWimTweak
     {
         private static readonly string extractedFilePath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
 

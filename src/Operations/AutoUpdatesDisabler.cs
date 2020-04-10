@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class AutoUpdatesDisabler : IOperation
+    public class AutoUpdatesDisabler : IOperation
     {
         private readonly IUserInterface ui;
         public AutoUpdatesDisabler(IUserInterface ui) => this.ui = ui;

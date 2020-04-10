@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class CortanaWebSearchDisabler : IOperation
+    public class CortanaWebSearchDisabler : IOperation
     {
         private readonly IUserInterface ui;
         public CortanaWebSearchDisabler(IUserInterface ui) => this.ui = ui;

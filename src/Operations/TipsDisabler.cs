@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class TipsDisabler : IOperation
+    public class TipsDisabler : IOperation
     {
         private readonly IUserInterface ui;
         public TipsDisabler(IUserInterface ui) => this.ui = ui;

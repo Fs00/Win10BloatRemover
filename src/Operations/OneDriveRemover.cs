@@ -6,7 +6,7 @@ using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations
 {
-    class OneDriveRemover : IOperation
+    public class OneDriveRemover : IOperation
     {
         private readonly IUserInterface ui;
         private readonly InstallWimTweak installWimTweak;

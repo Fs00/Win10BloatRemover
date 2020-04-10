@@ -19,7 +19,7 @@ namespace Win10BloatRemover.Operations
      *  passed into the constructor.
      *  This is made in order to include services that end with a random code.
      */
-    class ServiceRemover : IOperation
+    public class ServiceRemover : IOperation
     {
         private readonly string[] servicesToRemove;
         private readonly DirectoryInfo backupDirectory;

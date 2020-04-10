@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations
 {
-    class ErrorReportingDisabler : IOperation
+    public class ErrorReportingDisabler : IOperation
     {
         private static readonly string[] errorReportingServices = { "WerSvc", "wercplsupport" };
 

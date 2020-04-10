@@ -5,7 +5,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    class TelemetryDisabler : IOperation
+    public class TelemetryDisabler : IOperation
     {
         private static readonly string[] telemetryServices = {
             "DiagTrack",

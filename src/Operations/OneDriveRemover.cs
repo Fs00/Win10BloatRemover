@@ -19,7 +19,7 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            EditRegistryKeysToDisableOneDrive();
+            DisableOneDrive();
 
             var uninstallationExitCode = RunOneDriveUninstaller();
             if (uninstallationExitCode == SystemUtils.EXIT_CODE_SUCCESS)
@@ -36,7 +36,7 @@ namespace Win10BloatRemover.Operations
             installWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup", ui);
         }
 
-        private void EditRegistryKeysToDisableOneDrive()
+        private void DisableOneDrive()
         {
             ui.PrintHeading("Disabling OneDrive via registry edits...");
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);

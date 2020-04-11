@@ -9,8 +9,7 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            ui.PrintHeading("Writing values into the Registry...");
-            EditRegistryKeysToDisableTips();
+            DisableTips();
 
             ui.PrintHeading("\nDisabling feedback-related scheduled tasks...");
             new ScheduledTasksDisabler(new[] {
@@ -19,8 +18,9 @@ namespace Win10BloatRemover.Operations
             }, ui).Run();
         }
 
-        private void EditRegistryKeysToDisableTips()
+        private void DisableTips()
         {
+            ui.PrintHeading("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\CloudContent"))
             {
                 key.SetValue("DisableSoftLanding", 1, RegistryValueKind.DWord);

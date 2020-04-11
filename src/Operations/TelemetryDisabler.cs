@@ -26,7 +26,7 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             RemoveTelemetryServices();
-            EditRegistryKeysToDisableTelemetryFeatures();
+            DisableTelemetryFeatures();
         }
 
         private void RemoveTelemetryServices()
@@ -84,7 +84,7 @@ namespace Win10BloatRemover.Operations
          *  They include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
          *   SmartScreen, Steps Recorder, Compatibility Assistant
          */
-        private void EditRegistryKeysToDisableTelemetryFeatures()
+        private void DisableTelemetryFeatures()
         {
             ui.PrintHeading("Performing some registry edits to disable telemetry-related features...");
 

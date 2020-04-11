@@ -11,15 +11,15 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            ui.PrintHeading("Writing values into the Registry...");
-            EditRegistryKeysToDisableErrorReporting();
+            DisableErrorReporting();
 
             ui.PrintHeading("\nBacking up and removing error reporting services...");
             ServiceRemover.BackupAndRemove(errorReportingServices, ui);
         }
 
-        private void EditRegistryKeysToDisableErrorReporting()
+        private void DisableErrorReporting()
         {
+            ui.PrintHeading("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting"))
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\Windows Error Reporting"))

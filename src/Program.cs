@@ -20,7 +20,7 @@ namespace Win10BloatRemover
 
             RegisterExitEventHandlers();
 
-            var installWimTweak = new InstallWimTweak(configuration);
+            var installWimTweak = new InstallWimTweakImpl(configuration);
             var menu = new ConsoleMenu(CreateMenuEntries(configuration, installWimTweak));
             menu.RunLoopUntilExitRequested();
         }

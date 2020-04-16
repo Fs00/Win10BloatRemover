@@ -13,7 +13,7 @@ namespace Win10BloatRemover.Tests.Operations
 
         [Theory]
         [Repeat(2)]
-        public void ShouldNotEncounterErrors_WhenRemovingDefaultFeatures(int attempt)
+        public void ShouldRemoveDefaultFeaturesWithoutErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
             var featuresRemover = new FeaturesRemover(Configuration.Default.WindowsFeaturesToRemove, ui);

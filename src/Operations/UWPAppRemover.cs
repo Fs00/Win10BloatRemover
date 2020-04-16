@@ -15,29 +15,29 @@ namespace Win10BloatRemover.Operations
 
     public enum UWPAppGroup
     {
+        AlarmsAndClock,
         Bing,               // Weather, News, Finance and Sports
-        Mobile,             // YourPhone, OneConnect (aka Mobile plans) and Connect app
-        Xbox,
-        OfficeHub,
-        OneNote,
+        Calculator,
         Camera,
+        CommunicationsApps,
+        Edge,
         HelpAndFeedback,
         Maps,
-        Zune,               // Groove Music and Movies
-        CommunicationsApps,
         Messaging,
+        MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
+        Mobile,             // YourPhone, OneConnect (aka Mobile plans) and Connect app
+        OfficeHub,
+        OneNote,
+        Paint3D,
+        Photos,
+        SecurityCenter,
+        Skype,
+        SnipAndSketch,
         SolitaireCollection,
         StickyNotes,
-        MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
-        Paint3D,
-        Skype,
-        Photos,
-        AlarmsAndClock,
-        Calculator,
-        SnipAndSketch,
         Store,
-        Edge,
-        SecurityCenter
+        Xbox,
+        Zune                // Groove Music and Movies
     }
 
     public class UWPAppRemover : IOperation

@@ -13,7 +13,7 @@ namespace Win10BloatRemover.Tests.Operations
 
         [Theory]
         [Repeat(2)]
-        public void ShouldNotEncounterErrors_WhenDisablingDefaultScheduledTasks(int attempt)
+        public void ShouldDisableDefaultScheduledTasksWithoutErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
             var tasksDisabler = new ScheduledTasksDisabler(Configuration.Default.ScheduledTasksToDisable, ui);

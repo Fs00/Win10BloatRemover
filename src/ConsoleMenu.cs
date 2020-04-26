@@ -35,18 +35,21 @@ namespace Win10BloatRemover
 
         private void PrintHeading()
         {
-            Console.WriteLine("---------------------------------------------");
-            Console.WriteLine("|    Windows 10 Bloat Remover and Tweaker   |");
-            Console.WriteLine($"|                version {programVersion.Major}.{programVersion.Minor}                |");
-            Console.WriteLine("---------------------------------------------");
+            Console.WriteLine("┌────────────────────────────────────────────┐");
+            Console.WriteLine("│    Windows 10 Bloat Remover and Tweaker    │");
+            Console.WriteLine($"│                version {programVersion.Major}.{programVersion.Minor}                 │");
+            Console.WriteLine("└────────────────────────────────────────────┘");
             Console.WriteLine();
         }
 
         private void PrintMenuEntries()
         {
-            Console.WriteLine("-- MENU --");
+            ConsoleHelpers.WriteLine("-- MENU --", ConsoleColor.Green);
             for (int i = 0; i < entries.Length; i++)
-                Console.WriteLine($"{i}: {entries[i].FullName}");
+            {
+                ConsoleHelpers.Write($"{i}: ", ConsoleColor.Green);
+                Console.WriteLine(entries[i].FullName);
+            }
             Console.WriteLine();
         }
 
@@ -111,6 +114,7 @@ namespace Win10BloatRemover
                 #if DEBUG
                 ConsoleHelpers.WriteLine(exc.StackTrace, ConsoleColor.Red);
                 #endif
+                Console.WriteLine();
             }
 
             ConsoleHelpers.FlushStandardInput();

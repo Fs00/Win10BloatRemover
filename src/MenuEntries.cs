@@ -243,7 +243,7 @@ namespace Win10BloatRemover
     {
         public TipsAndFeedbackDisablingEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Windows Tips and feedback requests disabling";
+        public override string FullName => "Tips and feedback requests disabling";
         public override string GetExplanation()
         {
             return "Feedback notifications/requests, apps suggestions, tips and Spotlight (including dynamic lock " +

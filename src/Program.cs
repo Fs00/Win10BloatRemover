@@ -33,7 +33,7 @@ namespace Win10BloatRemover
                 new UWPAppRemovalEntry(ui, configuration, installWimTweak),
                 new WinDefenderRemovalEntry(ui, installWimTweak),
                 new EdgeRemovalEntry(ui),
-                new OneDriveRemovalEntry(ui, installWimTweak),
+                new OneDriveRemovalEntry(ui),
                 new ServicesRemovalEntry(ui, configuration),
                 new WindowsFeaturesRemovalEntry(ui, configuration),
                 new TelemetryDisablingEntry(ui),

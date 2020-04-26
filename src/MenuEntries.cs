@@ -110,22 +110,15 @@ namespace Win10BloatRemover
 
     class OneDriveRemovalEntry : MenuEntry
     {
-        private readonly InstallWimTweak installWimTweak;
-
-        public OneDriveRemovalEntry(IUserInterface ui, InstallWimTweak installWimTweak)
-        {
-            this.ui = ui;
-            this.installWimTweak = installWimTweak;
-        }
+        public OneDriveRemovalEntry(IUserInterface ui) => this.ui = ui;
 
         public override string FullName => "OneDrive removal";
         public override string GetExplanation()
         {
             return "OneDrive will be first disabled using Group Policies, and then uninstalled using its setup program.\n" +
-                   "If you allow the use of install-wim-tweak, the setup program will also be removed from the " +
-                   "system so that the app won't be installed for new users.";
+                   "Futhermore, its setup will be prevented from running when an user logs in for the first time.";
         }
-        public override IOperation CreateNewOperation() => new OneDriveRemover(ui, installWimTweak);
+        public override IOperation CreateNewOperation() => new OneDriveRemover(ui);
     }
 
     class ServicesRemovalEntry : MenuEntry

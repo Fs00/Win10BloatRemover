@@ -9,36 +9,21 @@ namespace Win10BloatRemover.Operations
     public class OneDriveRemover : IOperation
     {
         private readonly IUserInterface ui;
-        private readonly InstallWimTweak installWimTweak;
 
-        public OneDriveRemover(IUserInterface ui, InstallWimTweak installWimTweak)
-        {
-            this.ui = ui;
-            this.installWimTweak = installWimTweak;
-        }
+        public OneDriveRemover(IUserInterface ui) => this.ui = ui;
 
         public void Run()
         {
             DisableOneDrive();
-
-            var uninstallationExitCode = RunOneDriveUninstaller();
-            if (uninstallationExitCode == SystemUtils.EXIT_CODE_SUCCESS)
-                ui.PrintMessage("Uninstallation completed succesfully.");
-            else
-            {
-                ui.PrintError("Uninstallation failed due to an unknown error.");
-                ThrowIfUserWantsToAbort();
-            }
-
+            SystemUtils.KillProcess("onedrive");
+            RunOneDriveUninstaller();
             RemoveOneDriveLeftovers();
-
-            ui.PrintEmptySpace();
-            installWimTweak.RemoveComponentIfAllowed("Microsoft-Windows-OneDrive-Setup", ui);
+            DisableAutomaticSetupForNewUsers();
         }
 
         private void DisableOneDrive()
         {
-            ui.PrintHeading("Disabling OneDrive via registry edits...");
+            ui.PrintMessage("Disabling OneDrive via registry edits...");
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
                 key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
@@ -56,15 +41,19 @@ namespace Win10BloatRemover.Operations
                 throw new Exception("The user aborted the operation.");
         }
 
-        private int RunOneDriveUninstaller()
+        private void RunOneDriveUninstaller()
         {
-            ui.PrintHeading("\nExecuting OneDrive uninstaller...");
-            SystemUtils.KillProcess("onedrive");
-            string installerPath = RetrieveOneDriveInstallerPath();
-            return SystemUtils.RunProcessBlockingWithOutput(installerPath, "/uninstall", ui);
+            ui.PrintMessage("Executing OneDrive uninstaller...");
+            string setupPath = RetrieveOneDriveSetupPath();
+            var uninstallationExitCode = SystemUtils.RunProcessBlockingWithOutput(setupPath, "/uninstall", ui);
+            if (uninstallationExitCode != SystemUtils.EXIT_CODE_SUCCESS)
+            {
+                ui.PrintError("Uninstallation failed due to an unknown error.");
+                ThrowIfUserWantsToAbort();
+            }
         }
 
-        private string RetrieveOneDriveInstallerPath()
+        private string RetrieveOneDriveSetupPath()
         {
             if (Env.Is64BitOperatingSystem)
                 return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe";
@@ -74,7 +63,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveOneDriveLeftovers()
         {
-            ui.PrintHeading("\nRemoving OneDrive leftovers...");
+            ui.PrintMessage("Removing OneDrive leftovers...");
             SystemUtils.KillProcess("explorer");
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
@@ -83,7 +72,6 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualFiles()
         {
-            ui.PrintMessage("Removing old files...");
             SystemUtils.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp", ui);
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive", ui);
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", ui);
@@ -93,10 +81,21 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualRegistryKeys()
         {
-            ui.PrintMessage("Deleting old registry keys...");
             using RegistryKey classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry64);
             using RegistryKey key = classesRoot.OpenSubKey(@"CLSID", writable: true);
             key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", throwOnMissingSubKey: false);
+        }
+
+        // Borrowed from github.com/W4RH4WK/Debloat-Windows-10/blob/master/scripts/remove-onedrive.ps1
+        private void DisableAutomaticSetupForNewUsers()
+        {
+            ui.PrintMessage("Disabling automatic OneDrive setup for new users...");
+            int loadExitCode = SystemUtils.RunProcessBlocking("reg", @"load ""HKEY_USERS\_Default"" ""C:\Users\Default\NTUSER.DAT""");
+            if (loadExitCode != SystemUtils.EXIT_CODE_SUCCESS)
+                throw new Exception("Unable to load Default user registry hive.");
+            using (RegistryKey key = Registry.Users.CreateSubKey(@"_Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"))
+                key.DeleteValue("OneDriveSetup", throwOnMissingValue: false);
+            SystemUtils.RunProcessBlocking("reg", @"unload ""HKEY_USERS\_Default""");
         }
     }
 }

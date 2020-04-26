@@ -14,7 +14,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldNotEncounterErrors()
         {
             var ui = new TestUserInterface(output);
-            var oneDriveRemover = new OneDriveRemover(ui, new MockInstallWimTweak());
+            var oneDriveRemover = new OneDriveRemover(ui);
 
             oneDriveRemover.Run();
 

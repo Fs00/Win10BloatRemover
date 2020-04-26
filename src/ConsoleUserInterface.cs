@@ -18,15 +18,15 @@ namespace Win10BloatRemover
 
         public void PrintSubHeading(string text) => PrintConsoleMessage(text, ConsoleColor.DarkGreen);
 
-        public void PrintEmptySpace() => PrintConsoleMessage("\n");
+        public void PrintEmptySpace() => Console.Write("\n");
 
         public UserChoice AskUserConsent(string text)
         {
             Console.Write(text + " (y/N) ");
-            if (Console.ReadKey().Key == ConsoleKey.Y)
-                return UserChoice.Yes;
-            else
-                return UserChoice.No;
+            string userInput = Console.ReadLine()?.Trim() ?? "";
+            PrintEmptySpace();
+            bool userPressedY = userInput.Equals("y", StringComparison.InvariantCultureIgnoreCase);
+            return userPressedY ? UserChoice.Yes : UserChoice.No;
         }
 
         private void PrintConsoleMessage(string text)

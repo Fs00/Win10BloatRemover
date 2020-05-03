@@ -88,7 +88,18 @@ namespace Win10BloatRemover
                    "otherwise, its menu icon will remain there, but the app won't start anymore.\n" +
                    "Remember that any Windows cumulative update is likely to reinstall the app.";
         }
-        public override IOperation CreateNewOperation() => new WindowsDefenderRemover(ui, installWimTweak);
+
+        public override IOperation CreateNewOperation()
+        {
+            return new WindowsDefenderRemover(
+                ui, installWimTweak,
+                new UWPAppRemover(
+                    new[] { UWPAppGroup.SecurityCenter },
+                    UWPAppRemovalMode.KeepProvisionedPackages,
+                    ui, installWimTweak
+                )
+            );
+        }
     }
 
     class EdgeRemovalEntry : MenuEntry

@@ -15,11 +15,13 @@ namespace Win10BloatRemover.Operations
 
         private readonly InstallWimTweak installWimTweak;
         private readonly IUserInterface ui;
+        private readonly IOperation securityCenterRemover;
 
-        public WindowsDefenderRemover(IUserInterface ui, InstallWimTweak installWimTweak)
+        public WindowsDefenderRemover(IUserInterface ui, InstallWimTweak installWimTweak, IOperation securityCenterRemover)
         {
             this.ui = ui;
             this.installWimTweak = installWimTweak;
+            this.securityCenterRemover = securityCenterRemover;
         }
 
         public void Run()
@@ -30,7 +32,7 @@ namespace Win10BloatRemover.Operations
             ui.PrintEmptySpace();
             installWimTweak.RemoveComponentIfAllowed("Windows-Defender", ui);
 
-            TryUninstallSecurityCenter();
+            securityCenterRemover.Run();
         }
 
         private void EditWindowsRegistryKeys()
@@ -77,15 +79,6 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("\nRemoving Security Health services...");
             ServiceRemover.BackupAndRemove(securityHealthServices, ui, ServiceRemovalMode.Registry);
-        }
-
-        private void TryUninstallSecurityCenter()
-        {
-            new UWPAppRemover(
-                new[] { UWPAppGroup.SecurityCenter },
-                UWPAppRemovalMode.KeepProvisionedPackages, ui,
-                installWimTweak
-            ).Run();
         }
     }
 }

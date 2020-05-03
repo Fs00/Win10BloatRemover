@@ -1,19 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    // ServiceRemover can remove services using sc or reg commands (see below)
-    public enum ServiceRemovalMode
-    {
-        ServiceControl,
-        Registry
-    }
-
     /*
      *  Performs backup (export of registry keys) and removal of those services whose name starts with the service names
      *  passed into the constructor.
@@ -27,13 +21,11 @@ namespace Win10BloatRemover.Operations
 
         private const int SC_EXIT_CODE_MARKED_FOR_DELETION = 1072;
 
-        public static void BackupAndRemove(string[] servicesToRemove,
-                                           IUserInterface ui,
-                                           ServiceRemovalMode removalMode = ServiceRemovalMode.ServiceControl)
+        public static void BackupAndRemove(string[] servicesToRemove, IUserInterface ui)
         {
             var serviceRemover = new ServiceRemover(servicesToRemove, ui);
             string[] actualBackuppedServices = serviceRemover.PerformBackup();
-            serviceRemover.PerformRemoval(actualBackuppedServices, removalMode);
+            serviceRemover.PerformRemoval(actualBackuppedServices);
         }
 
         public ServiceRemover(string[] servicesToRemove, IUserInterface ui)
@@ -48,7 +40,7 @@ namespace Win10BloatRemover.Operations
             ui.PrintHeading("Backing up services...");
             string[] actualBackuppedServices = PerformBackup();
             ui.PrintHeading("Removing services...");
-            PerformRemoval(actualBackuppedServices, ServiceRemovalMode.ServiceControl);
+            PerformRemoval(actualBackuppedServices);
         }
 
         public string[] PerformBackup()
@@ -99,51 +91,48 @@ namespace Win10BloatRemover.Operations
                 backupDirectory.Create();
         }
 
-        /*
-         *  Performs the removal of the services by using either sc or reg command, according to the passed parameter
-         *  (default is sc).
-         *  reg command allows to remove unstoppable system services, like Windows Defender ones.
-         */
-        private void PerformRemoval(string[] backuppedServices, ServiceRemovalMode removalMode)
+        private void PerformRemoval(string[] backuppedServices)
         {
-            if (removalMode == ServiceRemovalMode.ServiceControl)
-                RemoveServicesUsingSC(backuppedServices);
-            else if (removalMode == ServiceRemovalMode.Registry)
-                RemoveServicesByDeletingRegistryKeys(backuppedServices);
+            foreach (string service in backuppedServices)
+                RemoveService(service);
         }
 
-        private void RemoveServicesUsingSC(string[] actualServicesToRemove)
+        private void RemoveService(string service)
         {
-            foreach (string service in actualServicesToRemove)
+            int scExitCode = SystemUtils.RunProcessBlocking("sc", $"delete {service}");
+            if (IsScExitCodeSuccessful(scExitCode))
+                PrintSuccessMessage(scExitCode, service);
+            else
             {
-                int scExitCode = SystemUtils.RunProcessBlocking("sc", $"delete {service}");
-                switch (scExitCode)
-                {
-                    case SystemUtils.EXIT_CODE_SUCCESS:
-                        ui.PrintMessage($"Service {service} removed successfully.");
-                        break;
-                    case SC_EXIT_CODE_MARKED_FOR_DELETION:
-                        ui.PrintMessage($"Service {service} will be removed after reboot.");
-                        break;
-                    default:
-                        ui.PrintError($"Service {service} removal failed: sc exited with code {scExitCode}.");
-                        break;
-                }
+                Debug.WriteLine($"SC removal failed with exit code {scExitCode} for service {service}.");
+                DeleteServiceRegistryKey(service);
             }
         }
 
-        private void RemoveServicesByDeletingRegistryKeys(string[] actualServicesToRemove)
+        private bool IsScExitCodeSuccessful(int exitCode)
         {
-            foreach (string service in actualServicesToRemove)
-            {
-                int regExitCode = SystemUtils.RunProcessBlocking(
-                    "reg", $@"delete HKLM\SYSTEM\CurrentControlSet\Services\{service} /f"
-                );
-                if (regExitCode == SystemUtils.EXIT_CODE_SUCCESS)
-                    ui.PrintMessage($"Service {service} removed, but it may continue to run until the next restart.");
-                else
-                    ui.PrintError($"Service {service} removal failed: couldn't delete its registry keys.");
-            }
+            return exitCode == SystemUtils.EXIT_CODE_SUCCESS ||
+                   exitCode == SC_EXIT_CODE_MARKED_FOR_DELETION;
+        }
+
+        private void PrintSuccessMessage(int scExitCode, string service)
+        {
+            if (scExitCode == SystemUtils.EXIT_CODE_SUCCESS)
+                ui.PrintMessage($"Service {service} removed successfully.");
+            else if (scExitCode == SC_EXIT_CODE_MARKED_FOR_DELETION)
+                ui.PrintMessage($"Service {service} will be removed after reboot.");
+            else
+                Debug.Fail($"There must be an error in {nameof(IsScExitCodeSuccessful)}: exit code {scExitCode}.");
+        }
+
+        // reg command with /f option allows to remove unstoppable system services, like Windows Defender ones
+        private void DeleteServiceRegistryKey(string service)
+        {
+            int regExitCode = SystemUtils.RunProcessBlocking("reg", $@"delete HKLM\SYSTEM\CurrentControlSet\Services\{service} /f");
+            if (regExitCode == SystemUtils.EXIT_CODE_SUCCESS)
+                ui.PrintMessage($"Service {service} removed, but it will continue to run until the next restart.");
+            else
+                ui.PrintError($"Service {service} removal failed: couldn't delete its registry keys.");
         }
     }
 }

@@ -78,7 +78,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveSecurityHealthServices()
         {
             ui.PrintHeading("\nRemoving Security Health services...");
-            ServiceRemover.BackupAndRemove(securityHealthServices, ui, ServiceRemovalMode.Registry);
+            ServiceRemover.BackupAndRemove(securityHealthServices, ui);
         }
     }
 }

@@ -60,8 +60,8 @@ namespace Win10BloatRemover.Utils
         {
             var handlers = new EventHandler<DataAddedEventArgs>[] {
                 (sender, eventArgs) => printer.PrintMessage(GetMessageToPrint<InformationRecord>(sender!, eventArgs)),
-                (sender, eventArgs) => printer.PrintWarning(GetMessageToPrint<ErrorRecord>(sender!, eventArgs)),
-                (sender, eventArgs) => printer.PrintMessage(GetMessageToPrint<WarningRecord>(sender!, eventArgs))
+                (sender, eventArgs) => printer.PrintError(GetMessageToPrint<ErrorRecord>(sender!, eventArgs)),
+                (sender, eventArgs) => printer.PrintWarning(GetMessageToPrint<WarningRecord>(sender!, eventArgs))
             };
             psInstance.Streams.Information.DataAdded += handlers[0];
             psInstance.Streams.Error.DataAdded += handlers[1];

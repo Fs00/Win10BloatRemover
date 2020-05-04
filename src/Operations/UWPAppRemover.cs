@@ -80,7 +80,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
             { UWPAppGroup.SecurityCenter, new[] { "Microsoft.Windows.SecHealthUI" } },
             { UWPAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
-            { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.SkreenSketch" } },
+            { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.ScreenSketch" } },
             { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
             { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
             {

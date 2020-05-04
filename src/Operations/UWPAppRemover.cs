@@ -338,10 +338,7 @@ namespace Win10BloatRemover.Operations
         {
             Console.WriteLine("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\WindowsStore"))
-            {
                 key.SetValue("RemoveWindowsStore", 1, RegistryValueKind.DWord);
-                key.SetValue("DisableStoreApps", 1, RegistryValueKind.DWord);
-            }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\PushToInstall"))
                 key.SetValue("DisablePushToInstall", 1, RegistryValueKind.DWord);
 

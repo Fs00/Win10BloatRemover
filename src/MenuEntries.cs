@@ -47,7 +47,7 @@ namespace Win10BloatRemover
             this.installWimTweak = installWimTweak;
         }
 
-        public override string FullName => "UWP apps removal";
+        public override string FullName => "Remove UWP apps";
         public override string GetExplanation()
         {
             string explanation = "The following groups of UWP apps will be removed:\n";
@@ -78,7 +78,7 @@ namespace Win10BloatRemover
             this.installWimTweak = installWimTweak;
         }
 
-        public override string FullName => "Windows Defender removal";
+        public override string FullName => "Remove Windows Defender";
         public override string GetExplanation()
         {
             return "Important: Before starting, disable Tamper protection in Windows Security " +
@@ -106,7 +106,7 @@ namespace Win10BloatRemover
     {
         public EdgeRemovalEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Microsoft Edge removal";
+        public override string FullName => "Remove Microsoft Edge";
         public override string GetExplanation()
         {
             return "You need to make system apps removable first, otherwise the uninstallation will fail.\n" +
@@ -123,7 +123,7 @@ namespace Win10BloatRemover
     {
         public OneDriveRemovalEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "OneDrive removal";
+        public override string FullName => "Remove OneDrive";
         public override string GetExplanation()
         {
             return "OneDrive will be first disabled using Group Policies, and then uninstalled using its setup program.\n" +
@@ -142,7 +142,7 @@ namespace Win10BloatRemover
             this.configuration = configuration;
         }
 
-        public override string FullName => "Miscellaneous services removal";
+        public override string FullName => "Remove miscellaneous services";
         public override string GetExplanation()
         {
             string explanation = "The services starting with the following names will be removed:\n";
@@ -163,7 +163,7 @@ namespace Win10BloatRemover
             this.configuration = configuration;
         }
 
-        public override string FullName => "Windows features removal";
+        public override string FullName => "Remove Windows features";
         public override string GetExplanation()
         {
             string explanation = "The following features will be removed:";
@@ -178,7 +178,7 @@ namespace Win10BloatRemover
     {
         public TelemetryDisablingEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Telemetry disabling";
+        public override string FullName => "Disable telemetry";
         public override string GetExplanation()
         {
             return "This will backup and remove several telemetry-related services and disable features that " +
@@ -192,7 +192,7 @@ namespace Win10BloatRemover
     {
         public CortanaDisablingEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Cortana and web search disabling";
+        public override string FullName => "Disable Cortana and web search";
         public override string GetExplanation()
         {
             return "By editing Group Policies, Cortana will be disabled and Windows Search won't display results " +
@@ -206,7 +206,7 @@ namespace Win10BloatRemover
     {
         public AutoUpdatesDisablingEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Automatic Windows updates disabling";
+        public override string FullName => "Disable automatic updates";
         public override string GetExplanation()
         {
             return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
@@ -225,7 +225,7 @@ namespace Win10BloatRemover
             this.configuration = configuration;
         }
 
-        public override string FullName => "Miscellaneous scheduled tasks disabling";
+        public override string FullName => "Disable miscellaneous scheduled tasks";
         public override string GetExplanation()
         {
             string explanation = "The following scheduled tasks will be disabled:";
@@ -241,7 +241,7 @@ namespace Win10BloatRemover
     {
         public ErrorReportingDisablingEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Windows Error Reporting disabling";
+        public override string FullName => "Disable Windows Error Reporting";
         public override string GetExplanation()
         {
             return "Windows Error Reporting will disabled by editing Group Policies, as well as by removing " +
@@ -254,7 +254,7 @@ namespace Win10BloatRemover
     {
         public TipsAndFeedbackDisablingEntry(IUserInterface ui) => this.ui = ui;
 
-        public override string FullName => "Tips and feedback requests disabling";
+        public override string FullName => "Disable tips and feedback requests";
         public override string GetExplanation()
         {
             return "Feedback notifications/requests, apps suggestions, tips and Spotlight (including dynamic lock " +

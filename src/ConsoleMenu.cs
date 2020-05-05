@@ -62,7 +62,7 @@ namespace Win10BloatRemover
                 Console.Write("Choose an operation: ");
                 chosenEntry = GetEntryCorrespondingToUserInput(Console.ReadLine());
                 if (chosenEntry == null)
-                    Console.WriteLine("Incorrect input.");
+                    ConsoleHelpers.WriteLine("Incorrect input. Must be a valid menu entry number.", ConsoleColor.Red);
                 else
                     isUserInputCorrect = true;
             }

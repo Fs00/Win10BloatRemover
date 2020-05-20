@@ -136,7 +136,7 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            using (psInstance = PowerShellExtensions.CreateWithImportedModules("AppX"))
+            using (psInstance = PowerShellExtensions.CreateWithImportedModules("AppX").WithOutput(ui))
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                 {
@@ -190,7 +190,7 @@ namespace Win10BloatRemover.Operations
                     }";
             }
 
-            psInstance.RunScriptAndPrintOutput(appRemovalScript, ui);
+            psInstance.RunScript(appRemovalScript);
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)

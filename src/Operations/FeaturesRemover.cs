@@ -31,8 +31,8 @@ namespace Win10BloatRemover.Operations
                     removalScript += "schtasks /Change /TN \"\\Microsoft\\Windows\\HelloFace\\FODCleanupTask\" /Disable;";
             }
 
-            using PowerShell psInstance = PowerShellExtensions.CreateWithImportedModules("Dism");
-            psInstance.RunScriptAndPrintOutput(removalScript, ui);
+            using PowerShell psInstance = PowerShellExtensions.CreateWithImportedModules("Dism").WithOutput(ui);
+            psInstance.RunScript(removalScript);
 
             ui.PrintMessage("A system reboot is recommended.");
         }

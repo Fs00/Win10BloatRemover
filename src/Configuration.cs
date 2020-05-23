@@ -95,9 +95,9 @@ namespace Win10BloatRemover
                 UWPAppGroup.Skype
             },
             WindowsFeaturesToRemove = new[] {
-                "InternetExplorer-Optional-Package",
-                "Hello-Face-Package",
-                "QuickAssist-Package"
+                "Microsoft-Windows-InternetExplorer",
+                "Microsoft-Windows-Hello-Face",
+                "Microsoft-Windows-QuickAssist"
             },
             ScheduledTasksToDisable = new[] {
                 @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",

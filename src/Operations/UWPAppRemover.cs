@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Management.Automation;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
@@ -109,7 +110,8 @@ namespace Win10BloatRemover.Operations
         private readonly UWPAppRemovalMode removalMode;
         private readonly InstallWimTweak installWimTweak;
         private readonly IUserInterface ui;
-        private /*lateinit*/ PowerShell psInstance;
+
+        private /*lateinit*/ PowerShell powerShell;
 
         #nullable disable warnings
         public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, InstallWimTweak installWimTweak)
@@ -136,61 +138,60 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            using (psInstance = PowerShellExtensions.CreateWithImportedModules("AppX").WithOutput(ui))
+            using (powerShell = PowerShellExtensions.CreateWithImportedModules("AppX").WithOutput(ui))
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
-                {
-                    bool atLeastOneAppUninstalled = UninstallAppsOfGroup(appGroup);
-
-                    // We check if at least one app has been uninstalled to avoid
-                    // performing tasks when no app of the group are installed anymore
-                    if (atLeastOneAppUninstalled && psInstance.Streams.Error.Count == 0)
-                        TryPerformPostUninstallOperations(appGroup);
-                }
+                    UninstallAppsOfGroup(appGroup);
             }
         }
 
-        private bool UninstallAppsOfGroup(UWPAppGroup appGroup)
+        private void UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
             ui.PrintHeading($"\nRemoving {appGroup} app(s)...");
-
-            bool atLeastOneAppUninstalled = false;
+            int removedApps = 0;
             foreach (string appName in appNamesForGroup[appGroup])
             {
-                UninstallApp(appName);
-                if (!atLeastOneAppUninstalled)
-                    atLeastOneAppUninstalled = psInstance.GetVariable("package").IsNotEmpty();
+                bool removalSuccessful = UninstallApp(appName);
+                if (removalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
+                    UninstallAppProvisionedPackage(appName);
+                if (removalSuccessful)
+                    removedApps++;
             }
 
-            return atLeastOneAppUninstalled;
+            if (removedApps > 0)
+                TryPerformPostUninstallOperations(appGroup);
         }
 
-        private void UninstallApp(string appName)
+        private bool UninstallApp(string appName)
         {
-            string appRemovalScript =
-                @"$package = Get-AppxPackage -AllUsers -Name """ + appName + @""";
-                if ($package) {
-                    Write-Host ""Removing app " + appName + @"..."";
-                    $package | Remove-AppxPackage -AllUsers;
-                }
-                else {
-                    Write-Host ""App " + appName + @" is not installed."";
-                }";
-
-            if (removalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
+            var packages = powerShell.Run($"Get-AppxPackage -AllUsers -Name \"{appName}\"");
+            if (packages.Length > 0)
             {
-                appRemovalScript +=
-                    @"$provisionedPackage = Get-AppxProvisionedPackage -Online | where {$_.DisplayName -eq """ + appName + @"""};
-                    if ($provisionedPackage) {
-                        Write-Host ""Removing provisioned package for app " + appName + @"..."";
-                        Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName;
-                    }
-                    else {
-                        Write-Host ""No provisioned package found for app " + appName + @"."";
-                    }";
+                ui.PrintMessage($"Removing app {appName}...");
+                foreach (var package in packages)  // some apps have both x86 and x64 variants installed
+                    powerShell.Run($"Remove-AppxPackage -AllUsers -Package \"{package.PackageFullName}\"");
+                return powerShell.Streams.Error.Count == 0;
             }
+            else
+            {
+                ui.PrintMessage($"App {appName} is not installed.");
+                return false;
+            }
+        }
 
-            psInstance.RunScript(appRemovalScript);
+        private void UninstallAppProvisionedPackage(string appName)
+        {
+            var provisionedPackage = powerShell.Run("Get-AppxProvisionedPackage -Online")
+                .FirstOrDefault(package => package.DisplayName == appName);
+            if (provisionedPackage != null)
+            {
+                ui.PrintMessage($"Removing provisioned package for app {appName}...");
+                powerShell.Run(
+                    $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
+                );
+            }
+            else
+                ui.PrintMessage($"No provisioned package found for app {appName}.");
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)

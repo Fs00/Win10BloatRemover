@@ -40,18 +40,6 @@ namespace Win10BloatRemover.Utils
             return results.Select(psObject => psObject.BaseObject).ToArray();
         }
 
-        public static void RunScript(this PowerShell psInstance, string script)
-        {
-            // Streams can be used by the caller to check for errors in the current script execution
-            psInstance.Streams.ClearStreams();
-
-            psInstance.AddScript(script);
-            psInstance.Invoke();
-
-            // Clear pipeline to avoid the script being re-executed the next time we use this instance
-            psInstance.Commands.Clear();
-        }
-
         public static PowerShell WithOutput(this PowerShell powerShell, IMessagePrinter printer)
         {
             powerShell.Streams.Information.DataAdded +=

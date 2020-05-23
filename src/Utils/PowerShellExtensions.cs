@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿using System;
+using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using Microsoft.PowerShell;
 using Win10BloatRemover.Operations;
@@ -9,6 +10,7 @@ namespace Win10BloatRemover.Utils
     {
         public static PowerShell CreateWithImportedModules(params string[] modules)
         {
+            Environment.SetEnvironmentVariable("POWERSHELL_TELEMETRY_OPTOUT", "true");
             var sessionState = InitialSessionState.CreateDefault2();
             sessionState.ThreadOptions = PSThreadOptions.UseCurrentThread;
             sessionState.ExecutionPolicy = ExecutionPolicy.Unrestricted;

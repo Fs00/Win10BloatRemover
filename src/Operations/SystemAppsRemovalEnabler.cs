@@ -36,7 +36,7 @@ namespace Win10BloatRemover.Operations
                     ReplaceStateRepositoryDatabaseWith(databaseCopyForEditing);
                 else
                 {
-                    ui.PrintNotice("\nOriginal database doesn't need to be replaced: nothing has changed.");
+                    ui.PrintNotice("Original database doesn't need to be replaced: nothing has changed.");
                     DeleteDatabaseCopies(databaseBackupCopy, databaseCopyForEditing);
                 }
             }
@@ -58,10 +58,12 @@ namespace Win10BloatRemover.Operations
 
         private string BackupStateRepositoryDatabase()
         {
-            ui.PrintHeading("\nBacking up state repository database...");
+            ui.PrintEmptySpace();
+            ui.PrintHeading("Backing up state repository database...");
             string backupCopyFileName = $"StateRepository-Machine_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.srd.bak";
             string backupCopyPath = CopyStateRepositoryDatabaseTo(backupCopyFileName);
             ui.PrintMessage($"Backup copy written to {backupCopyPath}.");
+            ui.PrintEmptySpace();
             return backupCopyPath;
         }
 
@@ -74,7 +76,7 @@ namespace Win10BloatRemover.Operations
 
         private void ReplaceStateRepositoryDatabaseWith(string databaseCopyPath)
         {
-            ui.PrintHeading("\nReplacing original state repository database with the edited copy...");
+            ui.PrintHeading("Replacing original state repository database with the edited copy...");
             EnsureAppXServicesAreStopped();
             try
             {
@@ -92,7 +94,7 @@ namespace Win10BloatRemover.Operations
 
         private EditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)
         {
-            ui.PrintHeading("\nEditing a temporary copy of state repository database...");
+            ui.PrintHeading("Editing a temporary copy of state repository database...");
             using (dbConnection = new SqliteConnection($"Data Source={databaseCopyPath}"))
             {
                 dbConnection.Open();
@@ -102,9 +104,11 @@ namespace Win10BloatRemover.Operations
                 string? createTriggerCode = RetrieveAfterPackageUpdateTriggerCode();
                 DeleteAfterPackageUpdateTrigger();
                 int updatedRows = EditPackageTable();
-                ui.PrintMessage($"Edited {updatedRows} row(s).");
                 if (createTriggerCode != null)
                     ReAddAfterPackageUpdateTrigger(createTriggerCode);
+
+                ui.PrintMessage($"Edited {updatedRows} row(s).");
+                ui.PrintEmptySpace();
 
                 return updatedRows == 0 ? EditingOutcome.NoChangesMade : EditingOutcome.ContentWasUpdated;
             }

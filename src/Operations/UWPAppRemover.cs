@@ -148,7 +148,7 @@ namespace Win10BloatRemover.Operations
 
         private void UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
-            ui.PrintHeading($"\nRemoving {appGroup} app(s)...");
+            ui.PrintHeading($"Removing {appGroup} app(s)...");
             int removedApps = 0;
             foreach (string appName in appNamesForGroup[appGroup])
             {
@@ -165,6 +165,7 @@ namespace Win10BloatRemover.Operations
 
             if (removedApps > 0)
                 TryPerformPostUninstallOperations(appGroup);
+            ui.PrintEmptySpace();
         }
 
         private bool UninstallApp(string appName)

@@ -13,7 +13,7 @@ namespace Win10BloatRemover.Operations
         {
             DisableErrorReporting();
 
-            ui.PrintHeading("\nBacking up and removing error reporting services...");
+            ui.PrintHeading("Backing up and removing error reporting services...");
             ServiceRemover.BackupAndRemove(errorReportingServices, ui);
         }
 
@@ -24,6 +24,7 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\Windows Error Reporting"))
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
+            ui.PrintEmptySpace();
         }
     }
 }

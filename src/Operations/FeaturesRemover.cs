@@ -26,6 +26,7 @@ namespace Win10BloatRemover.Operations
                     RemoveFeaturesWhoseNameStartsWith(featureName);
             }
 
+            ui.PrintEmptySpace();
             ui.PrintMessage("A system reboot is recommended.");
         }
 

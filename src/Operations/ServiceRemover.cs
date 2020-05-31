@@ -39,8 +39,13 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Backing up services...");
             string[] actualBackuppedServices = PerformBackup();
-            ui.PrintHeading("Removing services...");
-            PerformRemoval(actualBackuppedServices);
+
+            if (actualBackuppedServices.Length > 0)
+            {
+                ui.PrintEmptySpace();
+                ui.PrintHeading("Removing services...");
+                PerformRemoval(actualBackuppedServices);
+            }
         }
 
         public string[] PerformBackup()

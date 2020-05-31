@@ -13,6 +13,7 @@ namespace Win10BloatRemover
 
         private static void Main()
         {
+            Trace.Listeners.Add(new ConsoleTraceListener());
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
             EnsurePreliminaryChecksAreSuccessful();
 

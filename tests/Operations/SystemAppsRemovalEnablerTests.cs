@@ -22,7 +22,7 @@ namespace Win10BloatRemover.Tests.Operations
         {
             var ui = new TestUserInterface(output);
             var removalEnabler = new SystemAppsRemovalEnabler(ui);
-            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.KeepProvisionedPackages, ui, new MockInstallWimTweak());
+            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui, new MockInstallWimTweak());
 
             removalEnabler.Run();
             appRemover.Run();

@@ -128,7 +128,7 @@ namespace Win10BloatRemover
                 @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
                 @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
             },
-            UWPAppsRemovalMode = UWPAppRemovalMode.RemoveProvisionedPackages,
+            UWPAppsRemovalMode = UWPAppRemovalMode.AllUsers,
             AllowInstallWimTweak = false
         };
     }

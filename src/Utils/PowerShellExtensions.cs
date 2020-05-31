@@ -8,7 +8,7 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.Utils
 {
-    static class PowerShellExtensions
+    public static class PowerShellExtensions
     {
         public static PowerShell CreateWithImportedModules(params string[] modules)
         {

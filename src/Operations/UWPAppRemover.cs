@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management.Automation;
 using Win10BloatRemover.Utils;
@@ -10,8 +11,8 @@ namespace Win10BloatRemover.Operations
 {
     public enum UWPAppRemovalMode
     {
-        KeepProvisionedPackages,
-        RemoveProvisionedPackages
+        CurrentUser,
+        AllUsers
     }
 
     public enum UWPAppGroup
@@ -102,7 +103,7 @@ namespace Win10BloatRemover.Operations
                     "Microsoft.Xbox.TCUI"
                 }
             },
-            { UWPAppGroup.Zune, new[] {"Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
+            { UWPAppGroup.Zune, new[] { "Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
         private readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup;
@@ -152,7 +153,11 @@ namespace Win10BloatRemover.Operations
             foreach (string appName in appNamesForGroup[appGroup])
             {
                 bool removalSuccessful = UninstallApp(appName);
-                if (removalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
+                // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
+                // the corresponding provisioned package when the app is removed for all users.
+                // Since this behavior is not officially documented and seems not to be consistent across all Windows versions,
+                // we want to make sure that the provisioned package gets uninstalled to provide a consistent behavior.
+                if (removalMode == UWPAppRemovalMode.AllUsers)
                     UninstallAppProvisionedPackage(appName);
                 if (removalSuccessful)
                     removedApps++;
@@ -164,12 +169,15 @@ namespace Win10BloatRemover.Operations
 
         private bool UninstallApp(string appName)
         {
-            var packages = powerShell.Run($"Get-AppxPackage -AllUsers -Name \"{appName}\"");
+            var packages = powerShell.Run(GetAppxPackageCommand(appName));
             if (packages.Length > 0)
             {
                 ui.PrintMessage($"Removing app {appName}...");
-                foreach (var package in packages)  // some apps have both x86 and x64 variants installed
-                    powerShell.Run($"Remove-AppxPackage -AllUsers -Package \"{package.PackageFullName}\"");
+                foreach (var package in packages) // some apps have both x86 and x64 variants installed
+                {
+                    string command = RemoveAppxPackageCommand(package.PackageFullName);
+                    powerShell.Run(command);
+                }
                 return powerShell.Streams.Error.Count == 0;
             }
             else
@@ -179,19 +187,33 @@ namespace Win10BloatRemover.Operations
             }
         }
 
+        private string GetAppxPackageCommand(string appName)
+        {
+            string command = "Get-AppxPackage ";
+            if (removalMode == UWPAppRemovalMode.AllUsers)
+                command += "-AllUsers ";
+            return command + $"-Name \"{appName}\"";
+        }
+
+        private string RemoveAppxPackageCommand(string fullPackageName)
+        {
+            string command = "Remove-AppxPackage ";
+            if (removalMode == UWPAppRemovalMode.AllUsers)
+                command += "-AllUsers ";
+            return command + $"-Package \"{fullPackageName}\"";
+        }
+
         private void UninstallAppProvisionedPackage(string appName)
         {
             var provisionedPackage = powerShell.Run("Get-AppxProvisionedPackage -Online")
                 .FirstOrDefault(package => package.DisplayName == appName);
             if (provisionedPackage != null)
             {
-                ui.PrintMessage($"Removing provisioned package for app {appName}...");
+                Debug.WriteLine($"Removing provisioned package for app {appName}...");
                 powerShell.Run(
                     $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
                 );
             }
-            else
-                ui.PrintMessage($"No provisioned package found for app {appName}.");
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)

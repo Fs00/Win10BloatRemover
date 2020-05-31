@@ -50,19 +50,19 @@ namespace Win10BloatRemover
         public override string FullName => "Remove UWP apps";
         public override string GetExplanation()
         {
-            string explanation = "The following groups of UWP apps will be removed:\n";
+            string impactedUsers = configuration.UWPAppsRemovalMode == UWPAppRemovalMode.CurrentUser
+                ? "the current user"
+                : "all present and future users";
+            string explanation = $"The following groups of UWP apps will be removed for {impactedUsers}:\n";
             foreach (UWPAppGroup app in configuration.UWPAppsToRemove)
                 explanation += $"  {app}\n";
+
             explanation += "Some specific app-related services will also be removed " +
                            "(but backed up in case you need to restore them).\n" +
-                           "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first.";
-            
-            if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.RemoveProvisionedPackages)
-                explanation += "\n\nAs specified in configuration file, provisioned packages of the " +
-                               "aforementioned apps will be removed too (if available).\n" +
-                               "This means that those apps won't be installed to new users when they log in for the first time.\n" +
-                               @"To prevent this behaviour, change UWPAppsRemovalMode option to ""KeepProvisionedPackages"".";
-            return explanation;
+                           "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first";
+            if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.CurrentUser)
+                explanation += " and set UWPAppsRemovalMode option to \"AllUsers\" in configuration file";
+            return explanation + ".";
         }
         public override IOperation CreateNewOperation()
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, installWimTweak);
@@ -95,7 +95,7 @@ namespace Win10BloatRemover
                 ui, installWimTweak,
                 new UWPAppRemover(
                     new[] { UWPAppGroup.SecurityCenter },
-                    UWPAppRemovalMode.KeepProvisionedPackages,
+                    UWPAppRemovalMode.AllUsers,
                     ui, installWimTweak
                 )
             );
@@ -111,12 +111,12 @@ namespace Win10BloatRemover
         {
             return "You need to make system apps removable first, otherwise the uninstallation will fail.\n" +
                    @"You can also perform this task using UWP apps removal (""Edge"" must be included in the list " +
-                   "\"UWPAppsToRemove\" in configuration file).\n" + 
+                   "\"UWPAppsToRemove\" and \"UWPAppsRemovalMode\" must be set to \"AllUsers\" in configuration file).\n" + 
                    "Take note that this app will likely be reinstalled after any Windows cumulative update. Proceed " +
                    "only if you know the consequences and risks of uninstalling system apps.";
         }
         public override IOperation CreateNewOperation()
-            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.KeepProvisionedPackages, ui, installWimTweak: null!);
+            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, installWimTweak: null!);
     }
 
     class OneDriveRemovalEntry : MenuEntry

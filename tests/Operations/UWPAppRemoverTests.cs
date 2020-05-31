@@ -1,4 +1,6 @@
-﻿using Win10BloatRemover.Operations;
+﻿using System.Linq;
+using Win10BloatRemover.Operations;
+using Win10BloatRemover.Utils;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Repeat;
@@ -18,7 +20,7 @@ namespace Win10BloatRemover.Tests.Operations
             UWPAppGroup.Camera,
             UWPAppGroup.CommunicationsApps,
             UWPAppGroup.HelpAndFeedback,
-            UWPAppGroup.Maps,
+            // UWPAppGroup.Maps,  // excluded because there is a test dedicated to it
             UWPAppGroup.Messaging,
             UWPAppGroup.MixedReality,
             UWPAppGroup.OfficeHub,
@@ -33,12 +35,31 @@ namespace Win10BloatRemover.Tests.Operations
             UWPAppGroup.Zune
         };
 
+        [Fact]
+        public void ShouldRemoveAnAppForCurrentUser_WithoutRemovingItsProvisionedPackage()
+        {
+            var ui = new TestUserInterface(output);
+            var appRemover = new UWPAppRemover(new[] { UWPAppGroup.Maps }, UWPAppRemovalMode.CurrentUser, ui, new MockInstallWimTweak());
+
+            appRemover.Run();
+
+            var mapsProvisionedPackage = GetProvisionedPackage("Microsoft.WindowsMaps");
+            Assert.NotNull(mapsProvisionedPackage);
+        }
+
+        private dynamic? GetProvisionedPackage(string provisionedPackageName)
+        {
+            using var powerShell = PowerShellExtensions.CreateWithImportedModules("AppX");
+            return powerShell.Run("Get-AppxProvisionedPackage -Online")
+                .FirstOrDefault(package => package.DisplayName == provisionedPackageName);
+        }
+
         [Theory]
         [Repeat(2)]
         public void ShouldRemoveGroupsWithNoSystemAppsWithoutErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var appRemover = new UWPAppRemover(groupsWithNoSystemApps, UWPAppRemovalMode.KeepProvisionedPackages, ui, new MockInstallWimTweak());
+            var appRemover = new UWPAppRemover(groupsWithNoSystemApps, UWPAppRemovalMode.AllUsers, ui, new MockInstallWimTweak());
 
             appRemover.Run();
 

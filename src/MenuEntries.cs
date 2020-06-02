@@ -6,20 +6,14 @@ namespace Win10BloatRemover
 {
     abstract class MenuEntry
     {
-        #nullable disable warnings
-        protected IUserInterface ui;
-        #nullable restore warnings
-
         public abstract string FullName { get; }
         public virtual bool ShouldQuit => false;
         public abstract string GetExplanation();
-        public virtual IOperation? CreateNewOperation() => null;
+        public virtual IOperation? CreateNewOperation(IUserInterface ui) => null;
     }
 
     class SystemAppsRemovalEnablingEntry : MenuEntry
     {
-        public SystemAppsRemovalEnablingEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Make system apps removable";
         public override string GetExplanation()
         {
@@ -32,7 +26,7 @@ namespace Win10BloatRemover
                    "Remember also that certain apps are reinstalled after any Windows cumulative update.\n" +
                    "Before starting, make sure that the Store is not installing/updating apps in the background.";
         }
-        public override IOperation CreateNewOperation() => new SystemAppsRemovalEnabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new SystemAppsRemovalEnabler(ui);
     }
 
     class UWPAppRemovalEntry : MenuEntry
@@ -40,9 +34,8 @@ namespace Win10BloatRemover
         private readonly Configuration configuration;
         private readonly InstallWimTweak installWimTweak;
 
-        public UWPAppRemovalEntry(IUserInterface ui, Configuration configuration, InstallWimTweak installWimTweak)
+        public UWPAppRemovalEntry(Configuration configuration, InstallWimTweak installWimTweak)
         {
-            this.ui = ui;
             this.configuration = configuration;
             this.installWimTweak = installWimTweak;
         }
@@ -64,7 +57,7 @@ namespace Win10BloatRemover
                 explanation += " and set UWPAppsRemovalMode option to \"AllUsers\" in configuration file";
             return explanation + ".";
         }
-        public override IOperation CreateNewOperation()
+        public override IOperation CreateNewOperation(IUserInterface ui)
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, installWimTweak);
     }
 
@@ -72,11 +65,7 @@ namespace Win10BloatRemover
     {
         private readonly InstallWimTweak installWimTweak;
 
-        public WinDefenderRemovalEntry(IUserInterface ui, InstallWimTweak installWimTweak)
-        {
-            this.ui = ui;
-            this.installWimTweak = installWimTweak;
-        }
+        public WinDefenderRemovalEntry(InstallWimTweak installWimTweak) => this.installWimTweak = installWimTweak;
 
         public override string FullName => "Remove Windows Defender";
         public override string GetExplanation()
@@ -89,7 +78,7 @@ namespace Win10BloatRemover
                    "Remember that any Windows cumulative update is likely to reinstall the app.";
         }
 
-        public override IOperation CreateNewOperation()
+        public override IOperation CreateNewOperation(IUserInterface ui)
         {
             return new WindowsDefenderRemover(
                 ui, installWimTweak,
@@ -104,8 +93,6 @@ namespace Win10BloatRemover
 
     class EdgeRemovalEntry : MenuEntry
     {
-        public EdgeRemovalEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Remove Microsoft Edge";
         public override string GetExplanation()
         {
@@ -115,32 +102,26 @@ namespace Win10BloatRemover
                    "Take note that this app will likely be reinstalled after any Windows cumulative update. Proceed " +
                    "only if you know the consequences and risks of uninstalling system apps.";
         }
-        public override IOperation CreateNewOperation()
+        public override IOperation CreateNewOperation(IUserInterface ui)
             => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, installWimTweak: null!);
     }
 
     class OneDriveRemovalEntry : MenuEntry
     {
-        public OneDriveRemovalEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Remove OneDrive";
         public override string GetExplanation()
         {
             return "OneDrive will be first disabled using Group Policies, and then uninstalled using its setup program.\n" +
                    "Futhermore, its setup will be prevented from running when an user logs in for the first time.";
         }
-        public override IOperation CreateNewOperation() => new OneDriveRemover(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new OneDriveRemover(ui);
     }
 
     class ServicesRemovalEntry : MenuEntry
     {
         private readonly Configuration configuration;
 
-        public ServicesRemovalEntry(IUserInterface ui, Configuration configuration)
-        {
-            this.ui = ui;
-            this.configuration = configuration;
-        }
+        public ServicesRemovalEntry(Configuration configuration) => this.configuration = configuration;
 
         public override string FullName => "Remove miscellaneous services";
         public override string GetExplanation()
@@ -150,18 +131,14 @@ namespace Win10BloatRemover
                 explanation += $"  {service}\n";
             return explanation + "Services will be backed up in the same folder as this program executable.";
         }
-        public override IOperation CreateNewOperation() => new ServiceRemover(configuration.ServicesToRemove, ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new ServiceRemover(configuration.ServicesToRemove, ui);
     }
 
     class WindowsFeaturesRemovalEntry : MenuEntry
     {
         private readonly Configuration configuration;
 
-        public WindowsFeaturesRemovalEntry(IUserInterface ui, Configuration configuration)
-        {
-            this.ui = ui;
-            this.configuration = configuration;
-        }
+        public WindowsFeaturesRemovalEntry(Configuration configuration) => this.configuration = configuration;
 
         public override string FullName => "Remove Windows features";
         public override string GetExplanation()
@@ -171,13 +148,12 @@ namespace Win10BloatRemover
                 explanation += $"\n  {feature}";
             return explanation;
         }
-        public override IOperation CreateNewOperation() => new FeaturesRemover(configuration.WindowsFeaturesToRemove, ui);
+        public override IOperation CreateNewOperation(IUserInterface ui)
+            => new FeaturesRemover(configuration.WindowsFeaturesToRemove, ui);
     }
 
     class TelemetryDisablingEntry : MenuEntry
     {
-        public TelemetryDisablingEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Disable telemetry";
         public override string GetExplanation()
         {
@@ -185,13 +161,11 @@ namespace Win10BloatRemover
                    "report data to Microsoft, including MS Compatibility Telemetry, Device Census, " +
                    "SmartScreen, Steps Recorder and Compatibility Assistant.";
         }
-        public override IOperation CreateNewOperation() => new TelemetryDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui);
     }
 
     class CortanaDisablingEntry : MenuEntry
     {
-        public CortanaDisablingEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Disable Cortana and web search";
         public override string GetExplanation()
         {
@@ -199,31 +173,25 @@ namespace Win10BloatRemover
                    "from the web anymore.\n" +
                    "A firewall rule will also be added to prevent Cortana from connecting to the Internet.";
         }
-        public override IOperation CreateNewOperation() => new CortanaWebSearchDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new CortanaWebSearchDisabler(ui);
     }
 
     class AutoUpdatesDisablingEntry : MenuEntry
     {
-        public AutoUpdatesDisablingEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Disable automatic updates";
         public override string GetExplanation()
         {
             return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
                    "This method won't work on Windows 10 Home.";
         }
-        public override IOperation CreateNewOperation() => new AutoUpdatesDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new AutoUpdatesDisabler(ui);
     }
 
     class ScheduledTasksDisablingEntry : MenuEntry
     {
         private readonly Configuration configuration;
 
-        public ScheduledTasksDisablingEntry(IUserInterface ui, Configuration configuration)
-        {
-            this.ui = ui;
-            this.configuration = configuration;
-        }
+        public ScheduledTasksDisablingEntry(Configuration configuration) => this.configuration = configuration;
 
         public override string FullName => "Disable miscellaneous scheduled tasks";
         public override string GetExplanation()
@@ -233,27 +201,23 @@ namespace Win10BloatRemover
                 explanation += $"\n  {task}";
             return explanation;
         }
-        public override IOperation CreateNewOperation()
+        public override IOperation CreateNewOperation(IUserInterface ui)
             => new ScheduledTasksDisabler(configuration.ScheduledTasksToDisable, ui);
     }
 
     class ErrorReportingDisablingEntry : MenuEntry
     {
-        public ErrorReportingDisablingEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Disable Windows Error Reporting";
         public override string GetExplanation()
         {
             return "Windows Error Reporting will disabled by editing Group Policies, as well as by removing " +
                    "its services (after backing them up).";
         }
-        public override IOperation CreateNewOperation() => new ErrorReportingDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new ErrorReportingDisabler(ui);
     }
 
     class TipsAndFeedbackDisablingEntry : MenuEntry
     {
-        public TipsAndFeedbackDisablingEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "Disable tips and feedback requests";
         public override string GetExplanation()
         {
@@ -261,7 +225,7 @@ namespace Win10BloatRemover
                    "screen backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
                    "some related scheduled tasks.";
         }
-        public override IOperation CreateNewOperation() => new TipsDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new TipsDisabler(ui);
     }
 
     class NewGitHubIssueEntry : MenuEntry
@@ -272,14 +236,12 @@ namespace Win10BloatRemover
             return "Your browser will now open on a GitHub page where you will be able to " +
                    "open an issue to report a bug or suggest a new feature.";
         }
-        public override IOperation CreateNewOperation()
+        public override IOperation CreateNewOperation(IUserInterface ui)
             => new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
     }
 
     class AboutEntry : MenuEntry
     {
-        public AboutEntry(IUserInterface ui) => this.ui = ui;
-
         public override string FullName => "About this program";
         public override string GetExplanation()
         {
@@ -291,7 +253,7 @@ namespace Win10BloatRemover
                    "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n\n" +
                    "This software is released under BSD 3-Clause Clear license (continue to read full text).";
         }
-        public override IOperation CreateNewOperation() => new LicensePrinter(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new LicensePrinter(ui);
     }
 
     class QuitEntry : MenuEntry

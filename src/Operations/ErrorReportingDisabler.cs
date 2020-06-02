@@ -24,7 +24,6 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\Windows Error Reporting"))
                 key.SetValue("Disabled", 1, RegistryValueKind.DWord);
-            ui.PrintEmptySpace();
         }
     }
 }

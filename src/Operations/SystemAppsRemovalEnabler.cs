@@ -36,8 +36,9 @@ namespace Win10BloatRemover.Operations
                     ReplaceStateRepositoryDatabaseWith(databaseCopyForEditing);
                 else
                 {
-                    ui.PrintNotice("Original database doesn't need to be replaced: nothing has changed.");
                     DeleteDatabaseCopies(databaseBackupCopy, databaseCopyForEditing);
+                    ui.PrintNotice("Original database doesn't need to be replaced: nothing has changed.\n" +
+                                   "Database backup copy was unnecessary and therefore has been removed.");
                 }
             }
         }
@@ -58,12 +59,10 @@ namespace Win10BloatRemover.Operations
 
         private string BackupStateRepositoryDatabase()
         {
-            ui.PrintEmptySpace();
             ui.PrintHeading("Backing up state repository database...");
             string backupCopyFileName = $"StateRepository-Machine_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.srd.bak";
             string backupCopyPath = CopyStateRepositoryDatabaseTo(backupCopyFileName);
             ui.PrintMessage($"Backup copy written to {backupCopyPath}.");
-            ui.PrintEmptySpace();
             return backupCopyPath;
         }
 
@@ -108,8 +107,6 @@ namespace Win10BloatRemover.Operations
                     ReAddAfterPackageUpdateTrigger(createTriggerCode);
 
                 ui.PrintMessage($"Edited {updatedRows} row(s).");
-                ui.PrintEmptySpace();
-
                 return updatedRows == 0 ? EditingOutcome.NoChangesMade : EditingOutcome.ContentWasUpdated;
             }
         }
@@ -152,8 +149,6 @@ namespace Win10BloatRemover.Operations
         {
             foreach (string databaseCopy in databaseCopiesPaths)
                 File.Delete(databaseCopy);
-            
-            ui.PrintNotice("Database backup copy was unnecessary and therefore has been removed.");
         }
     }
 }

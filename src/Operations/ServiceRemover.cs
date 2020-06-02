@@ -42,7 +42,6 @@ namespace Win10BloatRemover.Operations
 
             if (actualBackuppedServices.Length > 0)
             {
-                ui.PrintEmptySpace();
                 ui.PrintHeading("Removing services...");
                 PerformRemoval(actualBackuppedServices);
             }

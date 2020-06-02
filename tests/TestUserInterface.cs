@@ -32,11 +32,9 @@ namespace Win10BloatRemover.Tests
 
         public void PrintNotice(string text) => WriteText($"NOTICE: {text}");
 
-        public void PrintHeading(string text) => WriteText($"# {text}");
+        public void PrintHeading(string text) => WriteText($"--- {text.ToUpper()} ---");
 
-        public void PrintSubHeading(string text) => WriteText($"## {text}");
-
-        public void PrintEmptySpace() => WriteText("\n");
+        public void PrintSubHeading(string text) => WriteText($"-- {text} --");
 
         private void WriteText(string text)
         {

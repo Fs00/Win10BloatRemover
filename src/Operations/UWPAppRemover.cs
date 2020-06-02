@@ -165,7 +165,6 @@ namespace Win10BloatRemover.Operations
 
             if (removedApps > 0)
                 TryPerformPostUninstallOperations(appGroup);
-            ui.PrintEmptySpace();
         }
 
         private bool UninstallApp(string appName)
@@ -219,7 +218,7 @@ namespace Win10BloatRemover.Operations
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
         {
-            ui.PrintSubHeading($"\nPerforming post-uninstall operations for app {appGroup}...");
+            ui.PrintSubHeading($"Performing post-uninstall operations for app {appGroup}...");
             try
             {
                 PerformPostUninstallOperations(appGroup);

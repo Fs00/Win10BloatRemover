@@ -38,15 +38,15 @@ namespace Win10BloatRemover.Utils
         {
             if (!isAllowed)
             {
-                printer.PrintWarning($"Skipped removal of {component} component(s) using install-wim-tweak since " +
-                                     @"option ""AllowInstallWimTweak"" is set to false.");
+                printer.PrintNotice($"Skipped removal of {component} component(s) using install-wim-tweak since " +
+                                    @"option ""AllowInstallWimTweak"" is set to false.");
                 return;
             }
 
             if (!HasBeenExtracted())
                 ExtractAndLock();
 
-            printer.PrintMessage($"Running install-wim-tweak to remove {component}...");
+            printer.PrintHeading($"Running install-wim-tweak to remove {component}...");
             int exitCode = SystemUtils.RunProcessBlockingWithOutput(extractedFilePath, $"/o /c {component} /r", printer);
             if (exitCode == SystemUtils.EXIT_CODE_SUCCESS)
                 printer.PrintMessage("Install-wim-tweak executed successfully!");

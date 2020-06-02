@@ -101,7 +101,7 @@ namespace Win10BloatRemover
             try
             {
                 Console.WriteLine();
-                IOperation? operation = entry.CreateNewOperation();
+                IOperation? operation = entry.CreateNewOperation(new ConsoleUserInterface());
                 if (operation == null)
                     return;
 

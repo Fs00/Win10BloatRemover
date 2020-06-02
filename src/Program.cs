@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security.Principal;
-using Win10BloatRemover.Operations;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
@@ -28,23 +27,22 @@ namespace Win10BloatRemover
 
         private static MenuEntry[] CreateMenuEntries(Configuration configuration, InstallWimTweak installWimTweak)
         {
-            IUserInterface ui = new ConsoleUserInterface();
             return new MenuEntry[] {
-                new SystemAppsRemovalEnablingEntry(ui),
-                new UWPAppRemovalEntry(ui, configuration, installWimTweak),
-                new WinDefenderRemovalEntry(ui, installWimTweak),
-                new EdgeRemovalEntry(ui),
-                new OneDriveRemovalEntry(ui),
-                new ServicesRemovalEntry(ui, configuration),
-                new WindowsFeaturesRemovalEntry(ui, configuration),
-                new TelemetryDisablingEntry(ui),
-                new CortanaDisablingEntry(ui),
-                new AutoUpdatesDisablingEntry(ui),
-                new ScheduledTasksDisablingEntry(ui, configuration),
-                new ErrorReportingDisablingEntry(ui),
-                new TipsAndFeedbackDisablingEntry(ui),
+                new SystemAppsRemovalEnablingEntry(),
+                new UWPAppRemovalEntry(configuration, installWimTweak),
+                new WinDefenderRemovalEntry(installWimTweak),
+                new EdgeRemovalEntry(),
+                new OneDriveRemovalEntry(),
+                new ServicesRemovalEntry(configuration),
+                new WindowsFeaturesRemovalEntry(configuration),
+                new TelemetryDisablingEntry(),
+                new CortanaDisablingEntry(),
+                new AutoUpdatesDisablingEntry(),
+                new ScheduledTasksDisablingEntry(configuration),
+                new ErrorReportingDisablingEntry(),
+                new TipsAndFeedbackDisablingEntry(),
                 new NewGitHubIssueEntry(),
-                new AboutEntry(ui),
+                new AboutEntry(),
                 new QuitEntry()
             };
         }

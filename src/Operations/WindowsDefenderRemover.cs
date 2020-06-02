@@ -30,7 +30,6 @@ namespace Win10BloatRemover.Operations
             RemoveSecurityHealthServices();
 
             installWimTweak.RemoveComponentIfAllowed("Windows-Defender", ui);
-            ui.PrintEmptySpace();
 
             securityCenterRemover.Run();
         }
@@ -73,15 +72,12 @@ namespace Win10BloatRemover.Operations
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
                    @"Image File Execution Options\SecHealthUI.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
-
-            ui.PrintEmptySpace();
         }
 
         private void RemoveSecurityHealthServices()
         {
             ui.PrintHeading("Removing Security Health services...");
             ServiceRemover.BackupAndRemove(securityHealthServices, ui);
-            ui.PrintEmptySpace();
         }
     }
 }

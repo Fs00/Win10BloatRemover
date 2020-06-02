@@ -36,7 +36,6 @@ namespace Win10BloatRemover.Operations
 
             new ServiceRemover(protectedTelemetryServices, ui).PerformBackup();
             RemoveProtectedServices();
-            ui.PrintEmptySpace();
         }
 
         private void RemoveProtectedServices()

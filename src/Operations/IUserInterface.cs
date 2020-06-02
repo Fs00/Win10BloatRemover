@@ -8,7 +8,6 @@
         void PrintNotice(string text);
         void PrintHeading(string text);
         void PrintSubHeading(string text);
-        void PrintEmptySpace();
     }
 
     public interface IUserInterface : IMessagePrinter

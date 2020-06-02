@@ -34,7 +34,6 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Siuf\Rules"))
                 key.SetValue("NumberOfSIUFInPeriod", 0, RegistryValueKind.DWord);
-            ui.PrintEmptySpace();
         }
     }
 }

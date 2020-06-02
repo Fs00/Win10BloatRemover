@@ -10,14 +10,20 @@ namespace Win10BloatRemover.Utils
         void RemoveComponentIfAllowed(string component, IMessagePrinter printer);
     }
 
-    public class InstallWimTweakImpl : InstallWimTweak
+    public class DisabledInstallWimTweak : InstallWimTweak
+    {
+        public void RemoveComponentIfAllowed(string component, IMessagePrinter printer)
+        {
+            printer.PrintNotice($"Skipped removal of {component} component(s) using install-wim-tweak since " +
+                                @"option ""AllowInstallWimTweak"" is set to false.");
+        }
+    }
+
+    public class ExtractedInstallWimTweak : InstallWimTweak
     {
         private static readonly string extractedFilePath = Path.Combine(Path.GetTempPath(), "install_wim_tweak.exe");
 
         private /*lateinit*/ FileStream executableFileStreamForLocking = default!;
-        private readonly bool isAllowed;
-
-        public InstallWimTweakImpl(Configuration configuration) => isAllowed = configuration.AllowInstallWimTweak;
 
         private bool HasBeenExtracted()
         {
@@ -36,13 +42,6 @@ namespace Win10BloatRemover.Utils
 
         public void RemoveComponentIfAllowed(string component, IMessagePrinter printer)
         {
-            if (!isAllowed)
-            {
-                printer.PrintNotice($"Skipped removal of {component} component(s) using install-wim-tweak since " +
-                                    @"option ""AllowInstallWimTweak"" is set to false.");
-                return;
-            }
-
             if (!HasBeenExtracted())
                 ExtractAndLock();
 

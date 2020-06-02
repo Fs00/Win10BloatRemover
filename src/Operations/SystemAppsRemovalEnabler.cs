@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Microsoft.Data.Sqlite;
 using Win10BloatRemover.Utils;
 
@@ -30,15 +29,14 @@ namespace Win10BloatRemover.Operations
             using (TokenPrivilege.Backup)
             using (TokenPrivilege.Restore)
             {
-                var (databaseBackupCopy, databaseCopyForEditing) = CreateStateRepositoryDatabaseCopies();
+                string databaseCopyForEditing = CopyStateRepositoryDatabaseTo($"{STATE_REPOSITORY_DB_NAME}.tmp");
                 var outcome = EditStateRepositoryDatabase(databaseCopyForEditing);
                 if (outcome == EditingOutcome.ContentWasUpdated)
                     ReplaceStateRepositoryDatabaseWith(databaseCopyForEditing);
                 else
                 {
-                    DeleteDatabaseCopies(databaseBackupCopy, databaseCopyForEditing);
-                    ui.PrintNotice("Original database doesn't need to be replaced: nothing has changed.\n" +
-                                   "Database backup copy was unnecessary and therefore has been removed.");
+                    File.Delete(databaseCopyForEditing);
+                    ui.PrintNotice("Original database doesn't need to be replaced: no changes have been made.");
                 }
             }
         }
@@ -49,25 +47,9 @@ namespace Win10BloatRemover.Operations
             SystemUtils.StopServiceAndItsDependents("StateRepository");
         }
 
-        private (string, string) CreateStateRepositoryDatabaseCopies()
-        {
-            EnsureAppXServicesAreStopped();
-            string databaseBackupCopy = BackupStateRepositoryDatabase();
-            string databaseCopyForEditing = CopyStateRepositoryDatabaseTo($"{STATE_REPOSITORY_DB_NAME}.tmp");
-            return (databaseBackupCopy, databaseCopyForEditing);
-        }
-
-        private string BackupStateRepositoryDatabase()
-        {
-            ui.PrintHeading("Backing up state repository database...");
-            string backupCopyFileName = $"StateRepository-Machine_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.srd.bak";
-            string backupCopyPath = CopyStateRepositoryDatabaseTo(backupCopyFileName);
-            ui.PrintMessage($"Backup copy written to {backupCopyPath}.");
-            return backupCopyPath;
-        }
-
         private string CopyStateRepositoryDatabaseTo(string databaseCopyPath)
         {
+            EnsureAppXServicesAreStopped();
             var database = new FileInfo(STATE_REPOSITORY_DB_PATH);
             FileInfo copiedDatabase = database.CopyTo(databaseCopyPath, overwrite: true);
             return copiedDatabase.FullName;
@@ -106,7 +88,7 @@ namespace Win10BloatRemover.Operations
                 if (createTriggerCode != null)
                     ReAddAfterPackageUpdateTrigger(createTriggerCode);
 
-                ui.PrintMessage($"Edited {updatedRows} row(s).");
+                ui.PrintMessage($"Edited {updatedRows} {(updatedRows == 1 ? "row" : "rows")}.");
                 return updatedRows == 0 ? EditingOutcome.NoChangesMade : EditingOutcome.ContentWasUpdated;
             }
         }
@@ -143,12 +125,6 @@ namespace Win10BloatRemover.Operations
         {
             using var query = new SqliteCommand(createTriggerQuery, dbConnection);
             query.ExecuteNonQuery();
-        }
-
-        private void DeleteDatabaseCopies(params string[] databaseCopiesPaths)
-        {
-            foreach (string databaseCopy in databaseCopiesPaths)
-                File.Delete(databaseCopy);
         }
     }
 }

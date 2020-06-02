@@ -19,10 +19,9 @@ namespace Win10BloatRemover
         {
             return "This procedure will edit an internal database to allow the removal of system UWP apps " +
                    "such as Edge, Security Center, Connect via normal PowerShell methods.\n" +
-                   "A backup of the database will be saved in the current directory. " +
-                   "It will become useless as soon as you install/remove an app, so make sure you don't have " +
-                   "any problems with Windows Update or the Store after the operation is completed.\n\n" +
-                   "REMOVING SYSTEM APPS MAY POSSIBLY BREAK SOME FUNCTIONALITY; PROCEED AT YOUR OWN RISK.\n" +
+                   "It is recommended to create a system restore point before proceeding.\n\n" +
+                   "Removing system apps is generally safe, but some functionality may possibly break if " +
+                   "you uninstall the wrong ones;\nproceed at your own risk.\n" +
                    "Remember also that certain apps are reinstalled after any Windows cumulative update.\n" +
                    "Before starting, make sure that the Store is not installing/updating apps in the background.";
         }

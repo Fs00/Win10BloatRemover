@@ -116,7 +116,6 @@ namespace Win10BloatRemover
                 @"\Microsoft\Windows\PI\Sqm-Tasks",
                 @"\Microsoft\Windows\Shell\FamilySafetyMonitor",
                 @"\Microsoft\Windows\Shell\FamilySafetyRefreshTask",
-                @"\Microsoft\Windows\Windows Error Reporting\QueueReporting",
                 @"\Microsoft\Windows\License Manager\TempSignedLicenseExchange",
                 @"\Microsoft\Windows\Clip\License Validation",
                 @"\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",

@@ -100,26 +100,29 @@ namespace Win10BloatRemover.Operations
         private void DisableTelemetryFeatures()
         {
             ui.PrintHeading("Performing some registry edits to disable telemetry features...");
-
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
-                key.SetValue("Start", 0, RegistryValueKind.DWord);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))
             {
-                key.SetValue("AITEnable", 0, RegistryValueKind.DWord);
-                key.SetValue("DisableInventory", 1, RegistryValueKind.DWord);
-                key.SetValue("DisablePCA", 1, RegistryValueKind.DWord);
-                key.SetValue("DisableUAR", 1, RegistryValueKind.DWord);
+                key.SetValue("AITEnable", 0);
+                key.SetValue("DisableInventory", 1);
+                key.SetValue("DisablePCA", 1);
+                key.SetValue("DisableUAR", 1);
             }
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System"))
-                key.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform"))
-                key.SetValue("NoGenTicket", 1, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
-                   @"Image File Execution Options\CompatTelRunner.exe"))
-                key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
-                   @"Image File Execution Options\DeviceCensus.exe"))
-                key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener", "Start", 0);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform",
+                "NoGenTicket", 1
+            );
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe",
+                "Debugger", @"%windir%\System32\taskkill.exe",
+                RegistryValueKind.ExpandString
+            );
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\DeviceCensus.exe",
+                "Debugger", @"%windir%\System32\taskkill.exe",
+                RegistryValueKind.ExpandString
+            );
         }
 
         private void DisableTelemetryScheduledTasks()

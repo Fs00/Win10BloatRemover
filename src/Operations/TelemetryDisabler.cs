@@ -20,6 +20,19 @@ namespace Win10BloatRemover.Operations
             "WdiServiceHost"
         };
 
+        private static readonly string[] telemetryScheduledTasks = {
+            @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
+            @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
+            @"\Microsoft\Windows\Application Experience\StartupAppTask",
+            @"\Microsoft\Windows\Autochk\Proxy",
+            @"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
+            @"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
+            @"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
+            @"\Microsoft\Windows\Device Information\Device",
+            @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
+            @"\Microsoft\Windows\PI\Sqm-Tasks"
+        };
+
         private readonly IUserInterface ui;
         public TelemetryDisabler(IUserInterface ui) => this.ui = ui;
 
@@ -27,6 +40,7 @@ namespace Win10BloatRemover.Operations
         {
             RemoveTelemetryServices();
             DisableTelemetryFeatures();
+            DisableTelemetryScheduledTasks();
         }
 
         private void RemoveTelemetryServices()
@@ -80,13 +94,12 @@ namespace Win10BloatRemover.Operations
         }
 
         /*
-         *  Additional tasks to disable telemetry-related features.
-         *  They include blocking of CompatTelRunner, DeviceCensus, Inventory (collection of installed programs),
-         *   SmartScreen, Steps Recorder, Compatibility Assistant
+         *  Disabled telemetry-related features include CompatTelRunner, DeviceCensus,
+         *  Inventory (collection of installed programs), SmartScreen, Steps Recorder, Compatibility Assistant
          */
         private void DisableTelemetryFeatures()
         {
-            ui.PrintHeading("Performing some registry edits to disable telemetry-related features...");
+            ui.PrintHeading("Performing some registry edits to disable telemetry features...");
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener"))
                 key.SetValue("Start", 0, RegistryValueKind.DWord);
@@ -107,6 +120,12 @@ namespace Win10BloatRemover.Operations
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
                    @"Image File Execution Options\DeviceCensus.exe"))
                 key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
+        }
+
+        private void DisableTelemetryScheduledTasks()
+        {
+            ui.PrintHeading("Disabling telemetry-related scheduled tasks...");
+            new ScheduledTasksDisabler(telemetryScheduledTasks, ui).Run();
         }
     }
 }

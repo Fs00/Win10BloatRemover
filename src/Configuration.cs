@@ -100,20 +100,10 @@ namespace Win10BloatRemover
                 "Microsoft-Windows-QuickAssist"
             },
             ScheduledTasksToDisable = new[] {
-                @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
-                @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
-                @"\Microsoft\Windows\Application Experience\StartupAppTask",
                 @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
-                @"\Microsoft\Windows\Autochk\Proxy",
                 @"\Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
-                @"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
-                @"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
-                @"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
                 @"\Microsoft\Windows\DiskFootprint\Diagnostics",
-                @"\Microsoft\Windows\Device Information\Device",
-                @"\Microsoft\Windows\FileHistory\File History (maintenance mode)",
                 @"\Microsoft\Windows\Maintenance\WinSAT",
-                @"\Microsoft\Windows\PI\Sqm-Tasks",
                 @"\Microsoft\Windows\Shell\FamilySafetyMonitor",
                 @"\Microsoft\Windows\Shell\FamilySafetyRefreshTask",
                 @"\Microsoft\Windows\License Manager\TempSignedLicenseExchange",
@@ -124,7 +114,6 @@ namespace Win10BloatRemover
                 @"\Microsoft\Windows\Subscription\EnableLicenseAcquisition",
                 @"\Microsoft\Windows\Subscription\LicenseAcquisition",
                 @"\Microsoft\Windows\Diagnosis\Scheduled",
-                @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
                 @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
             },
             UWPAppsRemovalMode = UWPAppRemovalMode.AllUsers,

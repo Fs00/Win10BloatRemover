@@ -156,8 +156,8 @@ namespace Win10BloatRemover
         public override string FullName => "Disable telemetry";
         public override string GetExplanation()
         {
-            return "This will backup and remove several telemetry-related services and disable features that " +
-                   "report data to Microsoft, including MS Compatibility Telemetry, Device Census, " +
+            return "This procedure will disable scheduled tasks, services and features that are responsible for " +
+                   "collecting and reporting data to Microsoft, including Compatibility Telemetry, Device Census, " +
                    "SmartScreen, Steps Recorder and Compatibility Assistant.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui);

@@ -237,12 +237,12 @@ namespace Win10BloatRemover.Operations
             if (postUninstallOperationsForGroup.ContainsKey(appGroup))
                 postUninstallOperationsForGroup[appGroup]();
             else
-                Console.WriteLine("Nothing to do.");
+                ui.PrintMessage("Nothing to do.");
         }
 
         private void RemoveEdgeResidualFiles()
         {
-            Console.WriteLine("Removing old files...");
+            ui.PrintMessage("Removing old files...");
             SystemUtils.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
                 ui
@@ -260,7 +260,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveMapsServicesAndTasks()
         {
-            Console.WriteLine("Removing app-related scheduled tasks and services...");
+            ui.PrintMessage("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] {
                 @"\Microsoft\Windows\Maps\MapsUpdateTask",
                 @"\Microsoft\Windows\Maps\MapsToastTask"
@@ -271,24 +271,21 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveXboxServicesAndTasks()
         {
-            Console.WriteLine("Removing app-related scheduled tasks and services...");
+            ui.PrintMessage("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" }, ui).Run();
-
-            using RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR");
-            key.SetValue("AllowGameDVR", 0, RegistryValueKind.DWord);
-
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
             ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" }, ui);
         }
 
         private void RemoveMessagingService()
         {
-            Console.WriteLine("Removing app-related services...");
+            ui.PrintMessage("Removing app-related services...");
             ServiceRemover.BackupAndRemove(new[] { "MessagingService" }, ui);
         }
 
         private void RemovePaint3DContextMenuEntries()
         {
-            Console.WriteLine("Removing Paint 3D context menu entries...");
+            ui.PrintMessage("Removing Paint 3D context menu entries...");
             SystemUtils.ExecuteWindowsPromptCommand(
                 @"echo off & for /f ""tokens=1* delims="" %I in " +
                  @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " +
@@ -305,7 +302,7 @@ namespace Win10BloatRemover.Operations
 
         private void Remove3DObjectsFolder()
         {
-            Console.WriteLine("Removing 3D Objects folder...");
+            ui.PrintMessage("Removing 3D Objects folder...");
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             using RegistryKey key = localMachine.OpenSubKey(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace", writable: true
@@ -317,7 +314,7 @@ namespace Win10BloatRemover.Operations
 
         private void Remove3DPrintContextMenuEntries()
         {
-            Console.WriteLine("Removing 3D Print context menu entries...");
+            ui.PrintMessage("Removing 3D Print context menu entries...");
             SystemUtils.ExecuteWindowsPromptCommand(
                 @"echo off & for /f ""tokens=1* delims="" %I in " +
                 @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
@@ -328,49 +325,51 @@ namespace Win10BloatRemover.Operations
 
         private void RestoreWindowsPhotoViewer()
         {
-            Console.WriteLine("Setting file association with original photo viewer for BMP, GIF, JPEG, PNG and TIFF pictures...");
+            ui.PrintMessage("Setting file association with original photo viewer for BMP, GIF, JPEG, PNG and TIFF pictures...");
 
             const string PHOTO_VIEWER_SHELL_COMMAND =
                 @"%SystemRoot%\System32\rundll32.exe ""%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll"", ImageView_Fullscreen %1";
             const string PHOTO_VIEWER_CLSID = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}";
 
-            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(@"Applications\photoviewer.dll\shell\open"))
-                key.SetValue("MuiVerb", "@photoviewer.dll,-3043", RegistryValueKind.String);
-            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(@"Applications\photoviewer.dll\shell\open\command"))
-                key.SetValue("(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString);
-            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(@"Applications\photoviewer.dll\shell\open\DropTarget"))
-                key.SetValue("Clsid", PHOTO_VIEWER_CLSID, RegistryValueKind.String);
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open", "MuiVerb", "@photoviewer.dll,-3043");
+            Registry.SetValue(
+                @"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\command",
+                "(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString
+            );
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\DropTarget", "Clsid", PHOTO_VIEWER_CLSID);
 
             string[] imageTypes = { "Paint.Picture", "giffile", "jpegfile", "pngfile" };
             foreach (string type in imageTypes)
             {
-                using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"{type}\shell\open\command"))
-                    key.SetValue("(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString);
-                using (RegistryKey key = Registry.ClassesRoot.CreateSubKey($@"{type}\shell\open\DropTarget"))
-                    key.SetValue("Clsid", PHOTO_VIEWER_CLSID, RegistryValueKind.String);
+                Registry.SetValue(
+                    $@"HKEY_CLASSES_ROOT\{type}\shell\open\command",
+                    "(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString
+                );
+                Registry.SetValue($@"HKEY_CLASSES_ROOT\{type}\shell\open\DropTarget", "Clsid", PHOTO_VIEWER_CLSID);
             }
         }
 
         private void RemoveSyncHostService()
         {
-            Console.WriteLine("Removing sync host service...");
+            ui.PrintMessage("Removing sync host service...");
             ServiceRemover.BackupAndRemove(new[] { "OneSyncSvc" }, ui);
         }
 
         private void DisableStoreFeaturesAndServices()
         {
-            Console.WriteLine("Writing values into the Registry...");
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\WindowsStore"))
-                key.SetValue("RemoveWindowsStore", 1, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\PushToInstall"))
-                key.SetValue("DisablePushToInstall", 1, RegistryValueKind.DWord);
+            ui.PrintMessage("Writing values into the Registry...");
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "RemoveWindowsStore", 1);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PushToInstall", "DisablePushToInstall", 1);
+            Registry.SetValue(
+                @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
+                "SilentInstalledAppsEnabled", 0
+            );
+            Registry.SetValue(
+                @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost",
+                "EnableWebContentEvaluation", 0
+            );
 
-            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"))
-                key.SetValue("SilentInstalledAppsEnabled", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AppHost"))
-                key.SetValue("EnableWebContentEvaluation", 0, RegistryValueKind.DWord);
-
-            Console.WriteLine("Removing app-related services...");
+            ui.PrintMessage("Removing app-related services...");
             ServiceRemover.BackupAndRemove(new[] { "PushToInstall" }, ui);
         }
     }

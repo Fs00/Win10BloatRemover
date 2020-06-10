@@ -24,11 +24,10 @@ namespace Win10BloatRemover.Operations
         private void DisableOneDrive()
         {
             ui.PrintMessage("Disabling OneDrive via registry edits...");
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\OneDrive", "DisableFileSyncNGSC", 1);
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\OneDrive"))
-                key.SetValue("DisableFileSyncNGSC", 1, RegistryValueKind.DWord);
-            using (RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Microsoft\OneDrive"))
-                key.SetValue("PreventNetworkTrafficPreUserSignIn", 1, RegistryValueKind.DWord);
+            using RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Microsoft\OneDrive");
+            key.SetValue("PreventNetworkTrafficPreUserSignIn", 1);
         }
 
         private void ThrowIfUserWantsToAbort()

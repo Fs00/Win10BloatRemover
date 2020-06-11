@@ -23,17 +23,20 @@ namespace Win10BloatRemover.Operations
             ui.PrintHeading("Writing values into the Registry...");
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\CloudContent"))
             {
-                key.SetValue("DisableSoftLanding", 1, RegistryValueKind.DWord);
-                key.SetValue("DisableWindowsSpotlightFeatures", 1, RegistryValueKind.DWord);
-                key.SetValue("DisableWindowsConsumerFeatures", 1, RegistryValueKind.DWord);
-                key.SetValue("DisableTailoredExperiencesWithDiagnosticData", 1, RegistryValueKind.DWord);
+                key.SetValue("DisableSoftLanding", 1);
+                key.SetValue("DisableWindowsSpotlightFeatures", 1);
+                key.SetValue("DisableWindowsConsumerFeatures", 1);
+                key.SetValue("DisableTailoredExperiencesWithDiagnosticData", 1);
             }
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection"))
-                key.SetValue("DoNotShowFeedbackNotifications", 1, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\WindowsInkWorkspace"))
-                key.SetValue("AllowSuggestedAppsInWindowsInkWorkspace", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Siuf\Rules"))
-                key.SetValue("NumberOfSIUFInPeriod", 0, RegistryValueKind.DWord);
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection",
+                "DoNotShowFeedbackNotifications", 1
+            );
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace",
+                "AllowSuggestedAppsInWindowsInkWorkspace", 0
+            );
+            Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules", "NumberOfSIUFInPeriod", 0);
         }
     }
 }

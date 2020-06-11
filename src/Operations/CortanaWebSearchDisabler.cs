@@ -17,10 +17,10 @@ namespace Win10BloatRemover.Operations
         private void DisableCortanaAndWebSearchViaGroupPolicies()
         {
             using RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Search");
-            key.SetValue("AllowCortana", 0, RegistryValueKind.DWord);
-            key.SetValue("AllowSearchToUseLocation", 0, RegistryValueKind.DWord);
-            key.SetValue("DisableWebSearch", 1, RegistryValueKind.DWord);
-            key.SetValue("ConnectedSearchUseWeb", 0, RegistryValueKind.DWord);
+            key.SetValue("AllowCortana", 0);
+            key.SetValue("AllowSearchToUseLocation", 0);
+            key.SetValue("DisableWebSearch", 1);
+            key.SetValue("ConnectedSearchUseWeb", 0);
         }
 
         private void AddFirewallRuleForCortana()
@@ -30,8 +30,7 @@ namespace Win10BloatRemover.Operations
             );
             firewallRules.SetValue(
                 "{2765E0F4-2918-4A46-B9C9-43CDD8FCBA2B}", "v2.30|Action=Block|Active=TRUE|Dir=Out|" +
-                @"App=%windir%\SystemApps\Microsoft.Windows.Cortana_cw5n1h2txyewy\searchUI.exe|Name=Block Search and Cortana|",
-                RegistryValueKind.String
+                @"App=%windir%\SystemApps\Microsoft.Windows.Cortana_cw5n1h2txyewy\searchUI.exe|Name=Block Search and Cortana|"
             );
         }
     }

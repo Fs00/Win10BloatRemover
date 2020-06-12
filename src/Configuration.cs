@@ -97,7 +97,8 @@ namespace Win10BloatRemover
             WindowsFeaturesToRemove = new[] {
                 "Microsoft-Windows-InternetExplorer",
                 "Microsoft-Windows-Hello-Face",
-                "Microsoft-Windows-QuickAssist"
+                "Microsoft-Windows-QuickAssist",
+                "Microsoft-Windows-TabletPCMath"
             },
             ScheduledTasksToDisable = new[] {
                 @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",

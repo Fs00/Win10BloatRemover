@@ -163,7 +163,7 @@ namespace Win10BloatRemover.Operations
                     removedApps++;
             }
 
-            if (removedApps > 0)
+            if (removalMode == UWPAppRemovalMode.AllUsers && removedApps > 0)
                 TryPerformPostUninstallOperations(appGroup);
         }
 

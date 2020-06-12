@@ -123,7 +123,7 @@ namespace Win10BloatRemover.Operations
             this.installWimTweak = installWimTweak;
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
-                { UWPAppGroup.CommunicationsApps, RemoveSyncHostService },
+                { UWPAppGroup.CommunicationsApps, RemoveOneSyncPackage },
                 { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
                 { UWPAppGroup.Mobile, RemoveConnectApp },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
@@ -349,10 +349,9 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private void RemoveSyncHostService()
+        private void RemoveOneSyncPackage()
         {
-            ui.PrintMessage("Removing sync host service...");
-            ServiceRemover.BackupAndRemove(new[] { "OneSyncSvc" }, ui);
+            new FeaturesRemover(new[] { "Microsoft-OneCore-ApplicationModel-Sync-Desktop" }, ui).Run();
         }
 
         private void DisableStoreFeaturesAndServices()

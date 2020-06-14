@@ -38,25 +38,19 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Editing keys in Windows Registry...");
 
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"))
-                key.SetValue("SmartScreenEnabled", "Off", RegistryValueKind.String);
-            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AppHost"))
-                key.SetValue("EnableWebContentEvaluation", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Local Settings\Software\Microsoft\" +
-                   @"Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\PhishingFilter"))
-                key.SetValue("EnabledV9", 0, RegistryValueKind.DWord);
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows Defender"))
-                key.SetValue("DisableAntiSpyware", 1, RegistryValueKind.DWord);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
+            Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost", "EnableWebContentEvaluation", 0);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter", "EnabledV9", 0);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender", "DisableAntiSpyware", 1);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows Defender\Spynet"))
             {
-                key.SetValue("SpyNetReporting", 0, RegistryValueKind.DWord);
-                key.SetValue("SubmitSamplesConsent", 2, RegistryValueKind.DWord);
-                key.SetValue("DontReportInfectionInformation", 1, RegistryValueKind.DWord);
+                key.SetValue("SpynetReporting", 0);
+                key.SetValue("SubmitSamplesConsent", 2);
             }
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\MRT"))
             {
-                key.SetValue("DontReportInfectionInformation", 1, RegistryValueKind.DWord);
-                key.SetValue("DontOfferThroughWUAU", 1, RegistryValueKind.DWord);
+                key.SetValue("DontReportInfectionInformation", 1);
+                key.SetValue("DontOfferThroughWUAU", 1);
             }
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", writable: true))
                 key.DeleteValue("SecurityHealth", throwOnMissingValue: false);
@@ -68,10 +62,11 @@ namespace Win10BloatRemover.Operations
                 );
                 key.DeleteValue("SecurityHealth", throwOnMissingValue: false);
             }
-
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\" +
-                   @"Image File Execution Options\SecHealthUI.exe"))
-                key.SetValue("Debugger", @"%windir%\System32\taskkill.exe", RegistryValueKind.String);
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe",
+                "Debugger", @"%windir%\System32\taskkill.exe",
+                RegistryValueKind.ExpandString
+            );
         }
 
         private void RemoveSecurityHealthServices()

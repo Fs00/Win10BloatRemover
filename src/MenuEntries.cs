@@ -69,9 +69,10 @@ namespace Win10BloatRemover
         public override string FullName => "Remove Windows Defender";
         public override string GetExplanation()
         {
-            return "Important: Before starting, disable Tamper protection in Windows Security " +
+            return "IMPORTANT: Before starting, disable Tamper protection in Windows Security " +
                    "under Virus & threat protection settings.\n" +
-                   "Defender will be removed using install-wim-tweak and disabled via Group Policies.\n\n" +
+                   "Defender will be removed using install-wim-tweak and disabled via Group Policies, " +
+                   "together with SmartScreen feature.\n\n" +
                    "If you have already made system apps removable, Security Center app will be removed too; " +
                    "otherwise, its menu icon will remain there, but the app won't start anymore.\n" +
                    "Remember that any Windows cumulative update is likely to reinstall the app.";
@@ -158,7 +159,7 @@ namespace Win10BloatRemover
         {
             return "This procedure will disable scheduled tasks, services and features that are responsible for " +
                    "collecting and reporting data to Microsoft, including Compatibility Telemetry, Device Census, " +
-                   "SmartScreen, Steps Recorder and Compatibility Assistant.";
+                   "Steps Recorder and Compatibility Assistant.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui);
     }

@@ -95,7 +95,7 @@ namespace Win10BloatRemover.Operations
 
         /*
          *  Disabled telemetry-related features include CompatTelRunner, DeviceCensus,
-         *  Inventory (collection of installed programs), SmartScreen, Steps Recorder, Compatibility Assistant
+         *  Inventory (collection of installed programs), Steps Recorder, Compatibility Assistant
          */
         private void DisableTelemetryFeatures()
         {
@@ -108,7 +108,6 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("DisableUAR", 1);
             }
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener", "Start", 0);
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows", "CEIPEnable", 0);
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform",

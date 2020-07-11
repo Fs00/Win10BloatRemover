@@ -124,7 +124,7 @@ namespace Win10BloatRemover.Operations
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncPackage },
-                { UWPAppGroup.Edge, RemoveEdgeResidualFiles },
+                { UWPAppGroup.Edge, PerformEdgePostUninstallOperations },
                 { UWPAppGroup.Mobile, RemoveConnectApp },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
                 { UWPAppGroup.Messaging, RemoveMessagingService },
@@ -240,7 +240,7 @@ namespace Win10BloatRemover.Operations
                 ui.PrintMessage("Nothing to do.");
         }
 
-        private void RemoveEdgeResidualFiles()
+        private void PerformEdgePostUninstallOperations()
         {
             ui.PrintMessage("Removing old files...");
             SystemUtils.TryDeleteDirectoryIfExists(
@@ -251,6 +251,9 @@ namespace Win10BloatRemover.Operations
                 $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge",
                 ui
             );
+
+            ui.PrintMessage("Blocking automatic delivery of Edge Chromium via Windows Update...");
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate", "DoNotUpdateToEdgeWithChromium", 1);
         }
 
         private void RemoveConnectApp()

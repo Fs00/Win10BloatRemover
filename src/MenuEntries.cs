@@ -166,14 +166,13 @@ namespace Win10BloatRemover
 
     class CortanaDisablingEntry : MenuEntry
     {
-        public override string FullName => "Disable Cortana and web search";
+        public override string FullName => "Disable Cortana";
         public override string GetExplanation()
         {
-            return "By editing Group Policies, Cortana will be disabled and Windows Search won't display results " +
-                   "from the web anymore.\n" +
+            return "Cortana will be disabled by setting Group Policies accordingly.\n" +
                    "A firewall rule will also be added to prevent Cortana from connecting to the Internet.";
         }
-        public override IOperation CreateNewOperation(IUserInterface ui) => new CortanaWebSearchDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new CortanaDisabler(ui);
     }
 
     class AutoUpdatesDisablingEntry : MenuEntry

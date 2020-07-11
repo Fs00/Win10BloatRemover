@@ -92,8 +92,7 @@ namespace Win10BloatRemover.Operations
             int loadExitCode = SystemUtils.RunProcessBlocking("reg", @"load ""HKEY_USERS\_Default"" ""C:\Users\Default\NTUSER.DAT""");
             if (loadExitCode != SystemUtils.EXIT_CODE_SUCCESS)
                 throw new Exception("Unable to load Default user registry hive.");
-            using (RegistryKey key = Registry.Users.CreateSubKey(@"_Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"))
-                key.DeleteValue("OneDriveSetup", throwOnMissingValue: false);
+            Registry.Users.DeleteSubKeyValue(@"_Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "OneDriveSetup");
             SystemUtils.RunProcessBlocking("reg", @"unload ""HKEY_USERS\_Default""");
         }
     }

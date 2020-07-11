@@ -7,9 +7,15 @@ namespace Win10BloatRemover.Utils
 {
     static class RegistryExtensions
     {
+        public static void DeleteSubKeyValue(this RegistryKey registryKey, string subkeyName, string valueName)
+        {
+            using RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, writable: true);
+            subKey?.DeleteValue(valueName, throwOnMissingValue: false);
+        }
+
         public static RegistryKey OpenSubKeyOrThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
         {
-            RegistryKey subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);
+            RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);
 
             if (subKey == null)
                 throw new KeyNotFoundException($"Subkey {subkeyName} not found.");

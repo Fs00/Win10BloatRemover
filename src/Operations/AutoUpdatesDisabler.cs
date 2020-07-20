@@ -12,6 +12,7 @@ namespace Win10BloatRemover.Operations
             ui.PrintMessage("Writing values into the Registry...");
             DisableAutomaticWindowsUpdates();
             DisableAutomaticStoreUpdates();
+            DisableAutomaticSpeechModelUpdates();
         }
 
         private void DisableAutomaticWindowsUpdates()
@@ -22,6 +23,11 @@ namespace Win10BloatRemover.Operations
         private void DisableAutomaticStoreUpdates()
         {
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "AutoDownload", 2);
+        }
+
+        private void DisableAutomaticSpeechModelUpdates()
+        {
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Speech", "AllowSpeechModelUpdate", 0);
         }
     }
 }

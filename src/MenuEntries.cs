@@ -180,8 +180,8 @@ namespace Win10BloatRemover
         public override string FullName => "Disable automatic updates";
         public override string GetExplanation()
         {
-            return "Windows and Store apps automatic updates will be disabled using Group Policies.\n" + 
-                   "This method won't work on Windows 10 Home.";
+            return "Automatic updates for Windows, Store apps and speech models will be disabled using Group Policies.\n" + 
+                   "At least Windows 10 Pro edition is required to disable automatic Windows updates.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new AutoUpdatesDisabler(ui);
     }

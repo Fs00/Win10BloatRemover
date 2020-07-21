@@ -94,12 +94,13 @@ namespace Win10BloatRemover.Operations
         }
 
         /*
-         *  Disabled telemetry-related features include CompatTelRunner, DeviceCensus,
+         *  Disabled telemetry-related features include CompatTelRunner, DeviceCensus, Customer Experience Improvement Program,
          *  Inventory (collection of installed programs), Steps Recorder, Compatibility Assistant
          */
         private void DisableTelemetryFeatures()
         {
             ui.PrintHeading("Performing some registry edits to disable telemetry features...");
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry", 0);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))
             {
                 key.SetValue("AITEnable", 0);
@@ -107,8 +108,9 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("DisablePCA", 1);
                 key.SetValue("DisableUAR", 1);
             }
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener", "Start", 0);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows", "CEIPEnable", 0);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener", "Start", 0);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\System", "AllowExperimentation", 0);
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform",
                 "NoGenTicket", 1

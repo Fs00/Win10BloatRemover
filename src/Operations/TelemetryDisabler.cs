@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
@@ -48,16 +47,16 @@ namespace Win10BloatRemover.Operations
             ui.PrintHeading("Backing up and removing telemetry services...");
             ServiceRemover.BackupAndRemove(telemetryServices, ui);
 
-            new ServiceRemover(protectedTelemetryServices, ui).PerformBackup();
-            RemoveProtectedServices();
+            string[] actualProtectedServices = new ServiceRemover(protectedTelemetryServices, ui).PerformBackup();
+            RemoveProtectedServices(actualProtectedServices);
         }
 
-        private void RemoveProtectedServices()
+        private void RemoveProtectedServices(string[] protectedServicesToRemove)
         {
             using (TokenPrivilege.TakeOwnership)
             {
                 using RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", writable: true);
-                foreach (string serviceName in protectedTelemetryServices)
+                foreach (string serviceName in protectedServicesToRemove)
                     TryRemoveProtectedService(serviceName, allServicesKey);
             }
         }
@@ -68,10 +67,6 @@ namespace Win10BloatRemover.Operations
             {
                 RemoveProtectedService(serviceName, allServicesKey);
                 ui.PrintMessage($"Service {serviceName} removed successfully.");
-            }
-            catch (KeyNotFoundException)
-            {
-                ui.PrintMessage($"Service {serviceName} is not present or its key can't be retrieved.");
             }
             catch (Exception exc)
             {

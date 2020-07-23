@@ -108,6 +108,8 @@ namespace Win10BloatRemover.Operations
                 PrintSuccessMessage(scExitCode, service);
             else
             {
+                // Unstoppable (but not protected) system services are not removable with SC,
+                // but can be removed by deleting their Registry keys
                 Debug.WriteLine($"SC removal failed with exit code {scExitCode} for service {service}.");
                 DeleteServiceRegistryKey(service);
             }
@@ -129,14 +131,18 @@ namespace Win10BloatRemover.Operations
                 Debug.Fail($"There must be an error in {nameof(IsScExitCodeSuccessful)}: exit code {scExitCode}.");
         }
 
-        // reg command with /f option allows to remove unstoppable system services, like Windows Defender ones
         private void DeleteServiceRegistryKey(string service)
         {
-            int regExitCode = SystemUtils.RunProcessBlocking("reg", $@"delete HKLM\SYSTEM\CurrentControlSet\Services\{service} /f");
-            if (regExitCode == SystemUtils.EXIT_CODE_SUCCESS)
+            try
+            {
+                using var allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", writable: true);
+                allServicesKey.DeleteSubKeyTree(service);
                 ui.PrintMessage($"Service {service} removed, but it will continue to run until the next restart.");
-            else
-                ui.PrintError($"Service {service} removal failed: couldn't delete its registry keys.");
+            }
+            catch (Exception exc)
+            {
+                ui.PrintError($"Service {service} removal failed: couldn't delete its registry keys ({exc.Message}).");
+            }
         }
     }
 }

@@ -9,9 +9,10 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
+            ui.PrintMessage("Writing values into the Registry...");
             DisableCortana();
             AddFirewallRuleToBlockCortana();
-            ui.PrintMessage("A system reboot is recommended.");
+            ui.PrintNotice("A system reboot is recommended.");
         }
 
         private void DisableCortana()

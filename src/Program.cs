@@ -43,6 +43,7 @@ namespace Win10BloatRemover
                 new OneDriveRemovalEntry(),
                 new ServicesRemovalEntry(configuration),
                 new WindowsFeaturesRemovalEntry(configuration),
+                new PrivacySettingsTweakEntry(),
                 new TelemetryDisablingEntry(),
                 new CortanaDisablingEntry(),
                 new AutoUpdatesDisablingEntry(),

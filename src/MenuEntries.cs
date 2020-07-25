@@ -152,6 +152,27 @@ namespace Win10BloatRemover
             => new FeaturesRemover(configuration.WindowsFeaturesToRemove, ui);
     }
 
+    class PrivacySettingsTweakEntry : MenuEntry
+    {
+        public override string FullName => "Tweak settings for privacy";
+        public override string GetExplanation()
+        {
+            return "Several default settings and policies will be changed to make Windows more respectful of user's privacy.\n" +
+                   "These changes consist essentially of:\n" +
+                   "  - adjusting various options under Privacy section of Settings app " +
+                   "(disable advertising ID, app launch tracking etc.)\n" +
+                   "  - preventing input data (inking/typing information, speech) from being sent to Microsoft to improve their services\n" +
+                   "  - denying access to sensitive data (location, documents, activities, account details, diagnostic info)" +
+                   " to all UWP apps by default\n" +
+                   "  - disabling voice activation for voice assistants (so that they can't always be listening)\n" +
+                   "  - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages)\n" +
+                   "  - disabling web search in bottom search bar\n\n" +
+                   "Whereas almost all of these settings are applied for all users, some of them are changed only for the current user.\n" +
+                   "Therefore it is recommended to log into each user in the system and run this procedure.";
+        }
+        public override IOperation CreateNewOperation(IUserInterface ui) => new PrivacySettingsTweaker(ui);
+    }
+
     class TelemetryDisablingEntry : MenuEntry
     {
         public override string FullName => "Disable telemetry";

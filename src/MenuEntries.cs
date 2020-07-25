@@ -267,10 +267,14 @@ namespace Win10BloatRemover
         {
             Version programVersion = GetType().Assembly.GetName().Version!;
             return $"Windows 10 Bloat Remover and Tweaker {programVersion.Major}.{programVersion.Minor} " +
-                   $"for Windows version {programVersion.Build}\n\n" +
+                   $"for Windows version {programVersion.Build}\n" +
                    "Developed by Fs00\n" +
-                   "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n" +
-                   "Based on Windows 10 de-botnet guide by Federico Dossena: fdossena.com\n\n" +
+                   "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n\n" +
+                   "Originally based on Windows 10 de-botnet guide by Federico Dossena: http://fdossena.com\n" +
+                   "Credits to all open source projects whose work has been used to improve this software:\n" +
+                   "  - privacy.sexy website: github.com/undergroundwires/privacy.sexy\n" +
+                   "  - Debloat Windows 10 scripts: github.com/W4RH4WK/Debloat-Windows-10\n" +
+                   "  - Windows 10 Exorcist: github.com/MegaphatNetworks/Windows-10-Exorcist\n\n" +
                    "This software is released under BSD 3-Clause Clear license (continue to read full text).";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new LicensePrinter(ui);

@@ -45,7 +45,6 @@ namespace Win10BloatRemover
                 new WindowsFeaturesRemovalEntry(configuration),
                 new PrivacySettingsTweakEntry(),
                 new TelemetryDisablingEntry(),
-                new CortanaDisablingEntry(),
                 new AutoUpdatesDisablingEntry(),
                 new ScheduledTasksDisablingEntry(configuration),
                 new ErrorReportingDisablingEntry(),

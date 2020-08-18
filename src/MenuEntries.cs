@@ -176,17 +176,6 @@ namespace Win10BloatRemover
         public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui);
     }
 
-    class CortanaDisablingEntry : MenuEntry
-    {
-        public override string FullName => "Disable Cortana";
-        public override string GetExplanation()
-        {
-            return "Cortana will be disabled by setting Group Policies accordingly.\n" +
-                   "A firewall rule will also be added to prevent Cortana from connecting to the Internet.";
-        }
-        public override IOperation CreateNewOperation(IUserInterface ui) => new CortanaDisabler(ui);
-    }
-
     class AutoUpdatesDisablingEntry : MenuEntry
     {
         public override string FullName => "Disable automatic updates";

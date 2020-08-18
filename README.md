@@ -35,6 +35,7 @@ Configures which pre-installed UWP apps should be uninstalled. Take note that yo
 * `"OfficeHub"` (My Office)
 * `"OneNote"`
 * `"Camera"`
+* `"Cortana"` (on Windows version 2004 or higher)
 * `"HelpAndFeedback"` (Feedback Hub, Get Help and Microsoft Tips)
 * `"Maps"`
 * `"Zune"` (Groove Music and Movies)
@@ -74,7 +75,7 @@ Take note that for each name you specify, the program will remove the services *
 Configures which scheduled tasks should be disabled by specifying their path. You can find the path of each scheduled task in the system with the following PowerShell command: `Get-ScheduledTask | foreach { $_.TaskPath + $_.TaskName }`.
 
 **Allowed values:** an array containing an arbitrary number of scheduled tasks  
-**Default value:** an array containing a set of scheduled tasks that are deemed superfluous or undesirable. [See the full list here](https://github.com/Fs00/Win10BloatRemover/blob/master/src/Configuration.cs#L104L118).
+**Default value:** an array containing a set of scheduled tasks that are deemed superfluous or undesirable. [See the full list here](https://github.com/Fs00/Win10BloatRemover/blob/master/src/Configuration.cs#L106L120).
 
 ### `WindowsFeaturesToRemove`
 Configures which Feature-On-Demand (FOD) packages should be removed by specifying their names. As with system services, the program will remove all packages whose name starts with the names you specify (particularly useful since often FODs are made up of multiple packages with very similar names).

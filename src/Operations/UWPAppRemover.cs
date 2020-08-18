@@ -22,6 +22,7 @@ namespace Win10BloatRemover.Operations
         Calculator,
         Camera,
         CommunicationsApps,
+        Cortana,
         Edge,
         HelpAndFeedback,
         Maps,
@@ -59,6 +60,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
             { UWPAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
+            { UWPAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
             { UWPAppGroup.Edge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             {
                 UWPAppGroup.HelpAndFeedback, new[] {
@@ -124,6 +126,7 @@ namespace Win10BloatRemover.Operations
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncPackage },
+                { UWPAppGroup.Cortana, HideCortanaFromTaskBar },
                 { UWPAppGroup.Edge, PerformEdgePostUninstallOperations },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
                 { UWPAppGroup.Messaging, RemoveMessagingService },
@@ -253,6 +256,12 @@ namespace Win10BloatRemover.Operations
 
             ui.PrintMessage("Blocking automatic delivery of Edge Chromium via Windows Update...");
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate", "DoNotUpdateToEdgeWithChromium", 1);
+        }
+
+        private void HideCortanaFromTaskBar()
+        {
+            ui.PrintMessage("Hiding Cortana from the taskbar of the current user...");
+            Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "ShowCortanaButton", 0);
         }
 
         private void RemoveMapsServicesAndTasks()

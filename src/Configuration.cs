@@ -82,17 +82,17 @@ namespace Win10BloatRemover
                 "TroubleshootingSvc"
             },
             UWPAppsToRemove = new[] {   
-                UWPAppGroup.Zune,
+                UWPAppGroup.Bing,
+                UWPAppGroup.Cortana,
                 UWPAppGroup.CommunicationsApps,
                 UWPAppGroup.OneNote,
                 UWPAppGroup.OfficeHub,
-                UWPAppGroup.Camera,
-                UWPAppGroup.Maps,
-                UWPAppGroup.Mobile,
                 UWPAppGroup.HelpAndFeedback,
-                UWPAppGroup.Bing,
+                UWPAppGroup.Maps,
                 UWPAppGroup.Messaging,
-                UWPAppGroup.Skype
+                UWPAppGroup.Mobile,
+                UWPAppGroup.Skype,
+                UWPAppGroup.Zune
             },
             WindowsFeaturesToRemove = new[] {
                 "Microsoft-Windows-InternetExplorer",

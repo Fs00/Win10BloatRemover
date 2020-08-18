@@ -22,6 +22,7 @@ namespace Win10BloatRemover.Tests.Operations
             UWPAppGroup.HelpAndFeedback,
             // UWPAppGroup.Maps,  // excluded because there is a test dedicated to it
             UWPAppGroup.Messaging,
+            UWPAppGroup.Mobile,
             UWPAppGroup.MixedReality,
             UWPAppGroup.OfficeHub,
             UWPAppGroup.OneNote,
@@ -40,7 +41,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldRemoveAnAppForCurrentUser_WithoutRemovingItsProvisionedPackage()
         {
             var ui = new TestUserInterface(output);
-            var appRemover = new UWPAppRemover(new[] { UWPAppGroup.Maps }, UWPAppRemovalMode.CurrentUser, ui, new MockInstallWimTweak());
+            var appRemover = new UWPAppRemover(new[] { UWPAppGroup.Maps }, UWPAppRemovalMode.CurrentUser, ui);
 
             appRemover.Run();
 
@@ -60,7 +61,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldRemoveGroupsWithNoSystemAppsWithoutErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var appRemover = new UWPAppRemover(groupsWithNoSystemApps, UWPAppRemovalMode.AllUsers, ui, new MockInstallWimTweak());
+            var appRemover = new UWPAppRemover(groupsWithNoSystemApps, UWPAppRemovalMode.AllUsers, ui);
 
             appRemover.Run();
 

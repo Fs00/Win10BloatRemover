@@ -18,7 +18,7 @@ namespace Win10BloatRemover
         public override string GetExplanation()
         {
             return "This procedure will edit an internal database to allow the removal of system UWP apps " +
-                   "such as Edge, Security Center, Connect via normal PowerShell methods.\n" +
+                   "such as Edge and Security Center via normal PowerShell methods.\n" +
                    "It is recommended to create a system restore point before proceeding.\n\n" +
                    "Removing system apps is generally safe, but some functionality may possibly break if " +
                    "you uninstall the wrong ones;\nproceed at your own risk.\n" +
@@ -31,13 +31,8 @@ namespace Win10BloatRemover
     class UWPAppRemovalEntry : MenuEntry
     {
         private readonly Configuration configuration;
-        private readonly InstallWimTweak installWimTweak;
 
-        public UWPAppRemovalEntry(Configuration configuration, InstallWimTweak installWimTweak)
-        {
-            this.configuration = configuration;
-            this.installWimTweak = installWimTweak;
-        }
+        public UWPAppRemovalEntry(Configuration configuration) => this.configuration = configuration;
 
         public override string FullName => "Remove UWP apps";
         public override string GetExplanation()
@@ -51,10 +46,10 @@ namespace Win10BloatRemover
 
             return explanation + "Some specific app-related services will also be removed " +
                                  "(but backed up in case you need to restore them).\n" +
-                                 "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first.";
+                                 "In order to remove Edge and some components of Xbox, you need to make system apps removable first.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, installWimTweak);
+            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui);
     }
 
     class WinDefenderRemovalEntry : MenuEntry
@@ -82,7 +77,7 @@ namespace Win10BloatRemover
                 new UWPAppRemover(
                     new[] { UWPAppGroup.SecurityCenter },
                     UWPAppRemovalMode.AllUsers,
-                    ui, installWimTweak
+                    ui
                 )
             );
         }
@@ -100,7 +95,7 @@ namespace Win10BloatRemover
                    "only if you know the consequences and risks of uninstalling system apps.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, installWimTweak: null!);
+            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui);
     }
 
     class OneDriveRemovalEntry : MenuEntry

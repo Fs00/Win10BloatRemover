@@ -30,7 +30,7 @@ Configures which pre-installed UWP apps should be uninstalled. Take note that yo
 **Allowed values:** an array which can contain the following values (each one represents a group of apps - a group can consist in a single app):
 * `"Edge"` (you need to make system apps removable to uninstall it)
 * `"Bing"` (Weather, News, Finance and Sports)
-* `"Mobile"` (YourPhone, Mobile plans and Connect app)
+* `"Mobile"` (Your Phone and Mobile plans)
 * `"Xbox"` (Xbox app, Game Overlay and related services)
 * `"OfficeHub"` (My Office)
 * `"OneNote"`
@@ -87,6 +87,7 @@ You can find the names of all removable FOD packages on your system with the Pow
   - `"Microsoft-Windows-QuickAssist"` (Quick Assist app)
   - `"Microsoft-Windows-TabletPCMath"` (Math Input Panel, Control and Recognizer)
   - `"Microsoft-Windows-StepsRecorder"` (Steps Recorder)
+  - `"Microsoft-Windows-WirelessDisplay"` (Connect app, pre-installed only on some devices)
 
 ### `AllowInstallWimTweak`
 Configures whether hidden system FOD packages should be removed using install-wim-tweak, an open-source tool which comes bundled together with the program. This tool is used only to fully remove Windows Defender and Connect app (the latter only for Windows versions prior to 2004).  

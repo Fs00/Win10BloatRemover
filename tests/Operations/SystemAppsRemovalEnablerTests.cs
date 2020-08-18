@@ -12,7 +12,6 @@ namespace Win10BloatRemover.Tests.Operations
 
         private readonly UWPAppGroup[] groupsWithSystemApps = {
             UWPAppGroup.Edge,
-            UWPAppGroup.Mobile,
             UWPAppGroup.SecurityCenter,
             UWPAppGroup.Xbox
         };
@@ -22,7 +21,7 @@ namespace Win10BloatRemover.Tests.Operations
         {
             var ui = new TestUserInterface(output);
             var removalEnabler = new SystemAppsRemovalEnabler(ui);
-            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui, new MockInstallWimTweak());
+            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui);
 
             removalEnabler.Run();
             appRemover.Run();

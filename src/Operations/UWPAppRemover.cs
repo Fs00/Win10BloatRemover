@@ -27,7 +27,7 @@ namespace Win10BloatRemover.Operations
         Maps,
         Messaging,
         MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
-        Mobile,             // YourPhone, OneConnect (aka Mobile plans) and Connect app
+        Mobile,             // Your Phone and Mobile plans (aka OneConnect)
         OfficeHub,
         OneNote,
         Paint3D,
@@ -76,7 +76,7 @@ namespace Win10BloatRemover.Operations
                     "Microsoft.MixedReality.Portal"
                 }
             },
-            { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect", "Microsoft.PPIProjection" } },
+            { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
             { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
             { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
             { UWPAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
@@ -111,23 +111,20 @@ namespace Win10BloatRemover.Operations
         private readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup;
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
-        private readonly InstallWimTweak installWimTweak;
         private readonly IUserInterface ui;
 
         private /*lateinit*/ PowerShell powerShell;
 
         #nullable disable warnings
-        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, InstallWimTweak installWimTweak)
+        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;
             this.ui = ui;
-            this.installWimTweak = installWimTweak;
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncPackage },
                 { UWPAppGroup.Edge, PerformEdgePostUninstallOperations },
-                { UWPAppGroup.Mobile, RemoveConnectApp },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
                 { UWPAppGroup.Messaging, RemoveMessagingService },
                 { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
@@ -256,11 +253,6 @@ namespace Win10BloatRemover.Operations
 
             ui.PrintMessage("Blocking automatic delivery of Edge Chromium via Windows Update...");
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate", "DoNotUpdateToEdgeWithChromium", 1);
-        }
-
-        private void RemoveConnectApp()
-        {
-            installWimTweak.RemoveComponentIfAllowed("Microsoft-PPIProjection-Package", ui);
         }
 
         private void RemoveMapsServicesAndTasks()

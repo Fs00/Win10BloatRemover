@@ -99,7 +99,8 @@ namespace Win10BloatRemover
                 "Microsoft-Windows-Hello-Face",
                 "Microsoft-Windows-QuickAssist",
                 "Microsoft-Windows-TabletPCMath",
-                "Microsoft-Windows-StepsRecorder"
+                "Microsoft-Windows-StepsRecorder",
+                "Microsoft-Windows-WirelessDisplay"
             },
             ScheduledTasksToDisable = new[] {
                 @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",

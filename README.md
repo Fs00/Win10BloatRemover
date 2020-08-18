@@ -50,6 +50,7 @@ Configures which pre-installed UWP apps should be uninstalled. Take note that yo
 * `"Calculator"`
 * `"SnipAndSketch"`
 * `"Store"`
+* `"SoundRecorder"`
 
 **Default value:** an array containing some of the app groups listed above
 

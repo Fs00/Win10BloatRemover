@@ -30,6 +30,7 @@ namespace Win10BloatRemover.Tests.Operations
             UWPAppGroup.Skype,
             UWPAppGroup.SnipAndSketch,
             UWPAppGroup.SolitaireCollection,
+            UWPAppGroup.SoundRecorder,
             UWPAppGroup.StickyNotes,
             UWPAppGroup.Store,
             UWPAppGroup.Zune

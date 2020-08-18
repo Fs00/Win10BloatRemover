@@ -36,6 +36,7 @@ namespace Win10BloatRemover.Operations
         Skype,
         SnipAndSketch,
         SolitaireCollection,
+        SoundRecorder,
         StickyNotes,
         Store,
         Xbox,
@@ -84,6 +85,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
             { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.ScreenSketch" } },
             { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
+            { UWPAppGroup.SoundRecorder, new[] { "Microsoft.WindowsSoundRecorder" } },
             { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
             {
                 UWPAppGroup.Store, new[] {

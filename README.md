@@ -86,6 +86,7 @@ You can find the names of all removable FOD packages on your system with the Pow
   - `"Microsoft-Windows-Hello-Face"` (Windows Hello face authentication)
   - `"Microsoft-Windows-QuickAssist"` (Quick Assist app)
   - `"Microsoft-Windows-TabletPCMath"` (Math Input Panel, Control and Recognizer)
+  - `"Microsoft-Windows-StepsRecorder"` (Steps Recorder)
 
 ### `AllowInstallWimTweak`
 Configures whether hidden system FOD packages should be removed using install-wim-tweak, an open-source tool which comes bundled together with the program. This tool is used only to fully remove Windows Defender and Connect app (the latter only for Windows versions prior to 2004).  

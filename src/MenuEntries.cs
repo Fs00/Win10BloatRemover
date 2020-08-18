@@ -89,8 +89,7 @@ namespace Win10BloatRemover
         public override string GetExplanation()
         {
             return "You need to make system apps removable first, otherwise the uninstallation will fail.\n" +
-                   @"You can also perform this task using UWP apps removal (""Edge"" must be included in the list " +
-                   "\"UWPAppsToRemove\" and \"UWPAppsRemovalMode\" must be set to \"AllUsers\" in configuration file).\n" + 
+                   "You can also perform this task using UWP apps removal (\"Edge\" must be included in the list \"UWPAppsToRemove\").\n" + 
                    "Take note that this app will likely be reinstalled after any Windows cumulative update. Proceed " +
                    "only if you know the consequences and risks of uninstalling system apps.";
         }

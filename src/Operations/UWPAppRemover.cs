@@ -154,13 +154,16 @@ namespace Win10BloatRemover.Operations
             int removedApps = 0;
             foreach (string appName in appNamesForGroup[appGroup])
             {
-                bool removalSuccessful = UninstallApp(appName);
                 // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
                 // the corresponding provisioned package when the app is removed for all users.
                 // Since this behavior is not officially documented and seems not to be consistent across all Windows versions,
                 // we want to make sure that the provisioned package gets uninstalled to provide a consistent behavior.
+                // Also, in version 2004 uninstalling an app for all users raises an error if the provisioned package has not
+                // been already removed.
                 if (removalMode == UWPAppRemovalMode.AllUsers)
                     UninstallAppProvisionedPackage(appName);
+
+                bool removalSuccessful = UninstallApp(appName);
                 if (removalSuccessful)
                     removedApps++;
             }
@@ -172,21 +175,19 @@ namespace Win10BloatRemover.Operations
         private bool UninstallApp(string appName)
         {
             var packages = powerShell.Run(GetAppxPackageCommand(appName));
-            if (packages.Length > 0)
-            {
-                ui.PrintMessage($"Removing app {appName}...");
-                foreach (var package in packages) // some apps have both x86 and x64 variants installed
-                {
-                    string command = RemoveAppxPackageCommand(package.PackageFullName);
-                    powerShell.Run(command);
-                }
-                return powerShell.Streams.Error.Count == 0;
-            }
-            else
+            if (packages.Length == 0)
             {
                 ui.PrintMessage($"App {appName} is not installed.");
                 return false;
             }
+
+            ui.PrintMessage($"Removing app {appName}...");
+            foreach (var package in packages) // some apps have both x86 and x64 variants installed
+            {
+                string command = RemoveAppxPackageCommand(package.PackageFullName);
+                powerShell.Run(command);
+            }
+            return powerShell.Streams.Error.Count == 0;
         }
 
         private string GetAppxPackageCommand(string appName)

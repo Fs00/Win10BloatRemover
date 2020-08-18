@@ -49,12 +49,9 @@ namespace Win10BloatRemover
             foreach (UWPAppGroup app in configuration.UWPAppsToRemove)
                 explanation += $"  {app}\n";
 
-            explanation += "Some specific app-related services will also be removed " +
-                           "(but backed up in case you need to restore them).\n" +
-                           "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first";
-            if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.CurrentUser)
-                explanation += " and set UWPAppsRemovalMode option to \"AllUsers\" in configuration file";
-            return explanation + ".";
+            return explanation + "Some specific app-related services will also be removed " +
+                                 "(but backed up in case you need to restore them).\n" +
+                                 "In order to remove Edge, Connect and some components of Xbox, you need to make system apps removable first.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, installWimTweak);
@@ -273,8 +270,7 @@ namespace Win10BloatRemover
                    "Originally based on Windows 10 de-botnet guide by Federico Dossena: http://fdossena.com\n" +
                    "Credits to all open source projects whose work has been used to improve this software:\n" +
                    "  - privacy.sexy website: github.com/undergroundwires/privacy.sexy\n" +
-                   "  - Debloat Windows 10 scripts: github.com/W4RH4WK/Debloat-Windows-10\n" +
-                   "  - Windows 10 Exorcist: github.com/MegaphatNetworks/Windows-10-Exorcist\n\n" +
+                   "  - Debloat Windows 10 scripts: github.com/W4RH4WK/Debloat-Windows-10\n\n" +
                    "This software is released under BSD 3-Clause Clear license (continue to read full text).";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new LicensePrinter(ui);

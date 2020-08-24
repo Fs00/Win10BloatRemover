@@ -112,13 +112,11 @@ namespace Win10BloatRemover.Operations
             );
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe",
-                "Debugger", @"%windir%\System32\taskkill.exe",
-                RegistryValueKind.ExpandString
+                "Debugger", @"%windir%\System32\taskkill.exe"
             );
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\DeviceCensus.exe",
-                "Debugger", @"%windir%\System32\taskkill.exe",
-                RegistryValueKind.ExpandString
+                "Debugger", @"%windir%\System32\taskkill.exe"
             );
         }
 

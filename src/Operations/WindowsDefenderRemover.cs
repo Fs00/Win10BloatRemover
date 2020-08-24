@@ -52,11 +52,6 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("DontReportInfectionInformation", 1);
                 key.SetValue("DontOfferThroughWUAU", 1);
             }
-            Registry.SetValue(
-                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SecHealthUI.exe",
-                "Debugger", @"%windir%\System32\taskkill.exe",
-                RegistryValueKind.ExpandString
-            );
 
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             localMachine.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");

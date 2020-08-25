@@ -89,7 +89,7 @@ You can find the names of all removable FOD packages on your system with the Pow
 
 ### `AllowInstallWimTweak`
 Configures whether hidden system FOD packages should be removed using install-wim-tweak, an open-source tool which comes bundled together with the program. This tool is used only to fully remove Connect app on Windows versions prior to 2004.  
-*A bit of background:* Despite the tool being safe, we noticed that removing certain system FODs caused the inability to install Windows cumulative updates (error 0x800f081f). We identified those critical FODs and changed the program to avoid removing them, but since we cannot guarantee that similar issues won't come up again in the future, we added the ability to choose between a more aggressive and a more cautious approach.
+Since the removal of FOD packages cannot be reverted in any way, this option allows users to choose between a more aggressive and a more cautious approach when removing Connect app.
 
 **Allowed values:** `true` or `false`  
 **Default value:** `false`

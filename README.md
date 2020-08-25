@@ -6,7 +6,7 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Disable OS telemetry:** disables several Windows components that collect diagnostic and usage information such as Compatibility Telemetry, Inventory, Device Census, Customer Experience Improvement Program and others. It also deletes the services which are responsible for data reporting to Microsoft.
 * **Remove system services:** deletes - not just disables - the services specified by the user (see *Configuration* below, option `ServicesToRemove`) after backing up their Registry keys, so that you can restore them if anything breaks.
 * **Tweak Windows settings for enhanced privacy:** makes Windows more privacy-respectful by turning off certain system features that put your personal data at risk, such as inking/typing personalization, app launch tracking, clipboard/text messages synchronization, voice activation and some more. Take note that the goal here is to provide a mindful balance that leans towards privacy, without sacrificing too much in terms of user experience.
-* **Disable/remove Windows Defender:** the user can choose either to just disable it or to fully eradicate it from the system (see *Configuration* below, option `AllowInstallWimTweak`). If you make system apps removable, Windows Security app will be deleted too.
+* **Disable Windows Defender:** disables the antivirus that comes pre-installed on the OS and removes its background services. Also, if you make system apps removable, Windows Security app will be uninstalled. *Only for tech-savvy users!*
 * **Remove OneDrive** using the uninstaller provided by Microsoft, its folder in Explorer sidebar will also be hidden. Furthermore, its automatic setup will be disabled to prevent the app from being installed for new users.
 * **Remove Windows feature packages:** uninstalls the [Feature-On-Demand (FOD) packages](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* below, option `WindowsFeaturesToRemove`).
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
@@ -91,7 +91,7 @@ You can find the names of all removable FOD packages on your system with the Pow
   - `"Microsoft-Windows-WirelessDisplay"` (Connect app, pre-installed only on some devices)
 
 ### `AllowInstallWimTweak`
-Configures whether hidden system FOD packages should be removed using install-wim-tweak, an open-source tool which comes bundled together with the program. This tool is used only to fully remove Windows Defender and Connect app (the latter only for Windows versions prior to 2004).  
+Configures whether hidden system FOD packages should be removed using install-wim-tweak, an open-source tool which comes bundled together with the program. This tool is used only to fully remove Connect app on Windows versions prior to 2004.  
 *A bit of background:* Despite the tool being safe, we noticed that removing certain system FODs caused the inability to install Windows cumulative updates (error 0x800f081f). We identified those critical FODs and changed the program to avoid removing them, but since we cannot guarantee that similar issues won't come up again in the future, we added the ability to choose between a more aggressive and a more cautious approach.
 
 **Allowed values:** `true` or `false`  

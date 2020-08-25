@@ -16,7 +16,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldNotEncounterErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var defenderRemover = new DefenderDisabler(ui, new MockOperation("UWPAppRemover", ui));
+            var defenderRemover = new DefenderDisabler(ui, new OperationStub("UWPAppRemover", ui));
 
             defenderRemover.Run();
 

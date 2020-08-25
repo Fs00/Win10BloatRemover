@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
@@ -33,9 +33,6 @@ namespace Win10BloatRemover
 
         [JsonProperty(Required = Required.Always)]
         public string[] WindowsFeaturesToRemove { private set; get; }
-
-        [JsonProperty(Required = Required.Always)]
-        public bool AllowInstallWimTweak { private set; get; }
         #nullable restore warnings
 
         public static Configuration LoadFromFileOrDefault()
@@ -119,8 +116,7 @@ namespace Win10BloatRemover
                 @"\Microsoft\Windows\Diagnosis\Scheduled",
                 @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
             },
-            UWPAppsRemovalMode = UWPAppRemovalMode.AllUsers,
-            AllowInstallWimTweak = false
+            UWPAppsRemovalMode = UWPAppRemovalMode.AllUsers
         };
     }
 }

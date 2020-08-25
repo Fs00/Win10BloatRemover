@@ -22,7 +22,7 @@ Program settings are stored in [JSON format](https://en.wikipedia.org/wiki/JSON)
 
 If the program isn't able to load the configuration from the file for some reason, the error will be displayed when the application starts up and options will be populated with their default values.
 
-Inside the settings file, you will find six options described below:
+Inside the settings file, you will find the following options:
 
 ### `UWPAppsToRemove`
 Configures which pre-installed UWP apps should be uninstalled. Take note that you can't choose to remove single UWP packages but only groups of them, to make configuration less tricky and also because some apps are made of multiple packages (e.g. Xbox) which depend on common services or components that get removed by the program.
@@ -89,13 +89,6 @@ You can find the names of all removable FOD packages on your system with the Pow
   - `"Microsoft-Windows-TabletPCMath"` (Math Input Panel, Control and Recognizer)
   - `"Microsoft-Windows-StepsRecorder"` (Steps Recorder)
   - `"Microsoft-Windows-WirelessDisplay"` (Connect app, pre-installed only on some devices)
-
-### `AllowInstallWimTweak`
-Configures whether hidden system FOD packages should be removed using install-wim-tweak, an open-source tool which comes bundled together with the program. This tool is used only to fully remove Connect app on Windows versions prior to 2004.  
-*A bit of background:* Despite the tool being safe, we noticed that removing certain system FODs caused the inability to install Windows cumulative updates (error 0x800f081f). We identified those critical FODs and changed the program to avoid removing them, but since we cannot guarantee that similar issues won't come up again in the future, we added the ability to choose between a more aggressive and a more cautious approach.
-
-**Allowed values:** `true` or `false`  
-**Default value:** `false`
 
 ## Release cycle and versions
 The binaries of this tool can be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter raising an error when run on an OS version different from 1903. This is done to ease developer maintenance and to make the tool impossible to run on an incompatible system (mistake-proof😉).  

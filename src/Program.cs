@@ -20,20 +20,11 @@ namespace Win10BloatRemover
 
             RegisterExitEventHandlers();
 
-            var installWimTweak = CreateInstallWimTweak(configuration);
-            var menu = new ConsoleMenu(CreateMenuEntries(configuration, installWimTweak));
+            var menu = new ConsoleMenu(CreateMenuEntries(configuration));
             menu.RunLoopUntilExitRequested();
         }
 
-        private static InstallWimTweak CreateInstallWimTweak(Configuration configuration)
-        {
-            if (configuration.AllowInstallWimTweak)
-                return new ExtractedInstallWimTweak();
-            else
-                return new DisabledInstallWimTweak();
-        }
-
-        private static MenuEntry[] CreateMenuEntries(Configuration configuration, InstallWimTweak installWimTweak)
+        private static MenuEntry[] CreateMenuEntries(Configuration configuration)
         {
             return new MenuEntry[] {
                 new SystemAppsRemovalEnablingEntry(),

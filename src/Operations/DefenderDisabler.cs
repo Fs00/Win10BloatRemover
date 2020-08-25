@@ -3,7 +3,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    public class WindowsDefenderRemover : IOperation
+    public class DefenderDisabler : IOperation
     {
         private static readonly string[] securityHealthServices = {
             "SecurityHealthService",
@@ -13,14 +13,12 @@ namespace Win10BloatRemover.Operations
             "SgrmAgent"
         };
 
-        private readonly InstallWimTweak installWimTweak;
         private readonly IUserInterface ui;
         private readonly IOperation securityCenterRemover;
 
-        public WindowsDefenderRemover(IUserInterface ui, InstallWimTweak installWimTweak, IOperation securityCenterRemover)
+        public DefenderDisabler(IUserInterface ui, IOperation securityCenterRemover)
         {
             this.ui = ui;
-            this.installWimTweak = installWimTweak;
             this.securityCenterRemover = securityCenterRemover;
         }
 
@@ -28,9 +26,6 @@ namespace Win10BloatRemover.Operations
         {
             EditWindowsRegistryKeys();
             RemoveSecurityHealthServices();
-
-            installWimTweak.RemoveComponentIfAllowed("Windows-Defender", ui);
-
             securityCenterRemover.Run();
         }
 

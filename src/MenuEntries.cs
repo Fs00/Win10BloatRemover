@@ -57,28 +57,27 @@ namespace Win10BloatRemover
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, installWimTweak);
     }
 
-    class WinDefenderRemovalEntry : MenuEntry
+    class DefenderDisablingEntry : MenuEntry
     {
         private readonly InstallWimTweak installWimTweak;
+        
+        public DefenderDisablingEntry(InstallWimTweak installWimTweak) => this.installWimTweak = installWimTweak;
 
-        public WinDefenderRemovalEntry(InstallWimTweak installWimTweak) => this.installWimTweak = installWimTweak;
-
-        public override string FullName => "Remove Windows Defender";
+        public override string FullName => "Disable Windows Defender";
         public override string GetExplanation()
         {
-            return "IMPORTANT: Before starting, disable Tamper protection in Windows Security " +
+            return "IMPORTANT: Before starting, disable Tamper protection in Windows Security app " +
                    "under Virus & threat protection settings.\n" +
-                   "Defender will be removed using install-wim-tweak and disabled via Group Policies, " +
+                   "Defender services will be removed and its antimalware engine will be disabled via Group Policies, " +
                    "together with SmartScreen feature.\n\n" +
-                   "If you have already made system apps removable, Security Center app will be removed too; " +
-                   "otherwise, its menu icon will remain there, but the app won't start anymore.\n" +
+                   "If you have already made system apps removable, Windows Security app will be removed too.\n" +
                    "Remember that any Windows cumulative update is likely to reinstall the app.";
         }
 
         public override IOperation CreateNewOperation(IUserInterface ui)
         {
-            return new WindowsDefenderRemover(
-                ui, installWimTweak,
+            return new DefenderDisabler(
+                ui,
                 new UWPAppRemover(
                     new[] { UWPAppGroup.SecurityCenter },
                     UWPAppRemovalMode.AllUsers,

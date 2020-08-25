@@ -154,8 +154,6 @@ namespace Win10BloatRemover.Operations
             int removedApps = 0;
             foreach (string appName in appNamesForGroup[appGroup])
             {
-                ui.PrintMessage($"Removing app {appName}...");
-
                 // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
                 // the corresponding provisioned package when the app is removed for all users.
                 // Since this behavior is not officially documented and seems not to be consistent across all Windows versions,
@@ -183,6 +181,7 @@ namespace Win10BloatRemover.Operations
                 return false;
             }
 
+            ui.PrintMessage($"Uninstalling app {appName}...");
             foreach (var package in packages) // some apps have both x86 and x64 variants installed
             {
                 string command = RemoveAppxPackageCommand(package.PackageFullName);
@@ -213,7 +212,7 @@ namespace Win10BloatRemover.Operations
                 .FirstOrDefault(package => package.DisplayName == appName);
             if (provisionedPackage != null)
             {
-                Debug.WriteLine($"Removing provisioned package for app {appName}...");
+                ui.PrintMessage($"Removing provisioned package for app {appName}...");
                 powerShell.Run(
                     $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
                 );

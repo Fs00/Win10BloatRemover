@@ -38,7 +38,6 @@ namespace Win10BloatRemover
             return new MenuEntry[] {
                 new SystemAppsRemovalEnablingEntry(),
                 new UWPAppRemovalEntry(configuration, installWimTweak),
-                new DefenderDisablingEntry(installWimTweak),
                 new EdgeRemovalEntry(),
                 new OneDriveRemovalEntry(),
                 new ServicesRemovalEntry(configuration),
@@ -46,6 +45,7 @@ namespace Win10BloatRemover
                 new PrivacySettingsTweakEntry(),
                 new TelemetryDisablingEntry(),
                 new CortanaDisablingEntry(),
+                new DefenderDisablingEntry(installWimTweak),
                 new AutoUpdatesDisablingEntry(),
                 new ScheduledTasksDisablingEntry(configuration),
                 new ErrorReportingDisablingEntry(),

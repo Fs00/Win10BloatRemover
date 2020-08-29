@@ -1,5 +1,8 @@
-﻿using Microsoft.Win32;
+﻿using System;
+using Microsoft.Win32;
 using Win10BloatRemover.Utils;
+using static Win10BloatRemover.Operations.IUserInterface;
+using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations
 {
@@ -24,9 +27,33 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
+            DowngradeAntimalwarePlatform();
             EditWindowsRegistryKeys();
             RemoveSecurityHealthServices();
             securityCenterRemover.Run();
+        }
+
+        // DisableAntiSpyware policy is not honored anymore on Defender antimalware platform version 4.18.2007.8+
+        // This workaround will last until Windows ships with a lower version of that platform pre-installed
+        private void DowngradeAntimalwarePlatform()
+        {
+            ui.PrintHeading("Downgrading Defender antimalware platform...");
+            int exitCode = SystemUtils.RunProcessBlockingWithOutput(
+                $@"{Env.GetFolderPath(Env.SpecialFolder.ProgramFiles)}\Windows Defender\MpCmdRun.exe", "-resetplatform",
+                ui
+            );
+
+            if (exitCode != SystemUtils.EXIT_CODE_SUCCESS)
+            {
+                ui.PrintWarning(
+                    "Antimalware platform downgrade failed. This is likely happened because you have already disabled Windows Defender.\n" +
+                    "If this is not your case, you can proceed anyway but be aware that Defender will not be disabled fully " +
+                    "if the antimalware platform has been updated to version 4.18.2007.8 or higher through Windows Update."
+                );
+                var choice = ui.AskUserConsent("Do you want to continue?");
+                if (choice == UserChoice.No)
+                    throw new Exception("The user aborted the operation.");
+            }
         }
 
         private void EditWindowsRegistryKeys()

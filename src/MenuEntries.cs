@@ -228,8 +228,8 @@ namespace Win10BloatRemover
         public override string FullName => "Report an issue/Suggest a feature";
         public override string GetExplanation()
         {
-            return "Your browser will now open on a GitHub page where you will be able to " +
-                   "open an issue to report a bug or suggest a new feature.";
+            return "You will now be brought to a web page where you can open a GitHub issue " +
+                   "in order to report a bug or to suggest a new feature.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");

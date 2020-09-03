@@ -22,29 +22,39 @@ namespace Win10BloatRemover.Operations
         {
             using (powerShell = PowerShellExtensions.CreateWithImportedModules("Dism").WithOutput(ui))
             {
-                foreach (string featureName in featuresToRemove)
-                    RemoveFeaturesWhoseNameStartsWith(featureName);
+                foreach (string capabilityName in featuresToRemove)
+                    RemoveCapabilitiesWhoseNameStartsWith(capabilityName);
             }
 
             ui.PrintNotice("A system reboot is recommended.");
         }
 
-        private void RemoveFeaturesWhoseNameStartsWith(string featureName)
+        private void RemoveCapabilitiesWhoseNameStartsWith(string capabilityName)
         {
-            var featurePackages = powerShell.Run($"Get-WindowsPackage -Online -PackageName {featureName}*");
-            if (featurePackages.Length > 0)
+            var capabilities = powerShell.Run($"Get-WindowsCapability -Online -Name {capabilityName}*");
+            if (capabilities.Length == 0)
             {
-                foreach (var package in featurePackages)
-                {
-                    ui.PrintMessage($"Removing feature {package.PackageName}...");
-                    powerShell.Run($"Remove-WindowsPackage -Online -NoRestart -PackageName {package.PackageName}");
-                }
-
-                if (featureName.Contains("Windows-Hello-Face"))
-                    new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();
+                ui.PrintWarning($"No features found with name {capabilityName}.");
+                return;
             }
-            else
-                ui.PrintMessage($"Feature {featureName} is not installed.");
+
+            foreach (var capability in capabilities)
+                RemoveCapability(capability);
+        }
+
+        private void RemoveCapability(dynamic capability)
+        {
+            if (capability.State.ToString() != "Installed")
+            {
+                ui.PrintMessage($"Feature {capability.Name} is not installed.");
+                return;
+            }
+
+            ui.PrintMessage($"Removing feature {capability.Name}...");
+            powerShell.Run($"Remove-WindowsCapability -Online -Name {capability.Name}");
+
+            if (capability.Name.StartsWith("Hello.Face"))
+                new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();
         }
     }
 }

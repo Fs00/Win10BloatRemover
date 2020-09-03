@@ -95,10 +95,10 @@ namespace Win10BloatRemover
                 UWPAppGroup.Skype
             },
             WindowsFeaturesToRemove = new[] {
-                "Microsoft-Windows-InternetExplorer",
-                "Microsoft-Windows-Hello-Face",
-                "Microsoft-Windows-QuickAssist",
-                "Microsoft-Windows-TabletPCMath"
+                "App.Support.QuickAssist",
+                "Browser.InternetExplorer",
+                "Hello.Face",
+                "MathRecognizer"
             },
             ScheduledTasksToDisable = new[] {
                 @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",

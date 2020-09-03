@@ -124,7 +124,7 @@ namespace Win10BloatRemover.Operations
             this.ui = ui;
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
-                { UWPAppGroup.CommunicationsApps, RemoveOneSyncPackage },
+                { UWPAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
                 { UWPAppGroup.Cortana, HideCortanaFromTaskBar },
                 { UWPAppGroup.Edge, PerformEdgePostUninstallOperations },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
@@ -355,9 +355,9 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private void RemoveOneSyncPackage()
+        private void RemoveOneSyncServiceFeature()
         {
-            new FeaturesRemover(new[] { "Microsoft-OneCore-ApplicationModel-Sync-Desktop" }, ui).Run();
+            new FeaturesRemover(new[] { "OneCoreUAP.OneSync" }, ui).Run();
         }
 
         private void DisableStoreFeaturesAndServices()

@@ -128,7 +128,7 @@ namespace Win10BloatRemover
         public override string FullName => "Remove Windows features";
         public override string GetExplanation()
         {
-            string explanation = "The following features will be removed:";
+            string explanation = "The following features on demand will be removed:";
             foreach (string feature in configuration.WindowsFeaturesToRemove)
                 explanation += $"\n  {feature}";
             return explanation;

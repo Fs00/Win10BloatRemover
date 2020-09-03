@@ -92,12 +92,12 @@ namespace Win10BloatRemover
                 UWPAppGroup.Zune
             },
             WindowsFeaturesToRemove = new[] {
-                "Microsoft-Windows-InternetExplorer",
-                "Microsoft-Windows-Hello-Face",
-                "Microsoft-Windows-QuickAssist",
-                "Microsoft-Windows-TabletPCMath",
-                "Microsoft-Windows-StepsRecorder",
-                "Microsoft-Windows-WirelessDisplay"
+                "App.StepsRecorder",
+                "App.Support.QuickAssist",
+                "App.WirelessDisplay.Connect",
+                "Browser.InternetExplorer",
+                "Hello.Face",
+                "MathRecognizer"
             },
             ScheduledTasksToDisable = new[] {
                 @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",

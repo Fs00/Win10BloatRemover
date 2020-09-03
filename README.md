@@ -8,7 +8,7 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Tweak Windows settings for enhanced privacy:** makes Windows more privacy-respectful by turning off certain system features that put your personal data at risk, such as inking/typing personalization, app launch tracking, clipboard/text messages synchronization, voice activation and some more. Take note that the goal here is to provide a mindful balance that leans towards privacy, without sacrificing too much in terms of user experience.
 * **Disable Windows Defender:** disables the antivirus that comes pre-installed on the OS and removes its background services. Also, if you make system apps removable, Windows Security app will be uninstalled. *Only for tech-savvy users!*
 * **Remove OneDrive** using the uninstaller provided by Microsoft, its folder in Explorer sidebar will also be hidden. Furthermore, its automatic setup will be disabled to prevent the app from being installed for new users.
-* **Remove Windows feature packages:** uninstalls the [Feature-On-Demand (FOD) packages](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* below, option `WindowsFeaturesToRemove`).
+* **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* below, option `WindowsFeaturesToRemove`).
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
 * **Disable Cortana:** accomplished using Group Policies until OS version 1909. Starting from version 2004, it can be removed like any other pre-installed app.
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
@@ -78,17 +78,17 @@ Configures which scheduled tasks should be disabled by specifying their path. Yo
 **Default value:** an array containing a set of scheduled tasks that are deemed superfluous or undesirable. [See the full list here](https://github.com/Fs00/Win10BloatRemover/blob/master/src/Configuration.cs#L106L120).
 
 ### `WindowsFeaturesToRemove`
-Configures which Feature-On-Demand (FOD) packages should be removed by specifying their names. As with system services, the program will remove all packages whose name starts with the names you specify (particularly useful since often FODs are made up of multiple packages with very similar names).
-You can find the names of all removable FOD packages on your system with the PowerShell command `(Get-WindowsPackage -Online).PackageName`.
+Configures which Feature-On-Demand (FOD) capabilities should be removed by specifying their names. As with system services, the program will remove all feature capabilities whose name starts with the names you specify (particularly useful since FODs have their version hardcoded in the name).
+You can find the names of all FOD capabilities available for your system (including non-installed ones) with the PowerShell command `Get-WindowsCapability -Online`.
 
-**Allowed values:** an array containing an arbitrary number of FOD package names  
-**Default value:** an array containing a set of FOD packages that are deemed superfluous for most users:
-  - `"Microsoft-Windows-InternetExplorer"` (Internet Explorer 11)
-  - `"Microsoft-Windows-Hello-Face"` (Windows Hello face authentication)
-  - `"Microsoft-Windows-QuickAssist"` (Quick Assist app)
-  - `"Microsoft-Windows-TabletPCMath"` (Math Input Panel, Control and Recognizer)
-  - `"Microsoft-Windows-StepsRecorder"` (Steps Recorder)
-  - `"Microsoft-Windows-WirelessDisplay"` (Connect app, pre-installed only on some devices)
+**Allowed values:** an array containing an arbitrary number of FOD capability names  
+**Default value:** an array containing a set of FOD capabilities that are deemed superfluous for most users:
+  - `"App.StepsRecorder"` (Steps Recorder)
+  - `"App.Support.QuickAssist"` (Quick Assist app)
+  - `"App.WirelessDisplay.Connect"` (Connect app, pre-installed only on some devices)
+  - `"Browser.InternetExplorer"` (Internet Explorer 11)
+  - `"Hello.Face"` (Windows Hello face authentication)
+  - `"MathRecognizer"` (Math Input Panel, Control and Recognizer)
 
 ## Release cycle and versions
 The binaries of this tool can be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter raising an error when run on an OS version different from 1903. This is done to ease developer maintenance and to make the tool impossible to run on an incompatible system (mistake-proof😉).  

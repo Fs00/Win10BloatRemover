@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\App.manifest</ApplicationManifest>

@@ -375,7 +375,7 @@ namespace Win10BloatRemover.Operations
             );
 
             ui.PrintMessage("Removing app-related services...");
-            ServiceRemover.BackupAndRemove(new[] { "PushToInstall", "LicenseManager" }, ui);
+            ServiceRemover.BackupAndRemove(new[] { "PushToInstall" }, ui);
         }
     }
 }

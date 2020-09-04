@@ -4,6 +4,14 @@ namespace Win10BloatRemover.Operations
 {
     public class PrivacySettingsTweaker : IOperation
     {
+        private static readonly string[] appPermissionsToDeny = {
+            "location",
+            "documentsLibrary",
+            "userDataTasks",
+            "appDiagnostics",
+            "userAccountInformation"
+        };
+
         private readonly IUserInterface ui;
         public PrivacySettingsTweaker(IUserInterface ui) => this.ui = ui;
 
@@ -57,13 +65,13 @@ namespace Win10BloatRemover.Operations
 
         private void DenySensitivePermissionsToApps()
         {
-            string[] permissionsToDeny = { "location", "documentsLibrary", "userDataTasks", "appDiagnostics", "userAccountInformation" };
-            foreach (string permission in permissionsToDeny)
+            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            foreach (string permission in appPermissionsToDeny)
             {
-                Registry.SetValue(
-                    $@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\{permission}",
-                    "Value", "Deny"
+                using var permissionKey = localMachine.CreateSubKey(
+                    $@"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\{permission}"
                 );
+                permissionKey.SetValue("Value", "Deny");
             }
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy", "LetAppsActivateWithVoice", 2);
         }

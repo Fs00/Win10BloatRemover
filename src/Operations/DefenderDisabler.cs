@@ -2,7 +2,6 @@
 using Microsoft.Win32;
 using Win10BloatRemover.Utils;
 using static Win10BloatRemover.Operations.IUserInterface;
-using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations
 {
@@ -39,7 +38,7 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Downgrading Defender antimalware platform...");
             int exitCode = SystemUtils.RunProcessBlockingWithOutput(
-                $@"{Env.GetFolderPath(Env.SpecialFolder.ProgramFiles)}\Windows Defender\MpCmdRun.exe", "-resetplatform",
+                $@"{SystemUtils.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform",
                 ui
             );
 

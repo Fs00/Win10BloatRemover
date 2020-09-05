@@ -39,6 +39,12 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("SubscribedContent-353696Enabled", 0);
             }
 
+            // System -> Notifications & actions -> Suggest ways I can finish setting up my device...
+            Registry.SetValue(
+                @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement",
+                "ScoobeSystemSettingEnabled", 0
+            );
+
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace",
                 "AllowSuggestedAppsInWindowsInkWorkspace", 0

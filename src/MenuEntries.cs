@@ -238,7 +238,9 @@ namespace Win10BloatRemover
         {
             return "Feedback notifications/requests, apps suggestions, tips and Spotlight (including dynamic lock " +
                    "screen backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
-                   "some related scheduled tasks.";
+                   "some related scheduled tasks.\n\n" +
+                   "Be aware that some of these features can be disabled only for the currently logged in user, " +
+                   "therefore it is recommended to log into each user in the system and run this procedure.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new TipsDisabler(ui);
     }

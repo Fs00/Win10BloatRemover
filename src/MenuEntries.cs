@@ -106,8 +106,8 @@ namespace Win10BloatRemover
         public override string FullName => "Remove OneDrive";
         public override string GetExplanation()
         {
-            return "OneDrive will be first disabled using Group Policies, and then uninstalled using its setup program.\n" +
-                   "Futhermore, its setup will be prevented from running when an user logs in for the first time.";
+            return "OneDrive will be disabled using Group Policies and then uninstalled for the current user.\n" +
+                   "Futhermore, it will be prevented from being installed when a new user logs in for the first time.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new OneDriveRemover(ui);
     }

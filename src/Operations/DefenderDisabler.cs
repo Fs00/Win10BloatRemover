@@ -77,6 +77,11 @@ namespace Win10BloatRemover.Operations
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             localMachine.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");
             localMachine.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "SecurityHealth");
+
+            using RegistryKey notificationSettings = localMachine.CreateSubKey(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance"
+            );
+            notificationSettings.SetValue("Enabled", 0);
         }
 
         private void RemoveSecurityHealthServices()

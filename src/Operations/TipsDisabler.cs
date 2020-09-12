@@ -16,15 +16,17 @@ namespace Win10BloatRemover.Operations
         private void DisableTips()
         {
             ui.PrintHeading("Disabling Tips and Spotlight via Registry edits...");
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\CloudContent"))
-            {
-                key.SetValue("DisableSoftLanding", 1);
-                key.SetValue("DisableWindowsSpotlightFeatures", 1);
-                key.SetValue("DisableWindowsConsumerFeatures", 1);  // works only on Education and Enterprise editions
-                key.SetValue("DisableTailoredExperiencesWithDiagnosticData", 1);
-            }
 
-            // Equivalent of DisableWindowsConsumerFeatures policy for Home and Pro editions
+            // These two policies work only on Education and Enterprise editions
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableSoftLanding", 1);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableWindowsConsumerFeatures", 1);
+
+            Registry.SetValue(@"HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\CloudContent", "DisableWindowsSpotlightFeatures", 1);
+            Registry.SetValue(
+                @"HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\CloudContent",
+                "DisableTailoredExperiencesWithDiagnosticData", 1
+            );
+
             using (RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"))
             {
                 // System -> Notifications & actions -> Show the Windows welcome experience...
@@ -41,7 +43,7 @@ namespace Win10BloatRemover.Operations
 
             // System -> Notifications & actions -> Suggest ways I can finish setting up my device...
             Registry.SetValue(
-                @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement",
+                @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement",
                 "ScoobeSystemSettingEnabled", 0
             );
 

@@ -260,8 +260,8 @@ namespace Win10BloatRemover.Operations
 
         private void HideCortanaFromTaskBar()
         {
-            ui.PrintMessage("Hiding Cortana from the taskbar of the current user...");
-            Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "ShowCortanaButton", 0);
+            ui.PrintMessage("Hiding Cortana from the taskbar of current and default user...");
+            RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "ShowCortanaButton", 0);
         }
 
         private void RemoveMapsServicesAndTasks()
@@ -365,12 +365,12 @@ namespace Win10BloatRemover.Operations
             ui.PrintMessage("Writing values into the Registry...");
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "RemoveWindowsStore", 1);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PushToInstall", "DisablePushToInstall", 1);
-            Registry.SetValue(
-                @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
+            RegistryUtils.SetForCurrentAndDefaultUser(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
                 "SilentInstalledAppsEnabled", 0
             );
-            Registry.SetValue(
-                @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost",
+            RegistryUtils.SetForCurrentAndDefaultUser(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost",
                 "EnableWebContentEvaluation", 0
             );
 

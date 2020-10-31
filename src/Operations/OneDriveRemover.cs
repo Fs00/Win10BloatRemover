@@ -88,11 +88,7 @@ namespace Win10BloatRemover.Operations
         private void DisableAutomaticSetupForNewUsers()
         {
             ui.PrintMessage("Disabling automatic OneDrive setup for new users...");
-            int loadExitCode = SystemUtils.RunProcessBlocking("reg", @"load ""HKEY_USERS\_Default"" ""C:\Users\Default\NTUSER.DAT""");
-            if (loadExitCode != SystemUtils.EXIT_CODE_SUCCESS)
-                throw new Exception("Unable to load Default user registry hive.");
-            Registry.Users.DeleteSubKeyValue(@"_Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "OneDriveSetup");
-            SystemUtils.RunProcessBlocking("reg", @"unload ""HKEY_USERS\_Default""");
+            RegistryUtils.DefaultUser.DeleteSubKeyValue(@"Software\Microsoft\Windows\CurrentVersion\Run", "OneDriveSetup");
         }
     }
 }

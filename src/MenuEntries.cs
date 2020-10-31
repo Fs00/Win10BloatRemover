@@ -152,8 +152,8 @@ namespace Win10BloatRemover
                    "  - disabling voice activation for voice assistants (so that they can't always be listening)\n" +
                    "  - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages)\n" +
                    "  - disabling web search in bottom search bar\n\n" +
-                   "Whereas almost all of these settings are applied for all users, some of them are changed only for the current user.\n" +
-                   "Therefore it is recommended to log into each user in the system and run this procedure.";
+                   "Whereas almost all of these settings are applied for all users, some of them will only be changed " +
+                   "for the current user and for new users created after running this procedure.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new PrivacySettingsTweaker(ui);
     }
@@ -218,8 +218,8 @@ namespace Win10BloatRemover
             return "Feedback notifications/requests, apps suggestions, tips and Spotlight (including dynamic lock " +
                    "screen backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
                    "some related scheduled tasks.\n\n" +
-                   "Be aware that some of these features can be disabled only for the currently logged in user, " +
-                   "therefore it is recommended to log into each user in the system and run this procedure.";
+                   "Be aware that some of these features will be disabled only for the currently logged in user " +
+                   "and for new users created after running this procedure.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new TipsDisabler(ui);
     }

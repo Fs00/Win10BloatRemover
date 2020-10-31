@@ -1,12 +1,43 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Loader;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Microsoft.Win32;
 
 namespace Win10BloatRemover.Utils
 {
-    static class RegistryExtensions
+    static class RegistryUtils
     {
+        private const string DEFAULT_USER_HIVE_PATH = @"HKEY_USERS\_loaded_Default";
+        private static RegistryKey? defaultUserKey;
+        public static RegistryKey DefaultUser => defaultUserKey ??= LoadDefaultUserHive();
+
+        private static RegistryKey LoadDefaultUserHive()
+        {
+            int loadExitCode = SystemUtils.RunProcessBlocking(
+                "reg", $@"load ""{DEFAULT_USER_HIVE_PATH}"" ""C:\Users\Default\NTUSER.DAT"""
+            );
+            if (loadExitCode != SystemUtils.EXIT_CODE_SUCCESS)
+                throw new Exception("Unable to load Default user registry hive.");
+
+            AssemblyLoadContext.Default.Unloading += _ => UnloadDefaultUserHive();
+            return Registry.Users.OpenSubKey("_loaded_Default", writable: true)!;
+        }
+
+        private static void UnloadDefaultUserHive()
+        {
+            defaultUserKey?.Close();
+            SystemUtils.RunProcessBlocking("reg", $@"unload ""{DEFAULT_USER_HIVE_PATH}""");
+        }
+
+        public static void SetForCurrentAndDefaultUser(string keyPath, string valueName, object value)
+        {
+            Registry.SetValue($@"HKEY_CURRENT_USER\{keyPath}", valueName, value);
+            using (RegistryKey key = DefaultUser.CreateSubKey(keyPath))
+                key.SetValue(valueName, value);
+        }
+
         public static void DeleteSubKeyValue(this RegistryKey registryKey, string subkeyName, string valueName)
         {
             using RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, writable: true);

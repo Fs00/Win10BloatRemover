@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.IO;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
 using static Win10BloatRemover.Operations.IUserInterface;
@@ -75,6 +76,9 @@ namespace Win10BloatRemover.Operations
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive", ui);
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", ui);
             SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", ui);
+            var menuShortcut = new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.StartMenu)}\Programs\OneDrive.lnk");
+            if (menuShortcut.Exists)
+                menuShortcut.Delete();
         }
 
         private void RemoveResidualRegistryKeys()

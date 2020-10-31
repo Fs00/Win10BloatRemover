@@ -165,7 +165,7 @@ namespace Win10BloatRemover
         {
             return "This procedure will disable scheduled tasks, services and features that are responsible for " +
                    "collecting and reporting data to Microsoft, including Compatibility Telemetry, Device Census, " +
-                   "Steps Recorder and Compatibility Assistant.";
+                   "Customer Experience Improvement Program and Compatibility Assistant.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui);
     }

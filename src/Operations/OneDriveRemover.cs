@@ -80,7 +80,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveResidualRegistryKeys()
         {
             using RegistryKey classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry64);
-            using RegistryKey key = classesRoot.OpenSubKey(@"CLSID", writable: true);
+            using RegistryKey key = classesRoot.OpenSubKeyWritable(@"CLSID");
             key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", throwOnMissingSubKey: false);
         }
 

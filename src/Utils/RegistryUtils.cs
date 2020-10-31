@@ -22,7 +22,7 @@ namespace Win10BloatRemover.Utils
                 throw new Exception("Unable to load Default user registry hive.");
 
             AssemblyLoadContext.Default.Unloading += _ => UnloadDefaultUserHive();
-            return Registry.Users.OpenSubKey("_loaded_Default", writable: true)!;
+            return Registry.Users.OpenSubKeyWritable("_loaded_Default");
         }
 
         private static void UnloadDefaultUserHive()
@@ -44,9 +44,13 @@ namespace Win10BloatRemover.Utils
             subKey?.DeleteValue(valueName, throwOnMissingValue: false);
         }
 
-        public static RegistryKey OpenSubKeyOrThrowIfMissing(this RegistryKey registryKey, string subkeyName, RegistryRights rights)
+        public static RegistryKey OpenSubKeyWritable(this RegistryKey registryKey, string subkeyName, RegistryRights? rights = null)
         {
-            RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights);
+            RegistryKey? subKey;
+            if (rights == null)
+                subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree);
+            else
+                subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights.Value);
 
             if (subKey == null)
                 throw new KeyNotFoundException($"Subkey {subkeyName} not found.");
@@ -57,7 +61,7 @@ namespace Win10BloatRemover.Utils
         // It's up to the caller to obtain the needed token privileges (TakeOwnership) for this operation
         public static void GrantFullControlOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
-            using RegistryKey subKey = registryKey.OpenSubKeyOrThrowIfMissing(subkeyName,
+            using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName,
                 RegistryRights.TakeOwnership | RegistryRights.ChangePermissions
             );
             RegistrySecurity accessRules = subKey.GetAccessControl();
@@ -77,7 +81,7 @@ namespace Win10BloatRemover.Utils
         // It's up to the caller to obtain the needed privileges (TakeOwnership) for this operation
         public static void TakeOwnershipOnSubKey(this RegistryKey registryKey, string subkeyName)
         {
-            using RegistryKey subKey = registryKey.OpenSubKeyOrThrowIfMissing(subkeyName, RegistryRights.TakeOwnership);
+            using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName, RegistryRights.TakeOwnership);
             RegistrySecurity accessRules = subKey.GetAccessControl();
             accessRules.SetOwner(WindowsIdentity.GetCurrent().User);
             subKey.SetAccessControl(accessRules);

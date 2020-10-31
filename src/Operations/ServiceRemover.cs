@@ -73,7 +73,7 @@ namespace Win10BloatRemover.Operations
 
         private string[] GetAllServicesNames()
         {
-            using RegistryKey servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services");
+            using RegistryKey servicesKey = Registry.LocalMachine.OpenSubKeyWritable(@"SYSTEM\CurrentControlSet\Services");
             return servicesKey.GetSubKeyNames();
         }
 
@@ -135,7 +135,7 @@ namespace Win10BloatRemover.Operations
         {
             try
             {
-                using var allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", writable: true);
+                using var allServicesKey = Registry.LocalMachine.OpenSubKeyWritable(@"SYSTEM\CurrentControlSet\Services");
                 allServicesKey.DeleteSubKeyTree(service);
                 ui.PrintMessage($"Service {service} removed, but it will continue to run until the next restart.");
             }

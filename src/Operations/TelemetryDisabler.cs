@@ -55,7 +55,7 @@ namespace Win10BloatRemover.Operations
         {
             using (TokenPrivilege.TakeOwnership)
             {
-                using RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", writable: true);
+                using RegistryKey allServicesKey = Registry.LocalMachine.OpenSubKeyWritable(@"SYSTEM\CurrentControlSet\Services");
                 foreach (string serviceName in protectedServicesToRemove)
                     TryRemoveProtectedService(serviceName, allServicesKey);
             }
@@ -77,7 +77,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveProtectedService(string serviceName, RegistryKey allServicesKey)
         {
             allServicesKey.GrantFullControlOnSubKey(serviceName);
-            using RegistryKey serviceKey = allServicesKey.OpenSubKey(serviceName, writable: true);
+            using RegistryKey serviceKey = allServicesKey.OpenSubKeyWritable(serviceName);
             foreach (string subkeyName in serviceKey.GetSubKeyNames())
             {
                 // Protected subkeys must first be opened only with TakeOwnership right,

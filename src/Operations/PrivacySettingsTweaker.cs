@@ -48,8 +48,7 @@ namespace Win10BloatRemover.Operations
             // Privacy -> Diagnostics and feedback -> Improve inking and typing recognition
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\TextInput",
-                "AllowLinguisticDataCollection", 0
-            );
+                "AllowLinguisticDataCollection", 0);
 
             // Privacy -> Speech
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\InputPersonalization", "AllowInputPersonalization", 0);

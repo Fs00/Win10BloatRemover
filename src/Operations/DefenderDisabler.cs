@@ -39,16 +39,14 @@ namespace Win10BloatRemover.Operations
             ui.PrintHeading("Downgrading Defender antimalware platform...");
             int exitCode = SystemUtils.RunProcessBlockingWithOutput(
                 $@"{SystemUtils.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform",
-                ui
-            );
+                ui);
 
             if (exitCode != SystemUtils.EXIT_CODE_SUCCESS)
             {
                 ui.PrintWarning(
                     "Antimalware platform downgrade failed. This is likely happened because you have already disabled Windows Defender.\n" +
                     "If this is not your case, you can proceed anyway but be aware that Defender will not be disabled fully " +
-                    "if the antimalware platform has been updated to version 4.18.2007.8 or higher through Windows Update."
-                );
+                    "if the antimalware platform has been updated to version 4.18.2007.8 or higher through Windows Update.");
                 var choice = ui.AskUserConsent("Do you want to continue?");
                 if (choice == UserChoice.No)
                     throw new Exception("The user aborted the operation.");

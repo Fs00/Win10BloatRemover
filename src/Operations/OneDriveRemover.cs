@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
+using static Win10BloatRemover.Operations.IUserInterface;
 
 namespace Win10BloatRemover.Operations
 {
@@ -34,9 +35,8 @@ namespace Win10BloatRemover.Operations
         {
             var choice = ui.AskUserConsent(
                 "Do you still want to continue the process by removing all leftover OneDrive files (including its " +
-                "application files for the current user) and registry keys?"
-            );
-            if (choice == IUserInterface.UserChoice.No)
+                "application files for the current user) and registry keys?");
+            if (choice == UserChoice.No)
                 throw new Exception("The user aborted the operation.");
         }
 

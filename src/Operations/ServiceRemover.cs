@@ -122,12 +122,10 @@ namespace Win10BloatRemover.Operations
 
         private void PrintSuccessMessage(int scExitCode, string service)
         {
-            if (scExitCode == SystemUtils.EXIT_CODE_SUCCESS)
-                ui.PrintMessage($"Service {service} removed successfully.");
-            else if (scExitCode == SC_EXIT_CODE_MARKED_FOR_DELETION)
+            if (scExitCode == SC_EXIT_CODE_MARKED_FOR_DELETION)
                 ui.PrintMessage($"Service {service} will be removed after reboot.");
             else
-                Debug.Fail($"There must be an error in {nameof(IsScExitCodeSuccessful)}: exit code {scExitCode}.");
+                ui.PrintMessage($"Service {service} removed successfully.");
         }
 
         private void DeleteServiceRegistryKey(string service)

@@ -43,9 +43,11 @@ namespace Win10BloatRemover
             foreach (UWPAppGroup app in configuration.UWPAppsToRemove)
                 explanation += $"  {app}\n";
 
-            return explanation + "Some specific app-related services will also be removed " +
-                                 "(but backed up in case you need to restore them).\n" +
-                                 "In order to remove Edge and some components of Xbox, you need to make system apps removable first.";
+            if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.AllUsers)
+                explanation += "\nServices, components and scheduled tasks used specifically by those apps will also " +
+                               "be disabled or removed, together with any leftover data.";
+
+            return explanation + "\nIn order to remove Edge and some components of Xbox, you need to make system apps removable first.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui);

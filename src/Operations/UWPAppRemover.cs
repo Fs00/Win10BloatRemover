@@ -220,26 +220,19 @@ namespace Win10BloatRemover.Operations
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
         {
-            ui.PrintSubHeading($"Performing post-uninstall operations for app {appGroup}...");
             try
             {
-                PerformPostUninstallOperations(appGroup);
+                if (postUninstallOperationsForGroup.ContainsKey(appGroup))
+                {
+                    ui.PrintEmptySpace();
+                    postUninstallOperationsForGroup[appGroup]();
+                }
             }
             catch (Exception exc)
             {
-                ui.PrintError($"Unable to complete post-uninstall operations for app group {appGroup}: {exc.Message}");
+                ui.PrintError(
+                    $"An error occurred while performing post-uninstall/cleanup operations for app group {appGroup}: {exc.Message}");
             }
-        }
-
-        /*
-         * Removes any eventual services, scheduled tasks and/or registry keys related to the specified app group
-         */
-        private void PerformPostUninstallOperations(UWPAppGroup appGroup)
-        {
-            if (postUninstallOperationsForGroup.ContainsKey(appGroup))
-                postUninstallOperationsForGroup[appGroup]();
-            else
-                ui.PrintMessage("Nothing to do.");
         }
 
         private void PerformEdgePostUninstallOperations()

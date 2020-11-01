@@ -17,23 +17,17 @@ namespace Win10BloatRemover
 
         public void PrintNotice(string text)
         {
-            PrintEmptyLine();
+            PrintEmptySpace();
             PrintConsoleMessage(text, ConsoleColor.Cyan);
         }
 
         public void PrintHeading(string text)
         {
-            PrintEmptyLine();
+            PrintEmptySpace();
             PrintConsoleMessage(text, ConsoleColor.Green);
         }
 
-        public void PrintSubHeading(string text)
-        {
-            PrintEmptyLine();
-            PrintConsoleMessage(text, ConsoleColor.DarkGreen);
-        }
-
-        private void PrintEmptyLine()
+        public void PrintEmptySpace()
         {
             // Avoid a double empty line when called at the beginning of an operation
             if (writtenMessages > 0)
@@ -44,7 +38,7 @@ namespace Win10BloatRemover
         {
             Console.Write(text + " (y/N) ");
             string userInput = Console.ReadLine()?.Trim() ?? "";
-            PrintEmptyLine();
+            PrintEmptySpace();
             bool userPressedY = userInput.Equals("y", StringComparison.InvariantCultureIgnoreCase);
             return userPressedY ? UserChoice.Yes : UserChoice.No;
         }

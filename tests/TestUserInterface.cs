@@ -34,7 +34,7 @@ namespace Win10BloatRemover.Tests
 
         public void PrintHeading(string text) => WriteText($"--- {text.ToUpper()} ---");
 
-        public void PrintSubHeading(string text) => WriteText($"-- {text} --");
+        public void PrintEmptySpace() => WriteText("");
 
         private void WriteText(string text)
         {

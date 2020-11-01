@@ -66,7 +66,7 @@ namespace Win10BloatRemover.Operations
             try
             {
                 RemoveProtectedService(serviceName, allServicesKey);
-                ui.PrintMessage($"Service {serviceName} removed successfully.");
+                ui.PrintMessage($"Service {serviceName} removed, but it will continue to run until the next restart.");
             }
             catch (Exception exc)
             {

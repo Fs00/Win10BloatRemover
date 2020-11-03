@@ -1,4 +1,4 @@
-﻿# Windows 10 Bloat Remover and Tweaker
+# Windows 10 Bloat Remover and Tweaker
 This configurable tool provides an interactive command-line interface to aggressively debloat and tweak your Windows 10 installation in an easy way. Here's what it can do for you:
 
 * **Make system apps removable** by editing an internal system database. Thanks to this, apps like Edge, Security Center and others can be uninstalled using default PowerShell commands. Take note that usually system apps get reinstalled by Windows cumulative updates.  
@@ -6,7 +6,7 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Disable OS telemetry:** disables several Windows components that collect diagnostic and usage information such as Compatibility Telemetry, Inventory, Device Census, Customer Experience Improvement Program and others. It also deletes the services which are responsible for data reporting to Microsoft.
 * **Remove system services:** deletes - not just disables - the services specified by the user (see *Configuration* below, option `ServicesToRemove`) after backing up their Registry keys, so that you can restore them if anything breaks.
 * **Tweak Windows settings for enhanced privacy:** makes Windows more privacy-respectful by turning off certain system features that put your personal data at risk, such as inking/typing personalization, app launch tracking, clipboard/text messages synchronization, voice activation and some more. Take note that the goal here is to provide a mindful balance that leans towards privacy, without sacrificing too much in terms of user experience.
-* **Disable Windows Defender:** disables the antivirus that comes pre-installed on the OS and removes its background services. Also, if you make system apps removable, Windows Security app will be uninstalled. *Only for tech-savvy users!*
+* **Disable Windows Defender:** disables the antivirus that comes pre-installed on the OS and removes its background services. Also, if you make system apps removable, Windows Security app will be uninstalled. *Only for tech-savvy users!⚠️*
 * **Remove OneDrive** using the uninstaller provided by Microsoft, its folder in Explorer sidebar will also be hidden. Furthermore, its automatic setup will be disabled to prevent the app from being installed for new users.
 * **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* below, option `WindowsFeaturesToRemove`).
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
@@ -15,7 +15,14 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Disable Tips, Spotlight and feedback requests** through Group Policies
 * **Disable scheduled tasks** specified by the user (see *Configuration* below, option `ScheduledTasksToDisable`)
 
-Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages/Windows Defender), and carry over after major Windows updates and full system restores.
+Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.
+
+👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**
+
+## Release cycle and versions
+The binaries of this tool can be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter raising an error when run on an OS version different from 1903. This is done to ease developer maintenance and to make the tool impossible to run on an incompatible system (mistake-proof 😉).  
+The third segment of the program version is the supported Windows version (it was the first segment in the first releases of the tool), so you can see at a glance if you have the right binary for your system.  
+The tool will be updated after any new Windows version. Only the latest two versions of Windows will be supported at the same time. The master branch will host the source code for the most recent version of Windows.
 
 ## Configuration
 Program settings are stored in [JSON format](https://en.wikipedia.org/wiki/JSON) in a file called *config.json*, located in the same folder as the program's executable. If said file is not found (e.g. when launching the tool for the first time), it is created containing the default settings.
@@ -90,16 +97,8 @@ You can find the names of all FOD capabilities available for your system (includ
   - `"Hello.Face"` (Windows Hello face authentication)
   - `"MathRecognizer"` (Math Input Panel, Control and Recognizer)
 
-## Release cycle and versions
-The binaries of this tool can be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter raising an error when run on an OS version different from 1903. This is done to ease developer maintenance and to make the tool impossible to run on an incompatible system (mistake-proof😉).  
-The third segment of the program version is the supported Windows version (it was the first segment in the first releases of the tool), so you can see at a glance if you have the right binary for your system.  
-The tool will be updated after any new Windows version. Only the latest two versions of Windows will be supported at the same time. The master branch will host the source code for the most recent version of Windows.
-
 ## Credits
 This tool was originally based on Federico Dossena's [Windows 10 de-botnet guide](https://github.com/adolfintel/Windows10-Privacy), which is now discontinued.  
 Over time, the program evolved on its own, taking sometimes inspiration from the work made by other open source developers:
   - [**privacy.sexy** website](https://github.com/undergroundwires/privacy.sexy) by @undergroundwires
   - [**Debloat Windows 10** scripts](https://github.com/W4RH4WK/Debloat-Windows-10) by @W4RH4WK
-
-## Download
-Head to Releases.

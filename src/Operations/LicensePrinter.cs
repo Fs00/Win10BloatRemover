@@ -1,4 +1,4 @@
-﻿using System.Resources;
+﻿using System.IO;
 
 namespace Win10BloatRemover.Operations
 {
@@ -9,8 +9,9 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            var resources = new ResourceManager("Win10BloatRemover.resources.Resources", typeof(Program).Assembly);
-            ui.PrintNotice(resources.GetString("LicenseText")!);
+            Stream licenseFile = GetType().Assembly.GetManifestResourceStream("Win10BloatRemover.Resources.License.txt")!;
+            string licenseText = new StreamReader(licenseFile).ReadToEnd();
+            ui.PrintNotice(licenseText);
         }
     }
 }

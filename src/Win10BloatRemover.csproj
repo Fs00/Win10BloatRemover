@@ -10,9 +10,7 @@
     <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\License.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.8" />

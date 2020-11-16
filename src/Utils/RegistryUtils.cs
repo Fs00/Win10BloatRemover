@@ -65,10 +65,11 @@ namespace Win10BloatRemover.Utils
                 RegistryRights.TakeOwnership | RegistryRights.ChangePermissions
             );
             RegistrySecurity accessRules = subKey.GetAccessControl();
-            accessRules.SetOwner(WindowsIdentity.GetCurrent().User);
+            SecurityIdentifier currentUser = RetrieveCurrentUserIdentifier();
+            accessRules.SetOwner(currentUser);
             accessRules.ResetAccessRule(
                 new RegistryAccessRule(
-                    WindowsIdentity.GetCurrent().User,
+                    currentUser,
                     RegistryRights.FullControl,
                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
                     PropagationFlags.None,
@@ -83,8 +84,11 @@ namespace Win10BloatRemover.Utils
         {
             using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName, RegistryRights.TakeOwnership);
             RegistrySecurity accessRules = subKey.GetAccessControl();
-            accessRules.SetOwner(WindowsIdentity.GetCurrent().User);
+            accessRules.SetOwner(RetrieveCurrentUserIdentifier());
             subKey.SetAccessControl(accessRules);
         }
+
+        private static SecurityIdentifier RetrieveCurrentUserIdentifier() 
+            => WindowsIdentity.GetCurrent().User ?? throw new Exception("Unable to retrieve current user SID.");
     }
 }

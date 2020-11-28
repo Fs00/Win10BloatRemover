@@ -21,6 +21,8 @@ namespace Win10BloatRemover.Operations
 
         private const int SC_EXIT_CODE_MARKED_FOR_DELETION = 1072;
 
+        public bool IsRebootRecommended { get; private set; }
+
         public static void BackupAndRemove(string[] servicesToRemove, IUserInterface ui)
         {
             var serviceRemover = new ServiceRemover(servicesToRemove, ui);
@@ -103,8 +105,12 @@ namespace Win10BloatRemover.Operations
         private void RemoveService(string service)
         {
             int scExitCode = SystemUtils.RunProcessBlocking("sc", $"delete \"{service}\"");
-            if (IsScExitCodeSuccessful(scExitCode))
+            if (IsScRemovalSuccessful(scExitCode))
+            {
                 PrintSuccessMessage(scExitCode, service);
+                if (scExitCode == SC_EXIT_CODE_MARKED_FOR_DELETION)
+                    IsRebootRecommended = true;
+            }
             else
             {
                 // Unstoppable (but not protected) system services are not removable with SC,
@@ -114,7 +120,7 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private bool IsScExitCodeSuccessful(int exitCode)
+        private bool IsScRemovalSuccessful(int exitCode)
         {
             return exitCode == SystemUtils.EXIT_CODE_SUCCESS ||
                    exitCode == SC_EXIT_CODE_MARKED_FOR_DELETION;
@@ -135,6 +141,7 @@ namespace Win10BloatRemover.Operations
                 using var allServicesKey = Registry.LocalMachine.OpenSubKeyWritable(@"SYSTEM\CurrentControlSet\Services");
                 allServicesKey.DeleteSubKeyTree(service);
                 ui.PrintMessage($"Service {service} removed, but it will continue to run until the next restart.");
+                IsRebootRecommended = true;
             }
             catch (Exception exc)
             {

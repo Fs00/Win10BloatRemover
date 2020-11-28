@@ -25,7 +25,7 @@ namespace Win10BloatRemover.Operations
         public ServiceRemover(IUserInterface ui, DateTime now)
         {
             this.ui = ui;
-            backupDirectory = new DirectoryInfo($"servicesBackup_{now:yyyy-MM-dd_hh-mm-ss}");
+            backupDirectory = new DirectoryInfo($"servicesBackup_{now:yyyy-MM-dd_HH-mm-ss}");
         }
 
         public ServiceRemover(string[] servicesToRemove, IUserInterface ui, DateTime now) : this(ui, now)

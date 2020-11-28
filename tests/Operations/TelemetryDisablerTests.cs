@@ -1,4 +1,5 @@
-﻿using Win10BloatRemover.Operations;
+﻿using System;
+using Win10BloatRemover.Operations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Repeat;
@@ -16,7 +17,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldNotEncounterErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var telemetryDisabler = new TelemetryDisabler(ui, new ServiceRemover(ui));
+            var telemetryDisabler = new TelemetryDisabler(ui, new ServiceRemover(ui, DateTime.Now));
 
             telemetryDisabler.Run();
 

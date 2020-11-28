@@ -1,4 +1,5 @@
-﻿using Win10BloatRemover.Operations;
+﻿using System;
+using Win10BloatRemover.Operations;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,7 +22,7 @@ namespace Win10BloatRemover.Tests.Operations
         {
             var ui = new TestUserInterface(output);
             var removalEnabler = new SystemAppsRemovalEnabler(ui);
-            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui));
+            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui, DateTime.Now));
 
             removalEnabler.Run();
             appRemover.Run();

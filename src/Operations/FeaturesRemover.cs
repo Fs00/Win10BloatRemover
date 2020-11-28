@@ -25,8 +25,6 @@ namespace Win10BloatRemover.Operations
                 foreach (string capabilityName in featuresToRemove)
                     RemoveCapabilitiesWhoseNameStartsWith(capabilityName);
             }
-
-            ui.PrintNotice("A system reboot is recommended.");
         }
 
         private void RemoveCapabilitiesWhoseNameStartsWith(string capabilityName)

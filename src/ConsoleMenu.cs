@@ -106,6 +106,9 @@ namespace Win10BloatRemover
                     return;
 
                 operation.Run();
+                if (operation.IsRebootRecommended)
+                    ConsoleHelpers.WriteLine("\nA system reboot is recommended.", ConsoleColor.Cyan);
+
                 Console.Write("\nDone! ");
             }
             catch (Exception exc)

@@ -17,13 +17,15 @@ namespace Win10BloatRemover.Operations
 
         private readonly IUserInterface ui;
         private readonly IOperation securityCenterRemover;
+        private readonly ServiceRemover serviceRemover;
 
         public bool IsRebootRecommended { get; private set; }
 
-        public DefenderDisabler(IUserInterface ui, IOperation securityCenterRemover)
+        public DefenderDisabler(IUserInterface ui, IOperation securityCenterRemover, ServiceRemover serviceRemover)
         {
             this.ui = ui;
             this.securityCenterRemover = securityCenterRemover;
+            this.serviceRemover = serviceRemover;
         }
 
         public void Run()
@@ -87,7 +89,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveSecurityHealthServices()
         {
             ui.PrintHeading("Removing Security Health services...");
-            ServiceRemover.BackupAndRemove(securityHealthServices, ui);
+            serviceRemover.BackupAndRemove(securityHealthServices);
         }
     }
 }

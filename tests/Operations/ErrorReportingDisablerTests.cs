@@ -16,7 +16,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldNotEncounterErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var errorReportingDisabler = new ErrorReportingDisabler(ui);
+            var errorReportingDisabler = new ErrorReportingDisabler(ui, new ServiceRemover(ui));
 
             errorReportingDisabler.Run();
 

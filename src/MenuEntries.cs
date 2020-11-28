@@ -50,7 +50,7 @@ namespace Win10BloatRemover
             return explanation + "\nIn order to remove Edge and some components of Xbox, you need to make system apps removable first.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui);
+            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new ServiceRemover(ui));
     }
 
     class DefenderDisablingEntry : MenuEntry
@@ -73,8 +73,9 @@ namespace Win10BloatRemover
                 new UWPAppRemover(
                     new[] { UWPAppGroup.SecurityCenter },
                     UWPAppRemovalMode.AllUsers,
-                    ui
-                )
+                    ui, new ServiceRemover(ui)
+                ),
+                new ServiceRemover(ui)
             );
         }
     }
@@ -90,7 +91,7 @@ namespace Win10BloatRemover
                    "only if you know the consequences and risks of uninstalling system apps.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui);
+            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui));
     }
 
     class OneDriveRemovalEntry : MenuEntry
@@ -169,7 +170,8 @@ namespace Win10BloatRemover
                    "collecting and reporting data to Microsoft, including Compatibility Telemetry, Device Census, " +
                    "Customer Experience Improvement Program and Compatibility Assistant.";
         }
-        public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui)
+            => new TelemetryDisabler(ui, new ServiceRemover(ui));
     }
 
     class AutoUpdatesDisablingEntry : MenuEntry
@@ -209,7 +211,8 @@ namespace Win10BloatRemover
             return "Windows Error Reporting will disabled by editing Group Policies, as well as by removing " +
                    "its services (after backing them up).";
         }
-        public override IOperation CreateNewOperation(IUserInterface ui) => new ErrorReportingDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui)
+            => new ErrorReportingDisabler(ui, new ServiceRemover(ui));
     }
 
     class TipsAndFeedbackDisablingEntry : MenuEntry

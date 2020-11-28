@@ -10,7 +10,15 @@ namespace Win10BloatRemover.Operations
         };
 
         private readonly IUserInterface ui;
-        public ErrorReportingDisabler(IUserInterface ui) => this.ui = ui;
+        private readonly ServiceRemover serviceRemover;
+
+        public bool IsRebootRecommended { get; private set; }
+
+        public ErrorReportingDisabler(IUserInterface ui, ServiceRemover serviceRemover)
+        {
+            this.ui = ui;
+            this.serviceRemover = serviceRemover;
+        }
 
         public void Run()
         {
@@ -30,7 +38,8 @@ namespace Win10BloatRemover.Operations
         private void RemoveErrorReportingServices()
         {
             ui.PrintHeading("Backing up and removing error reporting services...");
-            ServiceRemover.BackupAndRemove(errorReportingServices, ui);
+            serviceRemover.BackupAndRemove(errorReportingServices);
+            IsRebootRecommended = serviceRemover.IsRebootRecommended;
         }
         
         private void DisableErrorReportingScheduledTasks()

@@ -113,15 +113,17 @@ namespace Win10BloatRemover.Operations
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
         private readonly IUserInterface ui;
+        private readonly ServiceRemover serviceRemover;
 
         private /*lateinit*/ PowerShell powerShell;
 
         #nullable disable warnings
-        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui)
+        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, ServiceRemover serviceRemover)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;
             this.ui = ui;
+            this.serviceRemover = serviceRemover;
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
@@ -264,8 +266,7 @@ namespace Win10BloatRemover.Operations
                 @"\Microsoft\Windows\Maps\MapsUpdateTask",
                 @"\Microsoft\Windows\Maps\MapsToastTask"
             }, ui).Run();
-
-            ServiceRemover.BackupAndRemove(new[] { "MapsBroker", "lfsvc" }, ui);
+            serviceRemover.BackupAndRemove("MapsBroker", "lfsvc");
         }
 
         private void RemoveXboxServicesAndTasks()
@@ -273,13 +274,13 @@ namespace Win10BloatRemover.Operations
             ui.PrintMessage("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" }, ui).Run();
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
-            ServiceRemover.BackupAndRemove(new[] { "XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc" }, ui);
+            serviceRemover.BackupAndRemove("XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc");
         }
 
         private void RemoveMessagingService()
         {
             ui.PrintMessage("Removing app-related services...");
-            ServiceRemover.BackupAndRemove(new[] { "MessagingService" }, ui);
+            serviceRemover.BackupAndRemove("MessagingService");
         }
 
         private void RemovePaint3DContextMenuEntries()
@@ -368,7 +369,7 @@ namespace Win10BloatRemover.Operations
             );
 
             ui.PrintMessage("Removing app-related services...");
-            ServiceRemover.BackupAndRemove(new[] { "PushToInstall" }, ui);
+            serviceRemover.BackupAndRemove("PushToInstall");
         }
     }
 }

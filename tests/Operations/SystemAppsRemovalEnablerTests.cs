@@ -21,7 +21,7 @@ namespace Win10BloatRemover.Tests.Operations
         {
             var ui = new TestUserInterface(output);
             var removalEnabler = new SystemAppsRemovalEnabler(ui);
-            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui);
+            var appRemover = new UWPAppRemover(groupsWithSystemApps, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui));
 
             removalEnabler.Run();
             appRemover.Run();

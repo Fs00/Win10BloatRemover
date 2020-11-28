@@ -33,7 +33,15 @@ namespace Win10BloatRemover.Operations
         };
 
         private readonly IUserInterface ui;
-        public TelemetryDisabler(IUserInterface ui) => this.ui = ui;
+        private readonly ServiceRemover serviceRemover;
+
+        public bool IsRebootRecommended { get; private set; }
+
+        public TelemetryDisabler(IUserInterface ui, ServiceRemover serviceRemover)
+        {
+            this.ui = ui;
+            this.serviceRemover = serviceRemover;
+        }
 
         public void Run()
         {
@@ -45,9 +53,11 @@ namespace Win10BloatRemover.Operations
         private void RemoveTelemetryServices()
         {
             ui.PrintHeading("Backing up and removing telemetry services...");
-            ServiceRemover.BackupAndRemove(telemetryServices, ui);
+            serviceRemover.BackupAndRemove(telemetryServices);
+            if (serviceRemover.IsRebootRecommended)
+                IsRebootRecommended = true;
 
-            string[] actualProtectedServices = new ServiceRemover(protectedTelemetryServices, ui).PerformBackup();
+            string[] actualProtectedServices = serviceRemover.PerformBackup(protectedTelemetryServices);
             RemoveProtectedServices(actualProtectedServices);
         }
 
@@ -67,6 +77,7 @@ namespace Win10BloatRemover.Operations
             {
                 RemoveProtectedService(serviceName, allServicesKey);
                 ui.PrintMessage($"Service {serviceName} removed, but it will continue to run until the next restart.");
+                IsRebootRecommended = true;
             }
             catch (Exception exc)
             {

@@ -41,7 +41,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldRemoveAnAppForCurrentUser_WithoutRemovingItsProvisionedPackage()
         {
             var ui = new TestUserInterface(output);
-            var appRemover = new UWPAppRemover(new[] { UWPAppGroup.Maps }, UWPAppRemovalMode.CurrentUser, ui);
+            var appRemover = new UWPAppRemover(new[] { UWPAppGroup.Maps }, UWPAppRemovalMode.CurrentUser, ui, new ServiceRemover(ui));
 
             appRemover.Run();
 
@@ -61,7 +61,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldRemoveGroupsWithNoSystemAppsWithoutErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var appRemover = new UWPAppRemover(groupsWithNoSystemApps, UWPAppRemovalMode.AllUsers, ui);
+            var appRemover = new UWPAppRemover(groupsWithNoSystemApps, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui));
 
             appRemover.Run();
 

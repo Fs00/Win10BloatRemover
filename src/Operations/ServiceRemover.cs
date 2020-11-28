@@ -9,13 +9,12 @@ using Win10BloatRemover.Utils;
 namespace Win10BloatRemover.Operations
 {
     /*
-     *  Performs backup (export of registry keys) and removal of those services whose name starts with the service names
-     *  passed into the constructor.
+     *  Performs backup (export of registry keys) and removal of those services whose name starts with the given service names.
      *  This is made in order to include services that end with a random code.
      */
     public class ServiceRemover : IOperation
     {
-        private readonly string[] servicesToRemove;
+        private readonly string[] servicesToRemove = default!;
         private readonly DirectoryInfo backupDirectory;
         private readonly IUserInterface ui;
 
@@ -23,24 +22,28 @@ namespace Win10BloatRemover.Operations
 
         public bool IsRebootRecommended { get; private set; }
 
-        public static void BackupAndRemove(string[] servicesToRemove, IUserInterface ui)
+        public ServiceRemover(IUserInterface ui)
         {
-            var serviceRemover = new ServiceRemover(servicesToRemove, ui);
-            string[] actualBackuppedServices = serviceRemover.PerformBackup();
-            serviceRemover.PerformRemoval(actualBackuppedServices);
-        }
-
-        public ServiceRemover(string[] servicesToRemove, IUserInterface ui)
-        {
-            this.servicesToRemove = servicesToRemove;
             this.ui = ui;
             backupDirectory = new DirectoryInfo($"servicesBackup_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}");
+        }
+
+        public ServiceRemover(string[] servicesToRemove, IUserInterface ui) : this(ui)
+        {
+            this.servicesToRemove = servicesToRemove;
+        }
+
+        public void BackupAndRemove(params string[] servicesToRemove)
+        {
+            IsRebootRecommended = false;
+            string[] actualBackuppedServices = PerformBackup(servicesToRemove);
+            PerformRemoval(actualBackuppedServices);
         }
 
         void IOperation.Run()
         {
             ui.PrintHeading("Backing up services...");
-            string[] actualBackuppedServices = PerformBackup();
+            string[] actualBackuppedServices = PerformBackup(servicesToRemove);
 
             if (actualBackuppedServices.Length > 0)
             {
@@ -49,9 +52,9 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        public string[] PerformBackup()
+        public string[] PerformBackup(string[] servicesToBackup)
         {
-            string[] existingServices = FindExistingServicesWithNames(servicesToRemove);
+            string[] existingServices = FindExistingServicesWithNames(servicesToBackup);
             foreach (string service in existingServices)
                 BackupService(service);
             return existingServices;

@@ -16,7 +16,7 @@ namespace Win10BloatRemover.Tests.Operations
         public void ShouldNotEncounterErrors(int attempt)
         {
             var ui = new TestUserInterface(output);
-            var telemetryDisabler = new TelemetryDisabler(ui);
+            var telemetryDisabler = new TelemetryDisabler(ui, new ServiceRemover(ui));
 
             telemetryDisabler.Run();
 

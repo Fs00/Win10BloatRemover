@@ -18,6 +18,8 @@ namespace Win10BloatRemover.Operations
         private readonly IUserInterface ui;
         private readonly IOperation securityCenterRemover;
 
+        public bool IsRebootRecommended { get; private set; }
+
         public DefenderDisabler(IUserInterface ui, IOperation securityCenterRemover)
         {
             this.ui = ui;
@@ -38,8 +40,7 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Downgrading Defender antimalware platform...");
             int exitCode = SystemUtils.RunProcessBlockingWithOutput(
-                $@"{SystemUtils.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform",
-                ui);
+                $@"{SystemUtils.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform", ui);
 
             if (exitCode != SystemUtils.EXIT_CODE_SUCCESS)
             {
@@ -51,6 +52,7 @@ namespace Win10BloatRemover.Operations
                 if (choice == UserChoice.No)
                     throw new Exception("The user aborted the operation.");
             }
+            IsRebootRecommended = true;
         }
 
         private void EditWindowsRegistryKeys()

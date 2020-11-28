@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿using System.Linq;
+using System.Management.Automation;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
@@ -9,6 +10,8 @@ namespace Win10BloatRemover.Operations
         private readonly IUserInterface ui;
 
         private /*lateinit*/ PowerShell powerShell;
+
+        public bool IsRebootRecommended { get; private set; }
 
         #nullable disable warnings
         public FeaturesRemover(string[] featuresToRemove, IUserInterface ui)
@@ -49,7 +52,9 @@ namespace Win10BloatRemover.Operations
             }
 
             ui.PrintMessage($"Removing feature {capability.Name}...");
-            powerShell.Run($"Remove-WindowsCapability -Online -Name {capability.Name}");
+            var result = powerShell.Run($"Remove-WindowsCapability -Online -Name {capability.Name}").First();
+            if (result.RestartNeeded)
+                IsRebootRecommended = true;
 
             if (capability.Name.StartsWith("Hello.Face"))
                 new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();

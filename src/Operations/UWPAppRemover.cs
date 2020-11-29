@@ -116,6 +116,9 @@ namespace Win10BloatRemover.Operations
         private readonly ServiceRemover serviceRemover;
 
         private /*lateinit*/ PowerShell powerShell;
+        private int removedApps = 0;
+
+        public bool IsRebootRecommended => removedApps > 0;
 
         #nullable disable warnings
         public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, ServiceRemover serviceRemover)
@@ -152,7 +155,7 @@ namespace Win10BloatRemover.Operations
         private void UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
             ui.PrintHeading($"Removing {appGroup} app(s)...");
-            int removedApps = 0;
+            int removedAppsForGroup = 0;
             foreach (string appName in appNamesForGroup[appGroup])
             {
                 // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
@@ -166,10 +169,10 @@ namespace Win10BloatRemover.Operations
 
                 bool removalSuccessful = UninstallApp(appName);
                 if (removalSuccessful)
-                    removedApps++;
+                    removedAppsForGroup++;
             }
-
-            if (removalMode == UWPAppRemovalMode.AllUsers && removedApps > 0)
+            removedApps += removedAppsForGroup;
+            if (removalMode == UWPAppRemovalMode.AllUsers && removedAppsForGroup > 0)
                 TryPerformPostUninstallOperations(appGroup);
         }
 

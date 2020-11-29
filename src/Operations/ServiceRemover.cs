@@ -8,13 +8,40 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
+    public class ServiceRemovalOperation : IOperation
+    {
+        private readonly string[] servicesToRemove;
+        private readonly IUserInterface ui;
+        private readonly ServiceRemover serviceRemover;
+
+        public bool IsRebootRecommended => serviceRemover.IsRebootRecommended;
+
+        public ServiceRemovalOperation(string[] servicesToRemove, IUserInterface ui, ServiceRemover serviceRemover)
+        {
+            this.servicesToRemove = servicesToRemove;
+            this.ui = ui;
+            this.serviceRemover = serviceRemover;
+        }
+
+        public void Run()
+        {
+            ui.PrintHeading("Backing up services...");
+            string[] actualBackuppedServices = serviceRemover.PerformBackup(servicesToRemove);
+
+            if (actualBackuppedServices.Length > 0)
+            {
+                ui.PrintHeading("Removing services...");
+                serviceRemover.PerformRemoval(actualBackuppedServices);
+            }
+        }
+    }
+
     /*
      *  Performs backup (export of registry keys) and removal of those services whose name starts with the given service names.
      *  This is made in order to include services that end with a random code.
      */
-    public class ServiceRemover : IOperation
+    public class ServiceRemover
     {
-        private readonly string[] servicesToRemove = default!;
         private readonly DirectoryInfo backupDirectory;
         private readonly IUserInterface ui;
 
@@ -22,15 +49,11 @@ namespace Win10BloatRemover.Operations
 
         public bool IsRebootRecommended { get; private set; }
 
+        public ServiceRemover(IUserInterface ui) : this(ui, DateTime.Now) {}
         public ServiceRemover(IUserInterface ui, DateTime now)
         {
             this.ui = ui;
             backupDirectory = new DirectoryInfo($"servicesBackup_{now:yyyy-MM-dd_HH-mm-ss}");
-        }
-
-        public ServiceRemover(string[] servicesToRemove, IUserInterface ui, DateTime now) : this(ui, now)
-        {
-            this.servicesToRemove = servicesToRemove;
         }
 
         public void BackupAndRemove(params string[] servicesToRemove)
@@ -38,18 +61,6 @@ namespace Win10BloatRemover.Operations
             IsRebootRecommended = false;
             string[] actualBackuppedServices = PerformBackup(servicesToRemove);
             PerformRemoval(actualBackuppedServices);
-        }
-
-        void IOperation.Run()
-        {
-            ui.PrintHeading("Backing up services...");
-            string[] actualBackuppedServices = PerformBackup(servicesToRemove);
-
-            if (actualBackuppedServices.Length > 0)
-            {
-                ui.PrintHeading("Removing services...");
-                PerformRemoval(actualBackuppedServices);
-            }
         }
 
         public string[] PerformBackup(string[] servicesToBackup)
@@ -99,7 +110,7 @@ namespace Win10BloatRemover.Operations
                 backupDirectory.Create();
         }
 
-        private void PerformRemoval(string[] backuppedServices)
+        public void PerformRemoval(string[] backuppedServices)
         {
             foreach (string service in backuppedServices)
                 RemoveService(service);

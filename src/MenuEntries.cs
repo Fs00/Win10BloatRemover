@@ -50,7 +50,7 @@ namespace Win10BloatRemover
             return explanation + "\nIn order to remove Edge and some components of Xbox, you need to make system apps removable first.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new ServiceRemover(ui, DateTime.Now));
+            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new ServiceRemover(ui));
     }
 
     class DefenderDisablingEntry : MenuEntry
@@ -73,9 +73,9 @@ namespace Win10BloatRemover
                 new UWPAppRemover(
                     new[] { UWPAppGroup.SecurityCenter },
                     UWPAppRemovalMode.AllUsers,
-                    ui, new ServiceRemover(ui, DateTime.Now)
+                    ui, new ServiceRemover(ui)
                 ),
-                new ServiceRemover(ui, DateTime.Now)
+                new ServiceRemover(ui)
             );
         }
     }
@@ -91,7 +91,7 @@ namespace Win10BloatRemover
                    "only if you know the consequences and risks of uninstalling system apps.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui, DateTime.Now));
+            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui));
     }
 
     class OneDriveRemovalEntry : MenuEntry
@@ -120,7 +120,7 @@ namespace Win10BloatRemover
             return explanation + "Services will be backed up in the same folder as this program executable.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new ServiceRemover(configuration.ServicesToRemove, ui, DateTime.Now);
+            => new ServiceRemovalOperation(configuration.ServicesToRemove, ui, new ServiceRemover(ui));
     }
 
     class WindowsFeaturesRemovalEntry : MenuEntry
@@ -172,7 +172,7 @@ namespace Win10BloatRemover
                    "Customer Experience Improvement Program and Compatibility Assistant.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new TelemetryDisabler(ui, new ServiceRemover(ui, DateTime.Now));
+            => new TelemetryDisabler(ui, new ServiceRemover(ui));
     }
 
     class AutoUpdatesDisablingEntry : MenuEntry
@@ -213,7 +213,7 @@ namespace Win10BloatRemover
                    "its services (after backing them up).";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new ErrorReportingDisabler(ui, new ServiceRemover(ui, DateTime.Now));
+            => new ErrorReportingDisabler(ui, new ServiceRemover(ui));
     }
 
     class TipsAndFeedbackDisablingEntry : MenuEntry

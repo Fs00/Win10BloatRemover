@@ -8,7 +8,7 @@ namespace Win10BloatRemover
         public abstract string FullName { get; }
         public virtual bool ShouldQuit => false;
         public abstract string GetExplanation();
-        public virtual IOperation? CreateNewOperation(IUserInterface ui) => null;
+        public abstract IOperation CreateNewOperation(IUserInterface ui);
     }
 
     class SystemAppsRemovalEnablingEntry : MenuEntry
@@ -263,8 +263,13 @@ namespace Win10BloatRemover
 
     class QuitEntry : MenuEntry
     {
+        private readonly RebootRecommendedFlag rebootFlag;
+
+        public QuitEntry(RebootRecommendedFlag rebootFlag) => this.rebootFlag = rebootFlag;
+
         public override string FullName => "Exit the application";
         public override bool ShouldQuit => true;
         public override string GetExplanation() => "Are you sure?";
+        public override IOperation CreateNewOperation(IUserInterface ui) => new AskForRebootOperation(ui, rebootFlag);
     }
 }

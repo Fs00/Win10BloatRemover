@@ -24,6 +24,11 @@ namespace Win10BloatRemover.Utils
             }
         }
 
+        public static void RebootSystem()
+        {
+            RunProcessBlocking("shutdown", "/r /t 3");
+        }
+
         public static string GetProgramFilesFolder()
         {
             // See docs.microsoft.com/en-us/windows/win32/winprog64/wow64-implementation-details#environment-variables

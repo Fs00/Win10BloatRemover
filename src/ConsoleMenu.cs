@@ -9,12 +9,14 @@ namespace Win10BloatRemover
     {
         private bool exitRequested = false;
         private readonly MenuEntry[] entries;
+        private readonly RebootRecommendedFlag rebootFlag;
 
         private static readonly Version programVersion = typeof(ConsoleMenu).Assembly.GetName().Version!;
 
-        public ConsoleMenu(MenuEntry[] entries)
+        public ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
         {
             this.entries = entries;
+            this.rebootFlag = rebootFlag;
         }
 
         public void RunLoopUntilExitRequested()
@@ -92,22 +94,22 @@ namespace Win10BloatRemover
 
         private void TryPerformEntryOperation(MenuEntry entry)
         {
-            if (entry.ShouldQuit)
-            {
-                exitRequested = true;
-                return;
-            }
-
             try
             {
                 Console.WriteLine();
-                IOperation? operation = entry.CreateNewOperation(new ConsoleUserInterface());
-                if (operation == null)
-                    return;
-
+                IOperation operation = entry.CreateNewOperation(new ConsoleUserInterface());
                 operation.Run();
                 if (operation.IsRebootRecommended)
+                {
                     ConsoleHelpers.WriteLine("\nA system reboot is recommended.", ConsoleColor.Cyan);
+                    rebootFlag.SetRebootRecommended();
+                }
+
+                if (entry.ShouldQuit)
+                {
+                    exitRequested = true;
+                    return;
+                }
 
                 Console.Write("\nDone! ");
             }

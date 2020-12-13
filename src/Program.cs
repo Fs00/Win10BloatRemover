@@ -20,11 +20,12 @@ namespace Win10BloatRemover
 
             RegisterExitEventHandlers();
 
-            var menu = new ConsoleMenu(CreateMenuEntries(configuration));
+            var rebootFlag = new RebootRecommendedFlag();
+            var menu = new ConsoleMenu(CreateMenuEntries(configuration, rebootFlag), rebootFlag);
             menu.RunLoopUntilExitRequested();
         }
 
-        private static MenuEntry[] CreateMenuEntries(Configuration configuration)
+        private static MenuEntry[] CreateMenuEntries(Configuration configuration, RebootRecommendedFlag rebootFlag)
         {
             return new MenuEntry[] {
                 new SystemAppsRemovalEnablingEntry(),
@@ -42,7 +43,7 @@ namespace Win10BloatRemover
                 new TipsAndFeedbackDisablingEntry(),
                 new NewGitHubIssueEntry(),
                 new AboutEntry(),
-                new QuitEntry()
+                new QuitEntry(rebootFlag)
             };
         }
 

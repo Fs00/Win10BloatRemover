@@ -130,11 +130,7 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static bool IsWindowsReleaseId(string expectedId)
-        {
-            string? releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion",
-                                                  "ReleaseId", "")?.ToString();
-            return releaseId == expectedId;
-        }
+        public static string? RetrieveWindowsReleaseId() =>
+            Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "")?.ToString();
     }
 }

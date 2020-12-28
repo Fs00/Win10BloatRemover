@@ -20,7 +20,7 @@ Be aware that while most of these operations can be reverted with a system resto
 👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**
 
 ## Release cycle and versions
-The binaries of this tool can be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter raising an error when run on an OS version different from 1903. This is done to ease developer maintenance and to make the tool impossible to run on an incompatible system (mistake-proof 😉).  
+The binaries of this tool are made to be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter showing a warning when run on an OS version different from 1903.  
 The third segment of the program version is the supported Windows version (it was the first segment in the first releases of the tool), so you can see at a glance if you have the right binary for your system.  
 The tool will be updated after any new Windows version. Only the latest two versions of Windows will be supported at the same time. The master branch will host the source code for the most recent version of Windows.
 

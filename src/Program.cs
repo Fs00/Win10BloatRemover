@@ -14,12 +14,12 @@ namespace Win10BloatRemover
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
-            EnsurePreliminaryChecksAreSuccessful();
 
-            var configuration = LoadConfigurationFromFileOrDefault();
-
+            EnsureProgramIsRunningAsAdmin();
+            ShowWarningIfRunningOnIncompatibleOS();
             RegisterExitEventHandlers();
 
+            var configuration = LoadConfigurationFromFileOrDefault();
             var rebootFlag = new RebootRecommendedFlag();
             var menu = new ConsoleMenu(CreateMenuEntries(configuration, rebootFlag), rebootFlag);
             menu.RunLoopUntilExitRequested();
@@ -47,7 +47,7 @@ namespace Win10BloatRemover
             };
         }
 
-        private static void EnsurePreliminaryChecksAreSuccessful()
+        private static void EnsureProgramIsRunningAsAdmin()
         {
             if (!Program.HasAdministratorRights())
             {
@@ -55,15 +55,30 @@ namespace Win10BloatRemover
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
+        }
 
-            #if !DEBUG
-            if (!SystemUtils.IsWindowsReleaseId(SUPPORTED_WINDOWS_RELEASE_ID))
+        private static void ShowWarningIfRunningOnIncompatibleOS()
+        {
+            string? installedWindowsVersion = SystemUtils.RetrieveWindowsReleaseId();
+            if (installedWindowsVersion != SUPPORTED_WINDOWS_RELEASE_ID)
             {
-                ConsoleHelpers.WriteLine($"This application is compatible only with Windows 10 {SUPPORTED_WINDOWS_RELEASE_NAME}!", ConsoleColor.Red);
-                Console.ReadKey();
-                Environment.Exit(-1);
+                ConsoleHelpers.WriteLine(
+                    "-- INCOMPATIBILITY WARNING --\n\n" +
+                    $"This version of the program only supports Windows 10 {SUPPORTED_WINDOWS_RELEASE_NAME} (version {SUPPORTED_WINDOWS_RELEASE_ID}).\n" +
+                    $"You are running Windows 10 version {installedWindowsVersion}.\n\n" +
+                    "You should download a version of the program which is compatible with this Windows 10 version at the following page:",
+                    ConsoleColor.DarkYellow);
+                Console.WriteLine("  https://github.com/Fs00/Win10BloatRemover/releases/\n");
+                ConsoleHelpers.WriteLine(
+                    "If a compatible version is not available yet, you can still continue using this program.\n" +
+                    "However, BE AWARE that some features might work badly or not at all, and could even have unintended effects\n" +
+                    "on your system (including corruptions or instability).\n" +
+                    "PROCEED AT YOUR OWN RISK.", ConsoleColor.DarkYellow);
+                
+                Console.WriteLine("\nPress enter to continue, or another key to quit.");
+                if (Console.ReadKey().Key != ConsoleKey.Enter)
+                    Environment.Exit(-1);
             }
-            #endif
         }
 
         private static bool HasAdministratorRights()

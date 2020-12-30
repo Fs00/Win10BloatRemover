@@ -16,13 +16,14 @@ namespace Win10BloatRemover
         public override string FullName => "Make system apps removable";
         public override string GetExplanation()
         {
-            return "This procedure will edit an internal database to allow the removal of system UWP apps " +
-                   "such as Edge and Security Center via normal PowerShell methods.\n" +
+            return "This procedure will edit an internal database to allow the removal of system UWP apps such as legacy Edge " +
+                   "and Security Center via PowerShell (used by this tool) and in Settings app.\n" +
                    "It is recommended to create a system restore point before proceeding.\n\n" +
-                   "Removing system apps is generally safe, but some functionality may possibly break if " +
-                   "you uninstall the wrong ones;\nproceed at your own risk.\n" +
-                   "Remember also that certain apps are reinstalled after any Windows cumulative update.\n" +
-                   "Before starting, make sure that the Store is not installing/updating apps in the background.";
+                   "It is generally safe to remove only those system apps that can be found in Start menu.\n" +
+                   "Certain \"hidden\" apps are there to provide critical OS functionality, and therefore uninstalling " +
+                   "them may lead to an unstable or unusable system: BE CAREFUL.\n\n" +
+                   "Remember also that any system app may be reinstalled after any Windows cumulative update.\n" +
+                   "Before starting, make sure that Microsoft Store is not installing/updating apps in the background.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new SystemAppsRemovalEnabler(ui);
     }

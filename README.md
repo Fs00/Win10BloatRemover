@@ -1,7 +1,7 @@
 # Windows 10 Bloat Remover and Tweaker
 This configurable tool provides an interactive command-line interface to aggressively debloat and tweak your Windows 10 installation in an easy way. Here's what it can do for you:
 
-* **Make system apps removable** by editing an internal system database. Thanks to this, apps like Edge, Security Center and others can be uninstalled using default PowerShell commands. Take note that usually system apps get reinstalled by Windows cumulative updates.  
+* **Make system apps removable** by editing an internal system database. Thanks to this, apps like legacy Edge, Security Center and others can be uninstalled by this tool and also by the user in Settings app or via PowerShell commands. Take note that system apps can be reinstalled by Windows cumulative updates.  
 * **Remove pre-installed UWP apps:** Uninstalls the apps specified by the user either for the current Windows user or for all users (see *Configuration* below, options `UWPAppsToRemove` and `UWPAppsRemovalMode`). When apps are uninstalled for all users, their corresponding provisioned packages are deleted too (if present), so that they won't get reinstalled for new users or after feature updates.  
 * **Disable OS telemetry:** disables several Windows components that collect diagnostic and usage information such as Compatibility Telemetry, Inventory, Device Census, Customer Experience Improvement Program and others. It also deletes the services which are responsible for data reporting to Microsoft.
 * **Remove system services:** deletes - not just disables - the services specified by the user (see *Configuration* below, option `ServicesToRemove`) after backing up their Registry keys, so that you can restore them if anything breaks.
@@ -35,7 +35,7 @@ Inside the settings file, you will find the following options:
 Configures which pre-installed UWP apps should be uninstalled. Take note that you can't choose to remove single UWP packages but only groups of them, to make configuration less tricky and also because some apps are made of multiple packages (e.g. Xbox) which depend on common services or components that get removed by the program.
 
 **Allowed values:** an array which can contain the following values (each one represents a group of apps - a group can consist in a single app):
-* `"Edge"` (you need to make system apps removable to uninstall it)
+* `"Edge"` (legacy version, you need to make system apps removable to uninstall it)
 * `"Bing"` (Weather, News, Finance and Sports)
 * `"Mobile"` (Your Phone and Mobile plans)
 * `"Xbox"` (Xbox app, Game Overlay and related services)

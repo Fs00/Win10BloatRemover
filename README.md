@@ -12,15 +12,18 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
 * **Disable Cortana:** accomplished using Group Policies until OS version 1909. Starting from version 2004, it can be removed like any other pre-installed app.
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
-* **Disable Tips, Spotlight and feedback requests** through Group Policies
+* **Disable tips, Spotlight and feedback requests** through Group Policies
 * **Disable scheduled tasks** specified by the user (see *Configuration* below, option `ScheduledTasksToDisable`)
 
 Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.
 
+Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable tips and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created **before those operations have been run**, due to how user registry hives work.  
+Therefore, in order to have the maximum effect, it is recommended to run this tool before creating any other user in the system.
+
 👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**
 
 ## Release cycle and versions
-The binaries of this tool are made to be used only on a specific Windows version, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter showing a warning when run on an OS version different from 1903.  
+The binaries of this tool are made to be used **only on a specific Windows version**, so that, for example, you have an EXE for version 1809 and one for 1903, with the latter showing a warning when run on an OS version different from 1903.  
 The third segment of the program version is the supported Windows version (it was the first segment in the first releases of the tool), so you can see at a glance if you have the right binary for your system.  
 The tool will be updated after any new Windows version. Only the latest two versions of Windows will be supported at the same time. The master branch will host the source code for the most recent version of Windows.
 

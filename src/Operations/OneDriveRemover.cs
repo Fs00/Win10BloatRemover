@@ -1,10 +1,8 @@
 ﻿using Microsoft.Win32;
-using System;
 using System.Diagnostics;
 using System.IO;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
-using static Win10BloatRemover.Operations.IUserInterface;
 
 namespace Win10BloatRemover.Operations
 {
@@ -32,15 +30,6 @@ namespace Win10BloatRemover.Operations
             key.SetValue("PreventNetworkTrafficPreUserSignIn", 1);
         }
 
-        private void ThrowIfUserWantsToAbort()
-        {
-            var choice = ui.AskUserConsent(
-                "Do you still want to continue the process by removing all leftover OneDrive files (including its " +
-                "application files for the current user) and registry keys?");
-            if (choice == UserChoice.No)
-                throw new Exception("The user aborted the operation.");
-        }
-
         private void RunOneDriveUninstaller()
         {
             ui.PrintMessage("Executing OneDrive uninstaller...");
@@ -49,7 +38,8 @@ namespace Win10BloatRemover.Operations
             if (uninstallationExitCode != SystemUtils.EXIT_CODE_SUCCESS)
             {
                 ui.PrintError("Uninstallation failed due to an unknown error.");
-                ThrowIfUserWantsToAbort();
+                ui.ThrowIfUserDenies("Do you still want to continue the process by removing all leftover OneDrive " +
+                                     "files (including its application files for the current user) and registry keys?");
             }
         }
 

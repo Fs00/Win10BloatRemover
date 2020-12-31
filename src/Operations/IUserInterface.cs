@@ -1,4 +1,6 @@
-﻿namespace Win10BloatRemover.Operations
+﻿using System;
+
+namespace Win10BloatRemover.Operations
 {
     public interface IMessagePrinter
     {
@@ -19,5 +21,12 @@
         }
 
         UserChoice AskUserConsent(string text);
+
+        void ThrowIfUserDenies(string text)
+        {
+            var choice = AskUserConsent(text);
+            if (choice == UserChoice.No)
+                throw new Exception("The user aborted the operation.");
+        }
     }
 }

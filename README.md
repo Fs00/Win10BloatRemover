@@ -38,7 +38,6 @@ Inside the settings file, you will find the following options:
 Configures which pre-installed UWP apps should be uninstalled. Take note that you can't choose to remove single UWP packages but only groups of them, to make configuration less tricky and also because some apps are made of multiple packages (e.g. Xbox) which depend on common services or components that get removed by the program.
 
 **Allowed values:** an array which can contain the following values (each one represents a group of apps - a group can consist in a single app):
-* `"Edge"` (legacy version, you need to make system apps removable to uninstall it)
 * `"Bing"` (Weather, News, Finance and Sports)
 * `"Mobile"` (Your Phone and Mobile plans)
 * `"Xbox"` (Xbox app, Game Overlay and related services)

@@ -22,8 +22,8 @@ namespace Win10BloatRemover.Operations
         Camera,
         CommunicationsApps,
         Cortana,
-        Edge,
         HelpAndFeedback,
+        LegacyEdge,
         Maps,
         Messaging,
         MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
@@ -60,7 +60,6 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
             { UWPAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
             { UWPAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
-            { UWPAppGroup.Edge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             {
                 UWPAppGroup.HelpAndFeedback, new[] {
                     "Microsoft.WindowsFeedbackHub",
@@ -68,6 +67,7 @@ namespace Win10BloatRemover.Operations
                     "Microsoft.Getstarted"
                 }
             },
+            { UWPAppGroup.LegacyEdge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
             { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
             {
@@ -131,7 +131,7 @@ namespace Win10BloatRemover.Operations
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
                 { UWPAppGroup.Cortana, HideCortanaFromTaskBar },
-                { UWPAppGroup.Edge, PerformEdgePostUninstallOperations },
+                { UWPAppGroup.LegacyEdge, RemoveEdgeLeftovers },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
                 { UWPAppGroup.Messaging, RemoveMessagingService },
                 { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
@@ -240,7 +240,7 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private void PerformEdgePostUninstallOperations()
+        private void RemoveEdgeLeftovers()
         {
             ui.PrintMessage("Removing old files...");
             SystemUtils.TryDeleteDirectoryIfExists(
@@ -251,9 +251,6 @@ namespace Win10BloatRemover.Operations
                 $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge",
                 ui
             );
-
-            ui.PrintMessage("Blocking automatic delivery of Edge Chromium via Windows Update...");
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate", "DoNotUpdateToEdgeWithChromium", 1);
         }
 
         private void HideCortanaFromTaskBar()

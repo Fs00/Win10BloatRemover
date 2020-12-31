@@ -86,13 +86,21 @@ namespace Win10BloatRemover
         public override string FullName => "Remove Microsoft Edge";
         public override string GetExplanation()
         {
-            return "You need to make system apps removable first, otherwise the uninstallation will fail.\n" +
-                   "You can also perform this task using UWP apps removal (\"Edge\" must be included in the list \"UWPAppsToRemove\").\n" + 
-                   "Take note that this app will likely be reinstalled after any Windows cumulative update. Proceed " +
-                   "only if you know the consequences and risks of uninstalling system apps.";
+            return "Both Edge Chromium and legacy Edge browser will be uninstalled from the system.\n" +
+                   "In order to be able to uninstall the latter (which gets restored once you uninstall the first), you need to make system apps removable.\n" +
+                   "Take note that legacy Edge app may be reinstalled after any Windows cumulative update.\n" +
+                   "Make sure that Edge Chromium is not updating itself before proceeding.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(new[] { UWPAppGroup.Edge }, UWPAppRemovalMode.AllUsers, ui, new ServiceRemover(ui));
+        {
+            return new EdgeRemover(ui,
+                new UWPAppRemover(
+                    new[] { UWPAppGroup.LegacyEdge },
+                    UWPAppRemovalMode.AllUsers,
+                    ui, new ServiceRemover(ui)
+                )
+            );
+        }
     }
 
     class OneDriveRemovalEntry : MenuEntry

@@ -12,7 +12,7 @@ namespace Win10BloatRemover.Tests.Operations
         public SystemAppsRemovalEnablerTests(ITestOutputHelper output) => this.output = output;
 
         private readonly UWPAppGroup[] groupsWithSystemApps = {
-            UWPAppGroup.Edge,
+            UWPAppGroup.LegacyEdge,
             UWPAppGroup.SecurityCenter,
             UWPAppGroup.Xbox
         };

@@ -39,10 +39,10 @@ namespace Win10BloatRemover.Operations
         private void DowngradeAntimalwarePlatform()
         {
             ui.PrintHeading("Downgrading Defender antimalware platform...");
-            int exitCode = SystemUtils.RunProcessBlockingWithOutput(
+            var exitCode = SystemUtils.RunProcessBlockingWithOutput(
                 $@"{SystemUtils.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform", ui);
 
-            if (exitCode != SystemUtils.EXIT_CODE_SUCCESS)
+            if (exitCode.IsNotSuccessful())
             {
                 ui.PrintWarning(
                     "Antimalware platform downgrade failed. This is likely happened because you have already disabled Windows Defender.\n" +

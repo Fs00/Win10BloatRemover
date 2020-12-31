@@ -96,9 +96,9 @@ namespace Win10BloatRemover.Operations
         private void BackupService(string service)
         {
             EnsureBackupDirectoryExists();
-            int regExportExitCode = SystemUtils.RunProcessBlocking(
+            var regExportExitCode = SystemUtils.RunProcessBlocking(
                 "reg", $@"export ""HKLM\SYSTEM\CurrentControlSet\Services\{service}"" ""{backupDirectory.FullName}\{service}.reg""");
-            if (regExportExitCode == 0)
+            if (regExportExitCode.IsSuccessful())
                 ui.PrintMessage($"Service {service} backed up.");
             else
                 throw new Exception($"Could not backup service {service}.");
@@ -118,7 +118,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveService(string service)
         {
-            int scExitCode = SystemUtils.RunProcessBlocking("sc", $"delete \"{service}\"");
+            var scExitCode = SystemUtils.RunProcessBlocking("sc", $"delete \"{service}\"");
             if (IsScRemovalSuccessful(scExitCode))
             {
                 PrintSuccessMessage(scExitCode, service);
@@ -134,13 +134,13 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private bool IsScRemovalSuccessful(int exitCode)
+        private bool IsScRemovalSuccessful(ExitCode exitCode)
         {
-            return exitCode == SystemUtils.EXIT_CODE_SUCCESS ||
+            return exitCode.IsSuccessful() ||
                    exitCode == SC_EXIT_CODE_MARKED_FOR_DELETION;
         }
 
-        private void PrintSuccessMessage(int scExitCode, string service)
+        private void PrintSuccessMessage(ExitCode scExitCode, string service)
         {
             if (scExitCode == SC_EXIT_CODE_MARKED_FOR_DELETION)
                 ui.PrintMessage($"Service {service} will be removed after reboot.");

@@ -35,7 +35,7 @@ namespace Win10BloatRemover.Operations
             ui.PrintMessage("Executing OneDrive uninstaller...");
             string setupPath = RetrieveOneDriveSetupPath();
             var uninstallationExitCode = SystemUtils.RunProcessBlockingWithOutput(setupPath, "/uninstall", ui);
-            if (uninstallationExitCode != SystemUtils.EXIT_CODE_SUCCESS)
+            if (uninstallationExitCode.IsNotSuccessful())
             {
                 ui.PrintError("Uninstallation failed due to an unknown error.");
                 ui.ThrowIfUserDenies("Do you still want to continue the process by removing all leftover OneDrive " +

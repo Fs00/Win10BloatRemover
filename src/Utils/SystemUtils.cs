@@ -11,8 +11,6 @@ namespace Win10BloatRemover.Utils
 {
     static class SystemUtils
     {
-        public const int EXIT_CODE_SUCCESS = 0;
-
         public static void StopServiceAndItsDependents(string name)
         {
             using var service = new ServiceController(name);
@@ -66,15 +64,15 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static int RunProcessBlocking(string name, string args)
+        public static ExitCode RunProcessBlocking(string name, string args)
         {
             using var process = CreateProcessInstance(name, args);
             process.Start();
             process.WaitForExit();
-            return process.ExitCode;
+            return new ExitCode(process.ExitCode);
         }
 
-        public static int RunProcessBlockingWithOutput(string name, string args, IMessagePrinter printer)
+        public static ExitCode RunProcessBlockingWithOutput(string name, string args, IMessagePrinter printer)
         {
             using var process = CreateProcessInstance(name, args);
             process.OutputDataReceived += (_, evt) => {
@@ -90,7 +88,7 @@ namespace Win10BloatRemover.Utils
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.WaitForExit();
-            return process.ExitCode;
+            return new ExitCode(process.ExitCode);
         }
 
         private static Process CreateProcessInstance(string name, string args)

@@ -13,6 +13,13 @@ namespace Win10BloatRemover.Operations
             "SgrmAgent"
         };
 
+        private static readonly string[] defenderScheduledTasks = {
+            @"\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance",
+            @"\Microsoft\Windows\Windows Defender\Windows Defender Cleanup",
+            @"\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan",
+            @"\Microsoft\Windows\Windows Defender\Windows Defender Verification"
+        };
+
         private readonly IUserInterface ui;
         private readonly IOperation securityCenterRemover;
         private readonly ServiceRemover serviceRemover;
@@ -31,6 +38,7 @@ namespace Win10BloatRemover.Operations
             DowngradeAntimalwarePlatform();
             EditWindowsRegistryKeys();
             RemoveSecurityHealthServices();
+            DisableDefenderScheduledTasks();
             securityCenterRemover.Run();
         }
 
@@ -86,6 +94,12 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Removing Security Health services...");
             serviceRemover.BackupAndRemove(securityHealthServices);
+        }
+
+        private void DisableDefenderScheduledTasks()
+        {
+            ui.PrintHeading("Disabling Windows Defender scheduled tasks...");
+            new ScheduledTasksDisabler(defenderScheduledTasks, ui).Run();
         }
     }
 }

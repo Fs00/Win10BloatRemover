@@ -325,7 +325,7 @@ namespace Win10BloatRemover.Operations
 
         private void RestoreWindowsPhotoViewer()
         {
-            ui.PrintMessage("Setting file association with original photo viewer for BMP, GIF, JPEG, PNG and TIFF pictures...");
+            ui.PrintMessage("Setting file association with legacy photo viewer for BMP, GIF, JPEG, PNG and TIFF pictures...");
 
             const string PHOTO_VIEWER_SHELL_COMMAND =
                 @"%SystemRoot%\System32\rundll32.exe ""%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll"", ImageView_Fullscreen %1";

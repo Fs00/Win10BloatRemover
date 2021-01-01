@@ -28,6 +28,7 @@ namespace Win10BloatRemover.Operations
             @"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
             @"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector",
             @"\Microsoft\Windows\Device Information\Device",
+            @"\Microsoft\Windows\Device Information\Device User",
             @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
             @"\Microsoft\Windows\PI\Sqm-Tasks"
         };

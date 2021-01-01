@@ -116,9 +116,8 @@ namespace Win10BloatRemover.Operations
         private readonly ServiceRemover serviceRemover;
 
         private /*lateinit*/ PowerShell powerShell;
-        private int removedApps = 0;
 
-        public bool IsRebootRecommended => removedApps > 0;
+        public bool IsRebootRecommended { get; private set; }
 
         #nullable disable warnings
         public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, ServiceRemover serviceRemover)
@@ -171,7 +170,6 @@ namespace Win10BloatRemover.Operations
                 if (removalSuccessful)
                     removedAppsForGroup++;
             }
-            removedApps += removedAppsForGroup;
             if (removalMode == UWPAppRemovalMode.AllUsers && removedAppsForGroup > 0)
                 TryPerformPostUninstallOperations(appGroup);
         }
@@ -231,6 +229,7 @@ namespace Win10BloatRemover.Operations
                 {
                     ui.PrintEmptySpace();
                     postUninstallOperationsForGroup[appGroup]();
+                    IsRebootRecommended = true;
                 }
             }
             catch (Exception exc)

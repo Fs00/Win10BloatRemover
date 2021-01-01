@@ -48,7 +48,7 @@ namespace Win10BloatRemover
                 explanation += "\nServices, components and scheduled tasks used specifically by those apps will also " +
                                "be disabled or removed, together with any leftover data.";
 
-            return explanation + "\nIn order to remove Edge and some components of Xbox, you need to make system apps removable first.";
+            return explanation + "\nIn order to remove some components of Xbox, you need to make system apps removable first.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new ServiceRemover(ui));

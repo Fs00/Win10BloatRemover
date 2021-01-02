@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management.Automation;
 using Win10BloatRemover.Utils;
@@ -116,6 +117,7 @@ namespace Win10BloatRemover.Operations
         private readonly ServiceRemover serviceRemover;
 
         private /*lateinit*/ PowerShell powerShell;
+        private int removedApps = 0;
 
         public bool IsRebootRecommended { get; private set; }
 
@@ -149,6 +151,9 @@ namespace Win10BloatRemover.Operations
                 foreach (UWPAppGroup appGroup in appsToRemove)
                     UninstallAppsOfGroup(appGroup);
             }
+
+            if (removedApps > 0)
+                RestartExplorer();
         }
 
         private void UninstallAppsOfGroup(UWPAppGroup appGroup)
@@ -170,6 +175,7 @@ namespace Win10BloatRemover.Operations
                 if (removalSuccessful)
                     removedAppsForGroup++;
             }
+            removedApps += removedAppsForGroup;
             if (removalMode == UWPAppRemovalMode.AllUsers && removedAppsForGroup > 0)
                 TryPerformPostUninstallOperations(appGroup);
         }
@@ -219,6 +225,13 @@ namespace Win10BloatRemover.Operations
                     $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
                 );
             }
+        }
+
+        private void RestartExplorer()
+        {
+            ui.PrintHeading("Restarting Explorer to avoid stale app entries in Start menu...");
+            SystemUtils.KillProcess("explorer");
+            Process.Start("explorer");
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)

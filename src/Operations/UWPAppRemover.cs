@@ -158,9 +158,10 @@ namespace Win10BloatRemover.Operations
 
         private void UninstallAppsOfGroup(UWPAppGroup appGroup)
         {
-            ui.PrintHeading($"Removing {appGroup} app(s)...");
+            string[] appsInGroup = appNamesForGroup[appGroup];
+            ui.PrintHeading($"Removing {appGroup} {(appsInGroup.Length == 1 ? "app" : "apps")}...");
             int removedAppsForGroup = 0;
-            foreach (string appName in appNamesForGroup[appGroup])
+            foreach (string appName in appsInGroup)
             {
                 // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
                 // the corresponding provisioned package when the app is removed for all users.

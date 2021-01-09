@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Microsoft.Win32;
 using Win10BloatRemover.Utils;
 using static System.Environment;
 using Version = System.Version;
@@ -23,7 +22,6 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             UninstallEdgeChromiumIfPresent();
-            BlockAutomaticUpdateToEdgeChromium();
             legacyEdgeRemover.Run();
         }
 
@@ -64,12 +62,6 @@ namespace Win10BloatRemover.Operations
                 }
             }
             return null;
-        }
-
-        private void BlockAutomaticUpdateToEdgeChromium()
-        {
-            ui.PrintMessage("Blocking automatic delivery of Edge Chromium via Windows Update...");
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate", "DoNotUpdateToEdgeWithChromium", 1);
         }
     }
 }

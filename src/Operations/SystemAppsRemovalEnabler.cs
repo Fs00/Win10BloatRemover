@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 using Microsoft.Data.Sqlite;
 using Win10BloatRemover.Utils;
 
@@ -46,28 +49,12 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private void EnsureAppXServicesAreStopped()
-        {
-            ui.PrintMessage("Making sure AppX-related services are stopped before proceeding...");
-            SystemUtils.StopServiceAndItsDependents("StateRepository");
-        }
-
         private string CopyStateRepositoryDatabaseTo(string databaseCopyPath)
         {
             EnsureAppXServicesAreStopped();
             var database = new FileInfo(STATE_REPOSITORY_DB_PATH);
             FileInfo copiedDatabase = database.CopyTo(databaseCopyPath, overwrite: true);
             return copiedDatabase.FullName;
-        }
-
-        private void ReplaceStateRepositoryDatabaseWith(string databaseCopyPath)
-        {
-            ui.PrintHeading("Replacing original state repository database with the edited copy...");
-            EnsureAppXServicesAreStopped();
-            // File.Copy can't be used to replace the file because it fails with access denied
-            // even though we have Restore privilege, so we need to use File.Move instead
-            File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
-            ui.PrintMessage("Replacement successful.");
         }
 
         private EditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)
@@ -87,6 +74,40 @@ namespace Win10BloatRemover.Operations
 
                 ui.PrintMessage($"Edited {updatedRows} {(updatedRows == 1 ? "row" : "rows")}.");
                 return updatedRows == 0 ? EditingOutcome.NoChangesMade : EditingOutcome.ContentWasUpdated;
+            }
+        }
+
+        private void ReplaceStateRepositoryDatabaseWith(string databaseCopyPath)
+        {
+            ui.PrintHeading("Replacing original state repository database with the edited copy...");
+            EnsureAppXServicesAreStopped();
+            // File.Copy can't be used to replace the file because it fails with access denied
+            // even though we have Restore privilege, so we need to use File.Move instead
+            File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
+            ui.PrintMessage("Replacement successful.");
+        }
+
+        private void EnsureAppXServicesAreStopped()
+        {
+            ui.PrintMessage("Making sure AppX-related services are stopped before proceeding...");
+            // Workaround for some rare circumstances in which attempts to stop these services fail for no apparent reason
+            int currentAttempt = 1;
+            bool servicesStoppedSuccessfully = false;
+            while (!servicesStoppedSuccessfully)
+            {
+                try
+                {
+                    SystemUtils.StopServiceAndItsDependents("StateRepository");
+                    servicesStoppedSuccessfully = true;
+                }
+                catch
+                {
+                    Debug.WriteLine($"Failed attempt {currentAttempt}.");
+                    if (currentAttempt == 3)
+                        throw;
+                    currentAttempt++;
+                    Thread.Sleep(TimeSpan.FromMilliseconds(30));
+                }
             }
         }
 

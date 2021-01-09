@@ -29,14 +29,19 @@ namespace Win10BloatRemover.Operations
             using (TokenPrivilege.Backup)
             using (TokenPrivilege.Restore)
             {
-                string databaseCopyForEditing = CopyStateRepositoryDatabaseTo($"{STATE_REPOSITORY_DB_NAME}.tmp");
-                var outcome = EditStateRepositoryDatabase(databaseCopyForEditing);
-                if (outcome == EditingOutcome.ContentWasUpdated)
-                    ReplaceStateRepositoryDatabaseWith(databaseCopyForEditing);
-                else
+                string temporaryDatabaseCopy = CopyStateRepositoryDatabaseTo($"{STATE_REPOSITORY_DB_NAME}.tmp");
+                try
                 {
-                    File.Delete(databaseCopyForEditing);
-                    ui.PrintNotice("Original database doesn't need to be replaced: no changes have been made.");
+                    var outcome = EditStateRepositoryDatabase(temporaryDatabaseCopy);
+                    if (outcome == EditingOutcome.ContentWasUpdated)
+                        ReplaceStateRepositoryDatabaseWith(temporaryDatabaseCopy);
+                    else
+                        ui.PrintNotice("Original database doesn't need to be replaced: no changes have been made.");
+                }
+                finally
+                {
+                    if (File.Exists(temporaryDatabaseCopy))
+                        File.Delete(temporaryDatabaseCopy);
                 }
             }
         }
@@ -59,18 +64,10 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Replacing original state repository database with the edited copy...");
             EnsureAppXServicesAreStopped();
-            try
-            {
-                // File.Copy can't be used to replace the file because it fails with access denied
-                // even though we have Restore privilege, so we need to use File.Move instead
-                File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
-                ui.PrintMessage("Replacement successful.");
-            }
-            catch
-            {
-                File.Delete(databaseCopyPath);
-                throw;
-            }
+            // File.Copy can't be used to replace the file because it fails with access denied
+            // even though we have Restore privilege, so we need to use File.Move instead
+            File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
+            ui.PrintMessage("Replacement successful.");
         }
 
         private EditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)

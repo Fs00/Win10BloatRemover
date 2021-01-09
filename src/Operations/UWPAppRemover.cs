@@ -346,8 +346,8 @@ namespace Win10BloatRemover.Operations
 
             Registry.SetValue(@"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open", "MuiVerb", "@photoviewer.dll,-3043");
             Registry.SetValue(
-                @"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\command",
-                "(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString
+                @"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\command", valueName: null,
+                PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString
             );
             Registry.SetValue(@"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\DropTarget", "Clsid", PHOTO_VIEWER_CLSID);
 
@@ -355,8 +355,8 @@ namespace Win10BloatRemover.Operations
             foreach (string type in imageTypes)
             {
                 Registry.SetValue(
-                    $@"HKEY_CLASSES_ROOT\{type}\shell\open\command",
-                    "(Default)", PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString
+                    $@"HKEY_CLASSES_ROOT\{type}\shell\open\command", valueName: null,
+                    PHOTO_VIEWER_SHELL_COMMAND, RegistryValueKind.ExpandString
                 );
                 Registry.SetValue($@"HKEY_CLASSES_ROOT\{type}\shell\open\DropTarget", "Clsid", PHOTO_VIEWER_CLSID);
             }

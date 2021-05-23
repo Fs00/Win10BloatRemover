@@ -22,6 +22,9 @@ namespace Win10BloatRemover.Operations
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableSoftLanding", 1);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableWindowsConsumerFeatures", 1);
 
+            // Disables programmable taskbar
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableCloudOptimizedContent", 1);
+
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Policies\Microsoft\Windows\CloudContent",
                 "DisableWindowsSpotlightFeatures", 1);
@@ -45,7 +48,6 @@ namespace Win10BloatRemover.Operations
                 @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-353694Enabled", 0);
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-353696Enabled", 0);
-
             // System -> Notifications & actions -> Suggest ways I can finish setting up my device...
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement",

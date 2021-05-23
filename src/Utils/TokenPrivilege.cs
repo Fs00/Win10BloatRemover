@@ -24,18 +24,18 @@ namespace Win10BloatRemover.Utils
         private TokenPrivilege(string privilegeName)
         {
             this.privilegeName = privilegeName;
-            ApplyPrivilege(PrivilegeAction.Enable);
+            Apply(PrivilegeAction.Enable);
         }
 
-        private void ApplyPrivilege(PrivilegeAction action)
+        private void Apply(PrivilegeAction action)
         {
             OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle);
             LookupPrivilegeValue(null, privilegeName, out Luid luid);
             var tokenPrivilege = new TokenPrivileges(luid, (uint) action);
-            UpdateToken(tokenHandle, tokenPrivilege);
+            UpdateTokenPrivileges(tokenHandle, tokenPrivilege);
         }
 
-        private void UpdateToken(IntPtr tokenHandle, TokenPrivileges privilegeInfo)
+        private void UpdateTokenPrivileges(IntPtr tokenHandle, TokenPrivileges privilegeInfo)
         {
             bool successful = AdjustTokenPrivileges(tokenHandle, false, ref privilegeInfo, 0, IntPtr.Zero, IntPtr.Zero);
             if (!successful || Marshal.GetLastWin32Error() == ERROR_NOT_ALL_ASSIGNED)
@@ -44,7 +44,7 @@ namespace Win10BloatRemover.Utils
 
         public void Dispose()
         {
-            ApplyPrivilege(PrivilegeAction.Disable);
+            Apply(PrivilegeAction.Disable);
         }
 
         #region P/Invoke structs and methods

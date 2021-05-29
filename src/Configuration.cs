@@ -56,7 +56,7 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                throw new ConfigurationException($"Error when loading custom settings file: {exc.Message}\n" +
+                throw new ConfigurationException($"An error occurred while loading settings file: {exc.Message}\n" +
                                                  "Default settings have been loaded instead.\n");
             }
         }
@@ -70,7 +70,7 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                throw new ConfigurationException($"Can't write configuration file with default settings: {exc.Message}\n");
+                throw new ConfigurationException($"Can't write default configuration to settings file: {exc.Message}\n");
             }
         }
 

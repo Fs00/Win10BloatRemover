@@ -16,7 +16,7 @@ namespace Win10BloatRemover
             Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
             EnsureProgramIsRunningAsAdmin();
-            ShowWarningIfRunningOnIncompatibleOS();
+            ShowWarningOnIncompatibleOS();
             RegisterExitEventHandlers();
 
             var configuration = LoadConfigurationFromFileOrDefault();
@@ -57,7 +57,7 @@ namespace Win10BloatRemover
             }
         }
 
-        private static void ShowWarningIfRunningOnIncompatibleOS()
+        private static void ShowWarningOnIncompatibleOS()
         {
             string? installedWindowsVersion = SystemUtils.RetrieveWindowsReleaseId();
             if (installedWindowsVersion != SUPPORTED_WINDOWS_RELEASE_ID)

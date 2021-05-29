@@ -56,6 +56,8 @@ namespace Win10BloatRemover.Operations
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace",
                 "AllowSuggestedAppsInWindowsInkWorkspace", 0);
+            // Disables online tips and help for Settings app
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", "AllowOnlineTips", 0);
         }
 
         private void DisableFeedbackRequests()

@@ -48,8 +48,10 @@ namespace Win10BloatRemover
         {
             try
             {
-                var parsedConfiguration =
-                    JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(CONFIGURATION_FILE_NAME));
+                string settingsFileContent = File.ReadAllText(CONFIGURATION_FILE_NAME);
+                var parsedConfiguration = JsonConvert.DeserializeObject<Configuration>(settingsFileContent);
+                if (parsedConfiguration == null)
+                    throw new Exception("The file is empty.");
                 return parsedConfiguration;
             }
             catch (Exception exc)

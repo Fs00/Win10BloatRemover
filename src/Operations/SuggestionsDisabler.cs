@@ -3,20 +3,20 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
-    public class TipsDisabler : IOperation
+    public class SuggestionsDisabler : IOperation
     {
         private readonly IUserInterface ui;
-        public TipsDisabler(IUserInterface ui) => this.ui = ui;
+        public SuggestionsDisabler(IUserInterface ui) => this.ui = ui;
 
         public void Run()
         {
-            DisableTips();
+            DisableSuggestions();
             DisableFeedbackRequests();
         }
 
-        private void DisableTips()
+        private void DisableSuggestions()
         {
-            ui.PrintHeading("Disabling Tips and Spotlight via Registry edits...");
+            ui.PrintHeading("Disabling suggestions and Spotlight via Registry edits...");
 
             // These two policies work only on Education and Enterprise editions
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableSoftLanding", 1);

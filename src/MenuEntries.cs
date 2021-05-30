@@ -225,18 +225,18 @@ namespace Win10BloatRemover
             => new ErrorReportingDisabler(ui, new ServiceRemover(ui));
     }
 
-    class TipsAndFeedbackDisablingEntry : MenuEntry
+    class SuggestionsDisablingEntry : MenuEntry
     {
-        public override string FullName => "Disable tips and feedback requests";
+        public override string FullName => "Disable suggestions, cloud content and feedback requests";
         public override string GetExplanation()
         {
-            return "Feedback notifications/requests, apps suggestions, tips and Spotlight (including dynamic lock " +
-                   "screen backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
+            return "Feedback notifications and requests, apps suggestions, tips and cloud-based content (including Spotlight " +
+                   "dynamic backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
                    "some related scheduled tasks.\n\n" +
                    "Be aware that some of these features will be disabled only for the currently logged in user " +
                    "and for new users created after running this procedure.";
         }
-        public override IOperation CreateNewOperation(IUserInterface ui) => new TipsDisabler(ui);
+        public override IOperation CreateNewOperation(IUserInterface ui) => new SuggestionsDisabler(ui);
     }
 
     class NewGitHubIssueEntry : MenuEntry

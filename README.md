@@ -13,12 +13,12 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
 * **Disable Cortana:** accomplished using Group Policies until OS version 1909. Starting from version 2004, it can be removed like any other pre-installed app.
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
-* **Disable tips, Spotlight and feedback requests** through Group Policies
+* **Disable suggestions, cloud-based content** (including Spotlight) **and feedback requests** through Group Policies
 * **Disable scheduled tasks** specified by the user (see *Configuration* below, option `ScheduledTasksToDisable`)
 
 Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.
 
-Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable tips and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created **before those operations have been run**, due to how user registry hives work.  
+Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable suggestions, cloud content and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created **before those operations have been run**, due to how user registry hives work.  
 Therefore, in order to have the maximum effect, it is recommended to run this tool before creating any other user in the system.
 
 👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**

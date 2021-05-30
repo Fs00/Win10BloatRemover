@@ -40,7 +40,7 @@ namespace Win10BloatRemover
                 new AutoUpdatesDisablingEntry(),
                 new ScheduledTasksDisablingEntry(configuration),
                 new ErrorReportingDisablingEntry(),
-                new TipsAndFeedbackDisablingEntry(),
+                new SuggestionsDisablingEntry(),
                 new NewGitHubIssueEntry(),
                 new AboutEntry(),
                 new QuitEntry(rebootFlag)

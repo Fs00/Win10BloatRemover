@@ -91,15 +91,27 @@ namespace Win10BloatRemover
         {
             try
             {
-                return Configuration.LoadFromFileOrDefault();
+                return Configuration.LoadOrCreateFile();
             }
             catch (ConfigurationException exc)
             {
-                ConsoleHelpers.WriteLine(exc.Message, ConsoleColor.DarkYellow);
-                Console.WriteLine("Press a key to continue to the main menu.");
-                Console.ReadKey();
+                PrintConfigurationErrorMessage(exc);
                 return Configuration.Default;
             }
+        }
+
+        private static void PrintConfigurationErrorMessage(ConfigurationException exc)
+        {
+            string errorMessage = "";
+            if (exc is ConfigurationLoadException)
+                errorMessage = $"An error occurred while loading settings file: {exc.Message}\n" +
+                                "Default settings have been loaded instead.\n";
+            else if (exc is ConfigurationWriteException)
+                errorMessage = $"Couldn't write default configuration to settings file: {exc.Message}\n";
+
+            ConsoleHelpers.WriteLine(errorMessage, ConsoleColor.DarkYellow);
+            Console.WriteLine("Press a key to continue to the main menu.");
+            Console.ReadKey();
         }
 
         private static void RegisterExitEventHandlers()

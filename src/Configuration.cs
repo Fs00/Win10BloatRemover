@@ -6,13 +6,6 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
 {
-    class ConfigurationException : Exception
-    {
-        public ConfigurationException() {}
-        public ConfigurationException(string message) : base(message) {}
-        public ConfigurationException(string message, Exception inner) : base(message, inner) {}
-    }
-
     public class Configuration
     {
         private const string CONFIGURATION_FILE_NAME = "config.json";
@@ -35,16 +28,19 @@ namespace Win10BloatRemover
         public string[] WindowsFeaturesToRemove { private set; get; }
         #nullable restore warnings
 
-        public static Configuration LoadFromFileOrDefault()
+        public static Configuration LoadOrCreateFile()
         { 
             if (File.Exists(CONFIGURATION_FILE_NAME))
-                return ParseConfigFile();
+            {
+                var loadedConfiguration = LoadFromFile();
+                return loadedConfiguration;
+            }
 
             Default.WriteToFile();
             return Default;
         }
 
-        private static Configuration ParseConfigFile()
+        private static Configuration LoadFromFile()
         {
             try
             {
@@ -56,8 +52,7 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                throw new ConfigurationException($"An error occurred while loading settings file: {exc.Message}\n" +
-                                                 "Default settings have been loaded instead.\n");
+                throw new ConfigurationLoadException(exc.Message);
             }
         }
 
@@ -70,7 +65,7 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                throw new ConfigurationException($"Can't write default configuration to settings file: {exc.Message}\n");
+                throw new ConfigurationWriteException(exc.Message);
             }
         }
 
@@ -120,5 +115,20 @@ namespace Win10BloatRemover
             },
             UWPAppsRemovalMode = UWPAppRemovalMode.AllUsers
         };
+    }
+
+    abstract class ConfigurationException : Exception
+    {
+        protected ConfigurationException(string message) : base(message) {}
+    }
+
+    class ConfigurationLoadException : ConfigurationException
+    {
+        public ConfigurationLoadException(string message) : base(message) {}
+    }
+
+    class ConfigurationWriteException : ConfigurationException
+    {
+        public ConfigurationWriteException(string message) : base(message) {}
     }
 }

@@ -163,7 +163,7 @@ namespace Win10BloatRemover
                    "  - denying access to sensitive data (location, documents, activities, account details, diagnostic info)" +
                    " to all UWP apps by default\n" +
                    "  - disabling voice activation for voice assistants (so that they can't always be listening)\n" +
-                   "  - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages)\n" +
+                   "  - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages, passwords and app data)\n" +
                    "  - disabling web search in bottom search bar\n\n" +
                    "Whereas almost all of these settings are applied for all users, some of them will only be changed " +
                    "for the current user and for new users created after running this procedure.";

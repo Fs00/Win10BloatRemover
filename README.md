@@ -13,7 +13,7 @@ This configurable tool provides an interactive command-line interface to aggress
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
 * **Disable Cortana:** accomplished using Group Policies until OS version 1909. Starting from version 2004, it can be removed like any other pre-installed app.
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
-* **Disable suggestions, cloud-based content** (including Spotlight) **and feedback requests** through Group Policies
+* **Disable suggestions, cloud-based content** (including Spotlight and News and Interests) **and feedback requests** through Group Policies
 * **Disable scheduled tasks** specified by the user (see *Configuration* below, option `ScheduledTasksToDisable`)
 
 Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.

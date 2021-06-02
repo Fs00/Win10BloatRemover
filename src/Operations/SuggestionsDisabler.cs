@@ -11,26 +11,13 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             DisableSuggestions();
+            DisableCloudContent();
             DisableFeedbackRequests();
         }
 
         private void DisableSuggestions()
         {
-            ui.PrintHeading("Disabling suggestions and Spotlight via Registry edits...");
-
-            // These two policies work only on Education and Enterprise editions
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableSoftLanding", 1);
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableWindowsConsumerFeatures", 1);
-
-            // Disables programmable taskbar
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableCloudOptimizedContent", 1);
-
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"Software\Policies\Microsoft\Windows\CloudContent",
-                "DisableWindowsSpotlightFeatures", 1);
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"Software\Policies\Microsoft\Windows\CloudContent",
-                "DisableTailoredExperiencesWithDiagnosticData", 1);
+            ui.PrintHeading("Disabling suggestions via Registry edits...");
 
             // System -> Notifications & actions -> Show the Windows welcome experience...
             RegistryUtils.SetForCurrentAndDefaultUser(
@@ -60,15 +47,35 @@ namespace Win10BloatRemover.Operations
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", "AllowOnlineTips", 0);
         }
 
+        private void DisableCloudContent()
+        {
+            ui.PrintHeading("Disabling Spotlight, News and Interests and other cloud content via Registry edits...");
+
+            // These two policies work only on Education and Enterprise editions
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableSoftLanding", 1);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableWindowsConsumerFeatures", 1);
+
+            RegistryUtils.SetForCurrentAndDefaultUser(
+                @"Software\Policies\Microsoft\Windows\CloudContent",
+                "DisableWindowsSpotlightFeatures", 1);
+            RegistryUtils.SetForCurrentAndDefaultUser(
+                @"Software\Policies\Microsoft\Windows\CloudContent",
+                "DisableTailoredExperiencesWithDiagnosticData", 1);
+
+            // News and Interests
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds", "EnableFeeds", 0);
+            // Programmable taskbar
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableCloudOptimizedContent", 1);
+        }
+
         private void DisableFeedbackRequests()
         {
-            ui.PrintHeading("Disabling feedback requests via Registry edits...");
+            ui.PrintHeading("Disabling feedback requests and related scheduled tasks...");
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection",
                 "DoNotShowFeedbackNotifications", 1);
             RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Siuf\Rules", "NumberOfSIUFInPeriod", 0);
 
-            ui.PrintHeading("Disabling feedback-related scheduled tasks...");
             new ScheduledTasksDisabler(new[] {
                 @"\Microsoft\Windows\Feedback\Siuf\DmClient",
                 @"\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload"

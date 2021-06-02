@@ -231,8 +231,8 @@ namespace Win10BloatRemover
         public override string GetExplanation()
         {
             return "Feedback notifications and requests, apps suggestions, tips and cloud-based content (including Spotlight " +
-                   "dynamic backgrounds) will be turned off by setting Group Policies accordingly and by disabling " +
-                   "some related scheduled tasks.\n\n" +
+                   "dynamic backgrounds and News and Interests) will be turned off by setting Group Policies accordingly and " +
+                   "by disabling some related scheduled tasks.\n\n" +
                    "Be aware that some of these features will be disabled only for the currently logged in user " +
                    "and for new users created after running this procedure.";
         }

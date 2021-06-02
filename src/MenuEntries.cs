@@ -16,14 +16,17 @@ namespace Win10BloatRemover
         public override string FullName => "Make system apps removable";
         public override string GetExplanation()
         {
-            return "This procedure will edit an internal database to allow the removal of system UWP apps such as legacy Edge " +
-                   "and Security Center via PowerShell (used by this tool) and in Settings app.\n" +
-                   "It is recommended to create a system restore point before proceeding.\n\n" +
-                   "It is generally safe to remove only those system apps that can be found in Start menu.\n" +
-                   "Certain \"hidden\" apps are there to provide critical OS functionality, and therefore uninstalling " +
-                   "them may lead to an unstable or unusable system: BE CAREFUL.\n\n" +
-                   "Remember also that any system app may be reinstalled after any Windows cumulative update.\n" +
-                   "Before starting, make sure that Microsoft Store is not installing/updating apps in the background.";
+            return
+@"This procedure will edit an internal database to allow the removal of system UWP apps such as legacy Edge and
+Security Center via PowerShell (used by this tool) and in Settings app.
+It is recommended to create a system restore point before proceeding.
+
+It is generally safe to remove only those system apps that can be found in Start menu.
+Certain ""hidden"" apps are there to provide critical OS functionality, and therefore uninstalling them may lead
+to an unstable or unusable system: BE CAREFUL.
+
+Remember also that any system app may be reinstalled after any Windows cumulative update.
+Before starting, make sure that Microsoft Store is not installing/updating apps in the background.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new SystemAppsRemovalEnabler(ui);
     }
@@ -46,7 +49,7 @@ namespace Win10BloatRemover
 
             if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.AllUsers)
                 explanation += "\nServices, components and scheduled tasks used specifically by those apps will also " +
-                               "be disabled or removed, together with any leftover data.";
+                               "be disabled or removed,\ntogether with any leftover data.";
 
             return explanation + "\nIn order to remove some components of Xbox, you need to make system apps removable first.";
         }
@@ -59,12 +62,14 @@ namespace Win10BloatRemover
         public override string FullName => "Disable Windows Defender";
         public override string GetExplanation()
         {
-            return "IMPORTANT: Before starting, disable Tamper protection in Windows Security app " +
-                   "under Virus & threat protection settings.\n" +
-                   "Defender services will be removed and its antimalware engine will be disabled via Group Policies, " +
-                   "together with SmartScreen feature.\n\n" +
-                   "If you have already made system apps removable, Windows Security app will be removed too.\n" +
-                   "Remember that any Windows cumulative update is likely to reinstall the app.";
+            return
+@"IMPORTANT: Before starting, disable Tamper protection in Windows Security app under Virus & threat protection settings.
+
+Defender services will be removed and its antimalware engine will be disabled via Group Policies, together with
+SmartScreen feature.
+
+If you have already made system apps removable, Windows Security app will be removed too.
+Remember that any Windows cumulative update is likely to reinstall the app.";
         }
 
         public override IOperation CreateNewOperation(IUserInterface ui)
@@ -86,10 +91,12 @@ namespace Win10BloatRemover
         public override string FullName => "Remove Microsoft Edge";
         public override string GetExplanation()
         {
-            return "Both Edge Chromium and legacy Edge browser will be uninstalled from the system.\n" +
-                   "In order to be able to uninstall the latter (which gets restored once you uninstall the first), you need to make system apps removable.\n" +
-                   "Take note that both browsers may be reinstalled after any Windows cumulative update.\n" +
-                   "Make sure that Edge Chromium is not updating itself before proceeding.";
+            return
+@"Both Edge Chromium and legacy Edge browser will be uninstalled from the system.
+In order to be able to uninstall the latter (which gets restored once you uninstall the first), you need to make
+system apps removable.
+Take note that both browsers may be reinstalled after any Windows cumulative update.
+Make sure that Edge Chromium is not updating itself before proceeding.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
         {
@@ -155,18 +162,20 @@ namespace Win10BloatRemover
         public override string FullName => "Tweak settings for privacy";
         public override string GetExplanation()
         {
-            return "Several default settings and policies will be changed to make Windows more respectful of user's privacy.\n" +
-                   "These changes consist essentially of:\n" +
-                   "  - adjusting various options under Privacy section of Settings app " +
-                   "(disable advertising ID, app launch tracking etc.)\n" +
-                   "  - preventing input data (inking/typing information, speech) from being sent to Microsoft to improve their services\n" +
-                   "  - denying access to sensitive data (location, documents, activities, account details, diagnostic info)" +
-                   " to all UWP apps by default\n" +
-                   "  - disabling voice activation for voice assistants (so that they can't always be listening)\n" +
-                   "  - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages, passwords and app data)\n" +
-                   "  - disabling web search in bottom search bar\n\n" +
-                   "Whereas almost all of these settings are applied for all users, some of them will only be changed " +
-                   "for the current user and for new users created after running this procedure.";
+            return 
+@"Several default settings and policies will be changed to make Windows more respectful of user's privacy.
+These changes consist essentially of:
+  - adjusting various options under Privacy section of Settings app (disable advertising ID, app launch tracking etc.)
+  - preventing input data (inking/typing information, speech) from being sent to Microsoft to improve their services
+  - denying access to sensitive data (location, documents, activities, account details, diagnostic info) to
+  all UWP apps by default
+  - disabling voice activation for voice assistants (so that they can't always be listening)
+  - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages, passwords
+  and app data)
+  - disabling web search in bottom search bar
+
+Whereas almost all of these settings are applied for all users, some of them will only be changed for the current
+user and for new users created after running this procedure.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new PrivacySettingsTweaker(ui);
     }
@@ -176,9 +185,10 @@ namespace Win10BloatRemover
         public override string FullName => "Disable telemetry";
         public override string GetExplanation()
         {
-            return "This procedure will disable scheduled tasks, services and features that are responsible for " +
-                   "collecting and reporting data to Microsoft, including Compatibility Telemetry, Device Census, " +
-                   "Customer Experience Improvement Program and Compatibility Assistant.";
+            return
+@"This procedure will disable scheduled tasks, services and features that are responsible for collecting and
+reporting data to Microsoft, including Compatibility Telemetry, Device Census, Customer Experience Improvement
+Program and Compatibility Assistant.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new TelemetryDisabler(ui, new ServiceRemover(ui));
@@ -218,8 +228,9 @@ namespace Win10BloatRemover
         public override string FullName => "Disable Windows Error Reporting";
         public override string GetExplanation()
         {
-            return "Windows Error Reporting will disabled by editing Group Policies, as well as by removing " +
-                   "its services (after backing them up).";
+            return
+@"Windows Error Reporting will disabled by editing Group Policies, as well as by removing its services (after
+backing them up).";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new ErrorReportingDisabler(ui, new ServiceRemover(ui));
@@ -230,11 +241,13 @@ namespace Win10BloatRemover
         public override string FullName => "Disable suggestions, cloud content and feedback requests";
         public override string GetExplanation()
         {
-            return "Feedback notifications and requests, apps suggestions, tips and cloud-based content (including Spotlight " +
-                   "dynamic backgrounds and News and Interests) will be turned off by setting Group Policies accordingly and " +
-                   "by disabling some related scheduled tasks.\n\n" +
-                   "Be aware that some of these features will be disabled only for the currently logged in user " +
-                   "and for new users created after running this procedure.";
+            return 
+@"Feedback notifications and requests, apps suggestions, tips and cloud-based content (including Spotlight dynamic
+backgrounds and News and Interests) will be turned off by setting Group Policies accordingly and by disabling some
+related scheduled tasks.
+
+Be aware that some of these features will be disabled only for the currently logged in user and for new users
+created after running this procedure.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new SuggestionsDisabler(ui);
     }
@@ -244,8 +257,9 @@ namespace Win10BloatRemover
         public override string FullName => "Report an issue/Suggest a feature";
         public override string GetExplanation()
         {
-            return "You will now be brought to a web page where you can open a GitHub issue " +
-                   "in order to report a bug or to suggest a new feature.";
+            return
+@"You will now be brought to a web page where you can open a GitHub issue in order to report a bug or to suggest
+a new feature.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new BrowserOpener("https://github.com/Fs00/Win10BloatRemover/issues/new");
@@ -257,15 +271,17 @@ namespace Win10BloatRemover
         public override string GetExplanation()
         {
             Version programVersion = GetType().Assembly.GetName().Version!;
-            return $"Windows 10 Bloat Remover and Tweaker {programVersion.Major}.{programVersion.Minor} " +
-                   $"for Windows version {programVersion.Build}\n" +
-                   "Developed by Fs00\n" +
-                   "Official GitHub repository: github.com/Fs00/Win10BloatRemover\n\n" +
-                   "Originally based on Windows 10 de-botnet guide by Federico Dossena: http://fdossena.com\n" +
-                   "Credits to all open source projects whose work has been used to improve this software:\n" +
-                   "  - privacy.sexy website: github.com/undergroundwires/privacy.sexy\n" +
-                   "  - Debloat Windows 10 scripts: github.com/W4RH4WK/Debloat-Windows-10\n\n" +
-                   "This software is released under BSD 3-Clause Clear license (continue to read full text).";
+            return
+$@"Windows 10 Bloat Remover and Tweaker {programVersion.Major}.{programVersion.Minor} for Windows version {programVersion.Build}
+Developed by Fs00
+Official GitHub repository: github.com/Fs00/Win10BloatRemover
+
+Originally based on Windows 10 de-botnet guide by Federico Dossena: http://fdossena.com
+Credits to all open source projects whose work has been used to improve this software:
+  - privacy.sexy website: github.com/undergroundwires/privacy.sexy
+  - Debloat Windows 10 scripts: github.com/W4RH4WK/Debloat-Windows-10
+
+This software is released under BSD 3-Clause Clear license (continue to read full text).";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new LicensePrinter(ui);
     }

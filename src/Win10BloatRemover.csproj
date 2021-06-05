@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>x86</PlatformTarget>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -23,9 +24,6 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Management.Automation" Version="7.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
   </ItemGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="mscorlib" />

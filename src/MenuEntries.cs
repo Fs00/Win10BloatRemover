@@ -93,8 +93,8 @@ Remember that any Windows cumulative update is likely to reinstall the app.";
         {
             return
 @"Both Edge Chromium and legacy Edge browser will be uninstalled from the system.
-In order to be able to uninstall the latter (which gets restored once you uninstall the first), you need to make
-system apps removable.
+In order to be able to uninstall the latter (which may get restored once you uninstall the first), you need to
+make system apps removable.
 Take note that both browsers may be reinstalled after any Windows cumulative update.
 Make sure that Edge Chromium is not updating itself before proceeding.";
         }

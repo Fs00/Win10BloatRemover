@@ -1,6 +1,5 @@
 # Contributing guidelines
-- Open an issue before starting to implement a feature, so that it can be discussed and approved/rejected before you work on it (we don't want to waste contributors' time)
-- Arrange your work so that it can be easily ported over multiple branches (usually two branches are maintained at the same time)
+- Open an issue before starting to implement a feature, so that it can be discussed and approved/rejected before you start working on it
 - Always allow edits from maintainers on your pull requests
 - Keep your code as clean as possible by following these tips:
   - a long but descriptive function/variable name is better than a concise but unclear one

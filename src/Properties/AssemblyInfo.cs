@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using Win10BloatRemover;
 
 [assembly: AssemblyTitle("Windows 10 Bloat Remover")]
 [assembly: AssemblyDescription("")]
@@ -14,5 +13,5 @@ using Win10BloatRemover;
 [assembly: ComVisible(false)]
 [assembly: Guid("759f045d-adbf-4867-a0f7-f2d066e0c390")]
 
-[assembly: AssemblyVersion("4.1." + Program.SUPPORTED_WINDOWS_RELEASE_ID)]
-[assembly: AssemblyFileVersion("4.1." + Program.SUPPORTED_WINDOWS_RELEASE_ID)]
+[assembly: AssemblyVersion("4.1")]
+[assembly: AssemblyFileVersion("4.1")]

@@ -1,5 +1,10 @@
 # Windows 10 Bloat Remover and Tweaker
-This configurable tool provides an interactive command-line interface to aggressively debloat and tweak your Windows 10 installation in an easy way. Here's what it can do for you:
+
+This configurable tool provides an interactive command-line interface to aggressively debloat and tweak your Windows 10 installation in an easy way.
+
+![Program screenshot](https://github.com/Fs00/Win10BloatRemover/raw/master/screenshot.png)
+
+Here's what it can do for you:
 
 * **Make system apps removable** by editing an internal system database. Thanks to this, apps like legacy Edge, Security Center and others can be uninstalled by this tool and also by the user in Settings app or via PowerShell commands. Take note that system apps can be reinstalled by Windows cumulative updates.  
 * **Remove pre-installed UWP apps:** uninstalls the apps specified by the user either for the current Windows user or for all users (see *Configuration* below, options `UWPAppsToRemove` and `UWPAppsRemovalMode`). When apps are uninstalled for all users, their corresponding provisioned packages are deleted too (if present), so that they won't get reinstalled for new users or after feature updates. 

@@ -8,6 +8,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Publish release build
       run: dotnet publish -c Release -p:PublishProfile=Standalone
+    - name: Print published executable hash
+      run: (Get-FileHash src/bin/Release/standalone/Win10BloatRemover.exe).Hash
     - name: Copy Readme and License near published executable
       run: cp @('LICENSE', 'README.md') -Destination src/bin/Release/standalone
     - name: Upload release files

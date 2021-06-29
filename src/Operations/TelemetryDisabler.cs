@@ -21,6 +21,7 @@ namespace Win10BloatRemover.Operations
 
         private static readonly string[] telemetryScheduledTasks = {
             @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
+            @"\Microsoft\Windows\Application Experience\PcaPatchDbTask",
             @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
             @"\Microsoft\Windows\Application Experience\StartupAppTask",
             @"\Microsoft\Windows\Autochk\Proxy",

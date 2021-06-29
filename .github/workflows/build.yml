@@ -1,0 +1,16 @@
+name: Build release artifact
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Publish release build
+      run: dotnet publish -c Release -p:PublishProfile=Standalone
+    - name: Upload release build
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: Release build
+        path: src/bin/Release/standalone/Win10BloatRemover.exe
+        if-no-files-found: error

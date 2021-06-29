@@ -2,15 +2,17 @@ name: Build release artifact
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-release:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
     - name: Publish release build
       run: dotnet publish -c Release -p:PublishProfile=Standalone
-    - name: Upload release build
+    - name: Copy Readme and License near published executable
+      run: cp @('LICENSE', 'README.md') -Destination src/bin/Release/standalone
+    - name: Upload release files
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: Release build
-        path: src/bin/Release/standalone/Win10BloatRemover.exe
+        name: Release ZIP
+        path: src/bin/Release/standalone/*
         if-no-files-found: error

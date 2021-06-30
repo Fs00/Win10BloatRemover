@@ -5,7 +5,6 @@ using System.Management;
 using System.ServiceProcess;
 using Microsoft.Win32;
 using Win10BloatRemover.Operations;
-using Env = System.Environment;
 
 namespace Win10BloatRemover.Utils
 {
@@ -30,10 +29,10 @@ namespace Win10BloatRemover.Utils
         public static string GetProgramFilesFolder()
         {
             // See docs.microsoft.com/en-us/windows/win32/winprog64/wow64-implementation-details#environment-variables
-            if (Env.Is64BitOperatingSystem)
-                return Env.GetEnvironmentVariable("ProgramW6432")!;
+            if (Environment.Is64BitOperatingSystem)
+                return Environment.GetEnvironmentVariable("ProgramW6432")!;
             else
-                return Env.GetFolderPath(Env.SpecialFolder.ProgramFiles);
+                return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         }
 
         public static void ExecuteWindowsPromptCommand(string command, IMessagePrinter printer)
@@ -126,6 +125,12 @@ namespace Win10BloatRemover.Utils
                 directoryToDelete.Attributes = FileAttributes.Directory;
                 directoryToDelete.Delete(recursive: true);
             }
+        }
+
+        public static bool IsWindows10System()
+        {
+            var windowsVersion = Environment.OSVersion.Version;
+            return windowsVersion.Major == 10 && windowsVersion.Build < 21996;
         }
 
         public static string? RetrieveWindows10ReleaseId() =>

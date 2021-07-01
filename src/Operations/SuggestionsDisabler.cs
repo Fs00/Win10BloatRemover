@@ -69,6 +69,8 @@ namespace Win10BloatRemover.Operations
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "RotatingLockScreenEnabled", 0);
 
+            RegistryUtils.SetForCurrentAndDefaultUser(
+                @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "ContentDeliveryAllowed", 0);
             // News and Interests
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds", "EnableFeeds", 0);
             // Programmable taskbar

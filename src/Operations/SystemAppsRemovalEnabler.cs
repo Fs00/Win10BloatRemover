@@ -103,10 +103,10 @@ namespace Win10BloatRemover.Operations
                 catch
                 {
                     Debug.WriteLine($"Failed attempt {currentAttempt}.");
-                    if (currentAttempt == 3)
+                    if (currentAttempt == 5)
                         throw;
                     currentAttempt++;
-                    Thread.Sleep(TimeSpan.FromMilliseconds(30));
+                    Thread.Sleep(TimeSpan.FromMilliseconds(200));
                 }
             }
         }

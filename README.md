@@ -16,7 +16,6 @@ Here's what it can do for you:
 * **Remove OneDrive** using the uninstaller provided by Microsoft, its folder in Explorer sidebar will also be hidden. Furthermore, its automatic setup will be disabled to prevent the app from being installed for new users.
 * **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* below, option `WindowsFeaturesToRemove`).
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
-* **Disable Cortana:** accomplished using Group Policies until OS version 1909. Starting from version 2004, it can be removed like any other pre-installed app.
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
 * **Disable suggestions, cloud-based content** (including Spotlight and News and Interests) **and feedback requests** through Group Policies
 * **Disable scheduled tasks** specified by the user (see *Configuration* below, option `ScheduledTasksToDisable`)
@@ -45,7 +44,7 @@ Configures which pre-installed UWP apps should be uninstalled. Take note that yo
 * `"OfficeHub"` (My Office)
 * `"OneNote"`
 * `"Camera"`
-* `"Cortana"` (on Windows version 2004 or higher)
+* `"Cortana"`
 * `"HelpAndFeedback"` (Feedback Hub, Get Help and Microsoft Tips)
 * `"Maps"`
 * `"Zune"` (Groove Music and Movies)

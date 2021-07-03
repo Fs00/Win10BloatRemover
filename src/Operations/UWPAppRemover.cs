@@ -146,7 +146,7 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            using (powerShell = PowerShellExtensions.CreateWithImportedModules("AppX").WithOutput(ui))
+            using (powerShell = PowerShellExtensions.CreateWithImportedModules("AppX", "Dism").WithOutput(ui))
             {
                 foreach (UWPAppGroup appGroup in appsToRemove)
                     UninstallAppsOfGroup(appGroup);

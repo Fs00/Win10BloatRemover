@@ -12,6 +12,7 @@ namespace Win10BloatRemover.Utils
     {
         public static PowerShell CreateWithImportedModules(params string[] modules)
         {
+            Environment.SetEnvironmentVariable("PSModuleAutoLoadingPreference", "None");
             Environment.SetEnvironmentVariable("POWERSHELL_TELEMETRY_OPTOUT", "true");
             var sessionState = InitialSessionState.CreateDefault2();
             sessionState.ThreadOptions = PSThreadOptions.UseCurrentThread;

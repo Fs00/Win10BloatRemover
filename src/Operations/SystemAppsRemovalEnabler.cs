@@ -60,7 +60,7 @@ namespace Win10BloatRemover.Operations
         private EditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)
         {
             ui.PrintHeading("Editing a temporary copy of state repository database...");
-            using (dbConnection = new SqliteConnection($"Data Source={databaseCopyPath};Pooling=False"))
+            using (dbConnection = new SqliteConnection($"Data Source={databaseCopyPath}"))
             {
                 dbConnection.Open();
 

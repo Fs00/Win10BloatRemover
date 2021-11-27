@@ -65,12 +65,12 @@ namespace Win10BloatRemover
 
         private static void ShowWarningOnUnsupportedOS()
         {
-            string? installedWindows10Version = SystemUtils.RetrieveWindows10ReleaseId();
-            if (SystemUtils.IsWindows10System() && IsWindows10VersionSupported(installedWindows10Version))
+            string? installedWindows10Version = OS.RetrieveWindows10ReleaseId();
+            if (OS.IsWindows10() && IsWindows10VersionSupported(installedWindows10Version))
                 return;
 
             ConsoleHelpers.WriteLine("-- UNSUPPORTED WINDOWS VERSION --\n", ConsoleColor.DarkYellow);
-            if (!SystemUtils.IsWindows10System())
+            if (!OS.IsWindows10())
                 Console.WriteLine("This program was designed to work only on Windows 10.");
             else
             {

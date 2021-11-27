@@ -16,7 +16,7 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             foreach (string task in scheduledTasksToDisable)
-                SystemUtils.RunProcessBlockingWithOutput("schtasks", $@"/Change /TN ""{task}"" /disable", ui);
+                OS.RunProcessBlockingWithOutput("schtasks", $@"/Change /TN ""{task}"" /disable", ui);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             DisableOneDrive();
-            SystemUtils.KillProcess("onedrive");
+            OS.KillProcess("onedrive");
             RunOneDriveUninstaller();
             RemoveOneDriveLeftovers();
             DisableAutomaticSetupForNewUsers();
@@ -34,7 +34,7 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintMessage("Executing OneDrive uninstaller...");
             string setupPath = RetrieveOneDriveSetupPath();
-            var uninstallationExitCode = SystemUtils.RunProcessBlockingWithOutput(setupPath, "/uninstall", ui);
+            var uninstallationExitCode = OS.RunProcessBlockingWithOutput(setupPath, "/uninstall", ui);
             if (uninstallationExitCode.IsNotSuccessful())
             {
                 ui.PrintError("Uninstallation failed due to an unknown error.");
@@ -54,7 +54,7 @@ namespace Win10BloatRemover.Operations
         private void RemoveOneDriveLeftovers()
         {
             ui.PrintMessage("Removing OneDrive leftovers...");
-            SystemUtils.KillProcess("explorer");
+            OS.KillProcess("explorer");
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
             Process.Start("explorer");
@@ -62,10 +62,10 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveResidualFiles()
         {
-            SystemUtils.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp", ui);
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive", ui);
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", ui);
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", ui);
+            OS.TryDeleteDirectoryIfExists(@"C:\OneDriveTemp", ui);
+            OS.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\OneDrive", ui);
+            OS.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\Microsoft\OneDrive", ui);
+            OS.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\OneDrive", ui);
             var menuShortcut = new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.StartMenu)}\Programs\OneDrive.lnk");
             if (menuShortcut.Exists)
                 menuShortcut.Delete();

@@ -231,7 +231,7 @@ namespace Win10BloatRemover.Operations
         private void RestartExplorer()
         {
             ui.PrintHeading("Restarting Explorer to avoid stale app entries in Start menu...");
-            SystemUtils.KillProcess("explorer");
+            OS.KillProcess("explorer");
             Process.Start("explorer");
         }
 
@@ -256,11 +256,11 @@ namespace Win10BloatRemover.Operations
         private void RemoveEdgeLeftovers()
         {
             ui.PrintMessage("Removing old files...");
-            SystemUtils.TryDeleteDirectoryIfExists(
+            OS.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
                 ui
             );
-            SystemUtils.TryDeleteDirectoryIfExists(
+            OS.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge",
                 ui
             );
@@ -299,7 +299,7 @@ namespace Win10BloatRemover.Operations
         private void RemovePaint3DContextMenuEntries()
         {
             ui.PrintMessage("Removing Paint 3D context menu entries...");
-            SystemUtils.ExecuteWindowsPromptCommand(
+            OS.ExecuteWindowsPromptCommand(
                 @"echo off & for /f ""tokens=1* delims="" %I in " +
                  @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Edit"" ^| find /i ""3D Edit"" ') " +
                 @"do (reg delete ""%I"" /f )",
@@ -322,13 +322,13 @@ namespace Win10BloatRemover.Operations
             );
             key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}", throwOnMissingSubKey: false);
 
-            SystemUtils.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects", ui);
+            OS.TryDeleteDirectoryIfExists($@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\3D Objects", ui);
         }
 
         private void Remove3DPrintContextMenuEntries()
         {
             ui.PrintMessage("Removing 3D Print context menu entries...");
-            SystemUtils.ExecuteWindowsPromptCommand(
+            OS.ExecuteWindowsPromptCommand(
                 @"echo off & for /f ""tokens=1* delims="" %I in " +
                 @"(' reg query ""HKEY_CLASSES_ROOT\SystemFileAssociations"" /s /k /f ""3D Print"" ^| find /i ""3D Print"" ') " +
                 @"do (reg delete ""%I"" /f )",

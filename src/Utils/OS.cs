@@ -8,7 +8,7 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.Utils
 {
-    static class SystemUtils
+    static class OS
     {
         public static void StopServiceAndItsDependents(string name)
         {
@@ -24,7 +24,7 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static void RebootSystem()
+        public static void RebootPC()
         {
             RunProcessBlocking("shutdown", "/r /t 3");
         }
@@ -130,7 +130,7 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static bool IsWindows10System()
+        public static bool IsWindows10()
         {
             var windowsVersion = Environment.OSVersion.Version;
             return windowsVersion.Major == 10 && windowsVersion.Build < 21996;

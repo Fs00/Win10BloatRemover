@@ -47,8 +47,8 @@ namespace Win10BloatRemover.Operations
         private void DowngradeAntimalwarePlatform()
         {
             ui.PrintHeading("Downgrading Defender antimalware platform...");
-            var exitCode = SystemUtils.RunProcessBlockingWithOutput(
-                $@"{SystemUtils.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform", ui);
+            var exitCode = OS.RunProcessBlockingWithOutput(
+                $@"{OS.GetProgramFilesFolder()}\Windows Defender\MpCmdRun.exe", "-resetplatform", ui);
 
             if (exitCode.IsNotSuccessful())
             {

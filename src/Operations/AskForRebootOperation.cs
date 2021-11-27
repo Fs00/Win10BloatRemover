@@ -21,7 +21,7 @@ namespace Win10BloatRemover.Operations
                 ui.PrintWarning("You have executed one or more operations that require a system reboot to take full effect.");
                 var choice = ui.AskUserConsent("Do you want to reboot now?");
                 if (choice == UserChoice.Yes)
-                    SystemUtils.RebootSystem();
+                    OS.RebootPC();
             }
         }
     }

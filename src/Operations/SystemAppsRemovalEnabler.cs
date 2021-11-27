@@ -97,7 +97,7 @@ namespace Win10BloatRemover.Operations
             {
                 try
                 {
-                    SystemUtils.StopServiceAndItsDependents("StateRepository");
+                    OS.StopServiceAndItsDependents("StateRepository");
                     servicesStoppedSuccessfully = true;
                 }
                 catch

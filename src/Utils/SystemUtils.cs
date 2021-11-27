@@ -13,10 +13,13 @@ namespace Win10BloatRemover.Utils
         public static void StopServiceAndItsDependents(string name)
         {
             using var service = new ServiceController(name);
+            foreach (var dependent in service.DependentServices)
+                StopServiceAndItsDependents(dependent.ServiceName);
+
             if (service.Status != ServiceControllerStatus.Stopped)
             {
                 if (service.Status != ServiceControllerStatus.StopPending)
-                    service.Stop();
+                    service.Stop(stopDependentServices: false);
                 service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(5));
             }
         }

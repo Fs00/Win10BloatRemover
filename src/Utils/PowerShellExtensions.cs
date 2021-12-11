@@ -17,8 +17,20 @@ namespace Win10BloatRemover.Utils
             var sessionState = InitialSessionState.CreateDefault2();
             sessionState.ThreadOptions = PSThreadOptions.UseCurrentThread;
             sessionState.ExecutionPolicy = ExecutionPolicy.Unrestricted;
-            sessionState.ImportPSModule(modules);
-            return PowerShell.Create(sessionState);
+            var powerShell = PowerShell.Create(sessionState);
+            powerShell.ImportModules(modules);
+            return powerShell;
+        }
+
+        private static void ImportModules(this PowerShell powerShell, string[] modules)
+        {
+            // SkipEditionCheck flag is used in order to prevent "incompatible" modules from being imported via WinCompat,
+            // which wouldn't work anyway since we don't bundle the required PS core modules in the program.
+            // This is particularly important, since AppX module has been marked as incompatible with PS Core
+            // in recent builds of the OS (due to github.com/PowerShell/PowerShell/issues/13138) and therefore
+            // would be imported via WinCompat by default, despite being perfectly functional on .NET Core 3.1. 
+            foreach (var module in modules)
+                powerShell.Run($"Import-Module {module} -SkipEditionCheck"); 
         }
 
         public static dynamic[] Run(this PowerShell powerShell, string script)

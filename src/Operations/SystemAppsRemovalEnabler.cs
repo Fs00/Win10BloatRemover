@@ -18,7 +18,6 @@ namespace Win10BloatRemover.Operations
         private const string STATE_REPOSITORY_DB_NAME = "StateRepository-Machine.srd";
         private const string STATE_REPOSITORY_DB_PATH =
             @"C:\ProgramData\Microsoft\Windows\AppRepository\" + STATE_REPOSITORY_DB_NAME;
-        private const string AFTER_PACKAGE_UPDATE_TRIGGER_NAME = "TRG_AFTER_UPDATE_Package_SRJournal";
 
         private /*lateinit*/ SqliteConnection dbConnection;
         private readonly IUserInterface ui;
@@ -64,13 +63,12 @@ namespace Win10BloatRemover.Operations
             {
                 dbConnection.Open();
 
-                // There's an AFTER UPDATE trigger on the table we want to edit that causes problems,
-                // so we must prevent it from being run
-                string? createTriggerCode = RetrieveAfterPackageUpdateTriggerCode();
-                DeleteAfterPackageUpdateTrigger();
+                // There's an AFTER UPDATE trigger on the table we want to edit that uses application-defined functions
+                // and therefore would prevent us to make any change, so we need to temporarily get rid of it
+                var afterUpdateTrigger = RetrieveAfterPackageUpdateTrigger();
+                DeleteTrigger(afterUpdateTrigger?.Name);
                 int updatedRows = EditPackageTable();
-                if (createTriggerCode != null)
-                    ReAddAfterPackageUpdateTrigger(createTriggerCode);
+                ReAddTrigger(afterUpdateTrigger?.Sql);
 
                 ui.PrintMessage($"Edited {updatedRows} {(updatedRows == 1 ? "row" : "rows")}.");
                 return updatedRows == 0 ? EditingOutcome.NoChangesMade : EditingOutcome.ContentWasUpdated;
@@ -111,22 +109,27 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private string? RetrieveAfterPackageUpdateTriggerCode()
+        private (string Name, string Sql)? RetrieveAfterPackageUpdateTrigger()
         {
             using var query = new SqliteCommand(
-                $"SELECT sql FROM sqlite_master WHERE name='{AFTER_PACKAGE_UPDATE_TRIGGER_NAME}'",
+                $"SELECT name, sql FROM sqlite_master WHERE type='trigger' AND tbl_name='Package' AND sql LIKE '%AFTER UPDATE%'",
                 dbConnection
             );
-            return (string?) query.ExecuteScalar();
+            using var reader = query.ExecuteReader();
+            if (!reader.HasRows)
+                return null;
+
+            reader.Read();
+            return (Name: reader.GetString(0), Sql: reader.GetString(1));
         }
 
-        private void DeleteAfterPackageUpdateTrigger()
+        private void DeleteTrigger(string? triggerName)
         {
-            using var query = new SqliteCommand(
-                $"DROP TRIGGER IF EXISTS {AFTER_PACKAGE_UPDATE_TRIGGER_NAME}",
-                dbConnection
-            );
-            query.ExecuteNonQuery();
+            if (triggerName != null)
+            {
+                using var query = new SqliteCommand($"DROP TRIGGER {triggerName}", dbConnection);
+                query.ExecuteNonQuery();
+            }
         }
 
         private int EditPackageTable()
@@ -139,10 +142,13 @@ namespace Win10BloatRemover.Operations
             return updatedRows;
         }
 
-        private void ReAddAfterPackageUpdateTrigger(string createTriggerQuery)
+        private void ReAddTrigger(string? triggerSql)
         {
-            using var query = new SqliteCommand(createTriggerQuery, dbConnection);
-            query.ExecuteNonQuery();
+            if (triggerSql != null)
+            {
+                using var query = new SqliteCommand(triggerSql, dbConnection);
+                query.ExecuteNonQuery();
+            }
         }
     }
 }

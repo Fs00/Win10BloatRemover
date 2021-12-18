@@ -59,11 +59,7 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
             { UWPAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
             { UWPAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
-            { UWPAppGroup.EdgeUWP, new[] {
-                "Microsoft.MicrosoftEdge",
-                "Microsoft.MicrosoftEdge.Stable",
-                "Microsoft.MicrosoftEdgeDevToolsClient",
-            } },
+            { UWPAppGroup.EdgeUWP, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             { UWPAppGroup.HelpAndFeedback, new[] {
                 "Microsoft.WindowsFeedbackHub",
                 "Microsoft.GetHelp",

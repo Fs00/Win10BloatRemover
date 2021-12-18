@@ -102,7 +102,7 @@ Make sure that Edge Chromium is not updating itself before proceeding.";
         {
             return new EdgeRemover(ui,
                 new UWPAppRemover(
-                    new[] { UWPAppGroup.LegacyEdge },
+                    new[] { UWPAppGroup.EdgeUWP },
                     UWPAppRemovalMode.AllUsers,
                     ui, new ServiceRemover(ui)
                 )

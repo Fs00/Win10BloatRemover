@@ -23,8 +23,8 @@ namespace Win10BloatRemover.Operations
         Camera,
         CommunicationsApps,
         Cortana,
+        EdgeUWP,
         HelpAndFeedback,
-        LegacyEdge,
         Maps,
         Messaging,
         MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
@@ -49,35 +49,33 @@ namespace Win10BloatRemover.Operations
         // This dictionary contains the exact apps names corresponding to every defined group
         private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {
             { UWPAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
-            {
-                UWPAppGroup.Bing, new[] {
-                    "Microsoft.BingNews",
-                    "Microsoft.BingWeather",
-                    "Microsoft.BingFinance",
-                    "Microsoft.BingSports"
-                }
-            },
+            { UWPAppGroup.Bing, new[] {
+                "Microsoft.BingNews",
+                "Microsoft.BingWeather",
+                "Microsoft.BingFinance",
+                "Microsoft.BingSports"
+            } },
             { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
             { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
             { UWPAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
             { UWPAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
-            {
-                UWPAppGroup.HelpAndFeedback, new[] {
-                    "Microsoft.WindowsFeedbackHub",
-                    "Microsoft.GetHelp",
-                    "Microsoft.Getstarted"
-                }
-            },
-            { UWPAppGroup.LegacyEdge, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
+            { UWPAppGroup.EdgeUWP, new[] {
+                "Microsoft.MicrosoftEdge",
+                "Microsoft.MicrosoftEdge.Stable",
+                "Microsoft.MicrosoftEdgeDevToolsClient",
+            } },
+            { UWPAppGroup.HelpAndFeedback, new[] {
+                "Microsoft.WindowsFeedbackHub",
+                "Microsoft.GetHelp",
+                "Microsoft.Getstarted"
+            } },
             { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
             { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
-            {
-                UWPAppGroup.MixedReality, new[] {
-                    "Microsoft.Microsoft3DViewer",
-                    "Microsoft.Print3D",
-                    "Microsoft.MixedReality.Portal"
-                }
-            },
+            { UWPAppGroup.MixedReality, new[] {
+                "Microsoft.Microsoft3DViewer",
+                "Microsoft.Print3D",
+                "Microsoft.MixedReality.Portal"
+            } },
             { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
             { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
             { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
@@ -89,24 +87,20 @@ namespace Win10BloatRemover.Operations
             { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
             { UWPAppGroup.SoundRecorder, new[] { "Microsoft.WindowsSoundRecorder" } },
             { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
-            {
-                UWPAppGroup.Store, new[] {
-                    "Microsoft.WindowsStore",
-                    "Microsoft.StorePurchaseApp",
-                    "Microsoft.Services.Store.Engagement",
-                }
-            },
-            {
-                UWPAppGroup.Xbox, new[] {
-                    "Microsoft.XboxGameCallableUI",
-                    "Microsoft.XboxSpeechToTextOverlay",
-                    "Microsoft.XboxApp",
-                    "Microsoft.XboxGameOverlay",
-                    "Microsoft.XboxGamingOverlay",
-                    "Microsoft.XboxIdentityProvider",
-                    "Microsoft.Xbox.TCUI"
-                }
-            },
+            { UWPAppGroup.Store, new[] {
+                "Microsoft.WindowsStore",
+                "Microsoft.StorePurchaseApp",
+                "Microsoft.Services.Store.Engagement",
+            } },
+            { UWPAppGroup.Xbox, new[] {
+                "Microsoft.XboxGameCallableUI",
+                "Microsoft.XboxSpeechToTextOverlay",
+                "Microsoft.XboxApp",
+                "Microsoft.XboxGameOverlay",
+                "Microsoft.XboxGamingOverlay",
+                "Microsoft.XboxIdentityProvider",
+                "Microsoft.Xbox.TCUI"
+            } },
             { UWPAppGroup.Zune, new[] { "Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
@@ -132,7 +126,7 @@ namespace Win10BloatRemover.Operations
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
                 { UWPAppGroup.Cortana, HideCortanaFromTaskBar },
-                { UWPAppGroup.LegacyEdge, RemoveEdgeLeftovers },
+                { UWPAppGroup.EdgeUWP, RemoveEdgeLeftovers },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
                 { UWPAppGroup.Messaging, RemoveMessagingService },
                 { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
@@ -255,7 +249,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveEdgeLeftovers()
         {
-            ui.PrintMessage("Removing old files...");
+            ui.PrintMessage("Removing Edge leftovers...");
             OS.TryDeleteDirectoryIfExists(
                 $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
                 ui

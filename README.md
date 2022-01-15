@@ -7,23 +7,23 @@ This configurable tool provides an interactive command-line interface to aggress
 Here's what it can do for you:
 
 * **Make system apps removable** by editing an internal system database. Thanks to this, apps like legacy Edge, Security Center and others can be uninstalled by this tool and also by the user in Settings app or via PowerShell commands. Take note that system apps can be reinstalled by Windows cumulative updates.  
-* **Remove pre-installed UWP apps:** uninstalls the apps specified by the user either for the current Windows user or for all users (see *Configuration* below, options `UWPAppsToRemove` and `UWPAppsRemovalMode`). When apps are uninstalled for all users, their corresponding provisioned packages are deleted too (if present), so that they won't get reinstalled for new users or after feature updates. 
+* **Remove pre-installed UWP apps:** uninstalls the apps specified by the user either for the current Windows user or for all users (see *Configuration* section below, options `UWPAppsToRemove` and `UWPAppsRemovalMode`). When apps are uninstalled for all users, their corresponding provisioned packages are deleted too (if present), so that they won't get reinstalled for new users or after feature updates. 
 * **Remove Microsoft Edge:** uninstalls the newer Chromium-based Edge and the legacy UWP version of the browser, which are both pre-installed in recent versions of the OS.
 * **Disable OS telemetry:** disables several Windows components that collect diagnostic and usage information such as Compatibility Telemetry, Inventory, Device Census, Customer Experience Improvement Program and others. It also deletes the services which are responsible for data reporting to Microsoft.
-* **Remove system services:** deletes - not just disables - the services specified by the user (see *Configuration* below, option `ServicesToRemove`) after backing up their Registry keys, so that you can restore them if anything breaks.
+* **Remove system services:** deletes - not just disables - the services specified by the user (see *Configuration* section below, option `ServicesToRemove`) after backing up their Registry keys, so that you can restore them if anything breaks.
 * **Tweak Windows settings for enhanced privacy:** makes Windows more privacy-respectful by turning off certain system features that put your personal data at risk, such as inking/typing personalization, app launch tracking, clipboard/text messages synchronization, voice activation and some more. Take note that the goal here is to provide a mindful balance that leans towards privacy, without sacrificing too much in terms of user experience.
 * **Disable Windows Defender:** disables the antivirus that comes pre-installed on the OS and removes its background services. Also, if you make system apps removable, Windows Security app will be uninstalled. *Only for tech-savvy users!⚠️*
 * **Remove OneDrive** using the uninstaller provided by Microsoft, its folder in Explorer sidebar will also be hidden. Furthermore, its automatic setup will be disabled to prevent the app from being installed for new users.
-* **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* below, option `WindowsFeaturesToRemove`).
+* **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* section below, option `WindowsFeaturesToRemove`).
 * **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
 * **Disable suggestions, cloud-based content** (including Spotlight and News and Interests) **and feedback requests** through Group Policies
-* **Disable scheduled tasks** specified by the user (see *Configuration* below, option `ScheduledTasksToDisable`)
+* **Disable scheduled tasks** specified by the user (see *Configuration* section below, option `ScheduledTasksToDisable`)
 
 Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.
 
-Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable suggestions, cloud content and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created **before those operations have been run**, due to how user registry hives work.  
-Therefore, in order to have the maximum effect, it is recommended to run this tool before creating any other user in the system.
+Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable suggestions, cloud content and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created *before* those operations have been run, due to how user registry hives work.  
+Therefore, in order to have the maximum effect, it is recommended to **run this tool before creating any other user in the system.**
 
 👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**
 

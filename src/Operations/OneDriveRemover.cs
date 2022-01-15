@@ -57,7 +57,7 @@ namespace Win10BloatRemover.Operations
             OS.KillProcess("explorer");
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
-            Process.Start("explorer");
+            Process.Start(OS.SystemExecutablePath("explorer"));
         }
 
         private void RemoveResidualFiles()

@@ -222,7 +222,7 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Restarting Explorer to avoid stale app entries in Start menu...");
             OS.KillProcess("explorer");
-            Process.Start("explorer");
+            Process.Start(OS.SystemExecutablePath("explorer"));
         }
 
         private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)

@@ -16,7 +16,7 @@ namespace Win10BloatRemover.Utils
         private static RegistryKey LoadDefaultUserHive()
         {
             var loadExitCode = OS.RunProcessBlocking(
-                "reg", $@"load ""{DEFAULT_USER_HIVE_PATH}"" ""C:\Users\Default\NTUSER.DAT"""
+                OS.SystemExecutablePath("reg"), $@"load ""{DEFAULT_USER_HIVE_PATH}"" ""C:\Users\Default\NTUSER.DAT"""
             );
             if (loadExitCode.IsNotSuccessful())
                 throw new Exception("Unable to load Default user registry hive.");
@@ -28,7 +28,7 @@ namespace Win10BloatRemover.Utils
         private static void UnloadDefaultUserHive()
         {
             defaultUserKey?.Close();
-            OS.RunProcessBlocking("reg", $@"unload ""{DEFAULT_USER_HIVE_PATH}""");
+            OS.RunProcessBlocking(OS.SystemExecutablePath("reg"), $@"unload ""{DEFAULT_USER_HIVE_PATH}""");
         }
 
         public static void SetForCurrentAndDefaultUser(string keyPath, string valueName, object value)

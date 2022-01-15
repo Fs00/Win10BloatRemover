@@ -26,7 +26,7 @@ namespace Win10BloatRemover.Utils
 
         public static void RebootPC()
         {
-            RunProcessBlocking("shutdown", "/r /t 3");
+            RunProcessBlocking(SystemExecutablePath("shutdown"), "/r /t 3");
         }
 
         public static string GetProgramFilesFolder()
@@ -41,7 +41,14 @@ namespace Win10BloatRemover.Utils
         public static void ExecuteWindowsPromptCommand(string command, IMessagePrinter printer)
         {
             Debug.WriteLine($"Command executed: {command}");
-            RunProcessBlockingWithOutput("cmd.exe", $@"/c ""{command}""", printer);
+            RunProcessBlockingWithOutput(SystemExecutablePath("cmd"), $@"/c ""{command}""", printer);
+        }
+
+        public static string SystemExecutablePath(string executableName)
+        {
+            // SpecialFolder.SystemX86 returns SysWOW64 folder on 64-bit systems
+            string systemFolder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            return $@"{systemFolder}\{executableName}.exe";
         }
 
         public static void KillProcess(string processName)

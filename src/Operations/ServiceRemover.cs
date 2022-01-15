@@ -97,7 +97,9 @@ namespace Win10BloatRemover.Operations
         {
             EnsureBackupDirectoryExists();
             var regExportExitCode = OS.RunProcessBlocking(
-                "reg", $@"export ""HKLM\SYSTEM\CurrentControlSet\Services\{service}"" ""{backupDirectory.FullName}\{service}.reg""");
+                OS.SystemExecutablePath("reg"),
+                $@"export ""HKLM\SYSTEM\CurrentControlSet\Services\{service}"" ""{backupDirectory.FullName}\{service}.reg"""
+            );
             if (regExportExitCode.IsSuccessful())
                 ui.PrintMessage($"Service {service} backed up.");
             else
@@ -118,7 +120,7 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveService(string service)
         {
-            var scExitCode = OS.RunProcessBlocking("sc", $"delete \"{service}\"");
+            var scExitCode = OS.RunProcessBlocking(OS.SystemExecutablePath("sc"), $"delete \"{service}\"");
             if (IsScRemovalSuccessful(scExitCode))
             {
                 PrintSuccessMessage(scExitCode, service);

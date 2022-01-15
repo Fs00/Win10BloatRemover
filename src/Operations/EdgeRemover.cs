@@ -37,9 +37,11 @@ namespace Win10BloatRemover.Operations
 
             ui.PrintMessage("Running uninstaller...");
             OS.RunProcessBlocking(installerPath, "--uninstall --force-uninstall --system-level");
-            // Since actual uninstallation happens in another process launched by the installer, we wait
+            // Since part of the uninstallation happens in another process launched by the installer, we wait
             // for a reasonable amount of time to let this process do its work before continuing
             Thread.Sleep(TimeSpan.FromSeconds(5));
+
+            RemoveEdgeLeftovers();
         }
 
         private string? RetrieveEdgeChromiumInstallerPath()
@@ -62,6 +64,17 @@ namespace Win10BloatRemover.Operations
                 }
             }
             return null;
+        }
+
+        private void RemoveEdgeLeftovers()
+        {
+            ui.PrintMessage("Removing leftover data for the current user...");
+            OS.TryDeleteDirectoryIfExists($@"{GetFolderPath(SpecialFolder.UserProfile)}\MicrosoftEdgeBackups", ui);
+            OS.TryDeleteDirectoryIfExists($@"{GetFolderPath(SpecialFolder.LocalApplicationData)}\MicrosoftEdge", ui);
+            OS.TryDeleteDirectoryIfExists($@"{GetFolderPath(SpecialFolder.LocalApplicationData)}\Microsoft\Edge", ui);
+            var desktopShortcut = new FileInfo($@"{GetFolderPath(SpecialFolder.DesktopDirectory)}\Microsoft Edge.lnk");
+            if (desktopShortcut.Exists)
+                desktopShortcut.Delete();
         }
     }
 }

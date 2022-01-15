@@ -122,7 +122,6 @@ namespace Win10BloatRemover.Operations
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
                 { UWPAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
                 { UWPAppGroup.Cortana, HideCortanaFromTaskBar },
-                { UWPAppGroup.EdgeUWP, RemoveEdgeLeftovers },
                 { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
                 { UWPAppGroup.Messaging, RemoveMessagingService },
                 { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
@@ -241,19 +240,6 @@ namespace Win10BloatRemover.Operations
                 ui.PrintError(
                     $"An error occurred while performing post-uninstall/cleanup operations for app group {appGroup}: {exc.Message}");
             }
-        }
-
-        private void RemoveEdgeLeftovers()
-        {
-            ui.PrintMessage("Removing Edge leftovers...");
-            OS.TryDeleteDirectoryIfExists(
-                $@"{Env.GetFolderPath(Env.SpecialFolder.UserProfile)}\MicrosoftEdgeBackups",
-                ui
-            );
-            OS.TryDeleteDirectoryIfExists(
-                $@"{Env.GetFolderPath(Env.SpecialFolder.LocalApplicationData)}\MicrosoftEdge",
-                ui
-            );
         }
 
         private void HideCortanaFromTaskBar()

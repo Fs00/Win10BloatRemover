@@ -5,8 +5,7 @@ namespace Win10BloatRemover.Operations
 {
     public class DefenderDisabler : IOperation
     {
-        private static readonly string[] securityHealthServices = {
-            "SecurityHealthService",
+        private static readonly string[] defenderServices = {
             "wscsvc",
             "Sense",
             "SgrmBroker",
@@ -21,15 +20,13 @@ namespace Win10BloatRemover.Operations
         };
 
         private readonly IUserInterface ui;
-        private readonly IOperation securityCenterRemover;
         private readonly ServiceRemover serviceRemover;
 
         public bool IsRebootRecommended { get; private set; }
 
-        public DefenderDisabler(IUserInterface ui, IOperation securityCenterRemover, ServiceRemover serviceRemover)
+        public DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover)
         {
             this.ui = ui;
-            this.securityCenterRemover = securityCenterRemover;
             this.serviceRemover = serviceRemover;
         }
 
@@ -37,9 +34,8 @@ namespace Win10BloatRemover.Operations
         {
             DowngradeAntimalwarePlatform();
             EditWindowsRegistryKeys();
-            RemoveSecurityHealthServices();
+            RemoveDefenderServices();
             DisableDefenderScheduledTasks();
-            securityCenterRemover.Run();
         }
 
         // DisableAntiSpyware policy is not honored anymore on Defender antimalware platform version 4.18.2007.8+
@@ -95,10 +91,10 @@ namespace Win10BloatRemover.Operations
             notificationSettings.SetValue("Enabled", 0);
         }
 
-        private void RemoveSecurityHealthServices()
+        private void RemoveDefenderServices()
         {
-            ui.PrintHeading("Removing Security Health services...");
-            serviceRemover.BackupAndRemove(securityHealthServices);
+            ui.PrintHeading("Removing Windows Defender services...");
+            serviceRemover.BackupAndRemove(defenderServices);
         }
 
         private void DisableDefenderScheduledTasks()

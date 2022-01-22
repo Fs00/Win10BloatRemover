@@ -66,23 +66,12 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
 @"IMPORTANT: Before starting, disable Tamper protection in Windows Security app under Virus & threat protection settings.
 
 Defender services will be removed and its antimalware engine will be disabled via Group Policies, together with
-SmartScreen feature.
-
-If you have already made system apps removable, Windows Security app will be removed too.
-Remember that any Windows cumulative update is likely to reinstall the app.";
+SmartScreen feature.";
         }
 
         public override IOperation CreateNewOperation(IUserInterface ui)
         {
-            return new DefenderDisabler(
-                ui,
-                new UWPAppRemover(
-                    new[] { UWPAppGroup.SecurityCenter },
-                    UWPAppRemovalMode.AllUsers,
-                    ui, new ServiceRemover(ui)
-                ),
-                new ServiceRemover(ui)
-            );
+            return new DefenderDisabler(ui, new ServiceRemover(ui));
         }
     }
 

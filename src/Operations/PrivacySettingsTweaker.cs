@@ -52,6 +52,9 @@ namespace Win10BloatRemover.Operations
 
             // Privacy -> Speech
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\InputPersonalization", "AllowInputPersonalization", 0);
+
+            // Microsoft Edge settings -> Privacy, search and services -> Personalize your web experience
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "PersonalizationReportingEnabled", 0);
         }
 
         private void DisableSensitiveDataSynchronization()

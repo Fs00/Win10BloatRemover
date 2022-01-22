@@ -158,16 +158,18 @@ Make sure that Edge Chromium is not updating itself before proceeding.";
         public override string FullName => "Tweak settings for privacy";
         public override string GetExplanation()
         {
-            return 
+            return
 @"Several default settings and policies will be changed to make Windows more respectful of user's privacy.
 These changes consist essentially of:
   - adjusting various options under Privacy section of Settings app (disable advertising ID, app launch tracking etc.)
   - preventing input data (inking/typing information, speech) from being sent to Microsoft to improve their services
+  - preventing Edge from sending browsing history, favorites and other data to Microsoft in order to personalize ads,
+    news and other services for your Microsoft account
   - denying access to sensitive data (location, documents, activities, account details, diagnostic info) to
-  all UWP apps by default
+    all UWP apps by default
   - disabling voice activation for voice assistants (so that they can't always be listening)
   - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages, passwords
-  and app data)
+    and app data)
   - disabling web search in bottom search bar
 
 Whereas almost all of these settings are applied for all users, some of them will only be changed for the current

@@ -31,7 +31,7 @@ namespace Win10BloatRemover.Utils
             OS.RunProcessBlocking(OS.SystemExecutablePath("reg"), $@"unload ""{DEFAULT_USER_HIVE_PATH}""");
         }
 
-        public static void SetForCurrentAndDefaultUser(string keyPath, string valueName, object value)
+        public static void SetForCurrentAndDefaultUser(string keyPath, string? valueName, object value)
         {
             Registry.SetValue($@"HKEY_CURRENT_USER\{keyPath}", valueName, value);
             using (RegistryKey key = DefaultUser.CreateSubKey(keyPath))

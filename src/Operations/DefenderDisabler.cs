@@ -65,9 +65,6 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Editing keys in Windows Registry...");
 
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
-            RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost", "EnableWebContentEvaluation", 0);
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter", "EnabledV9", 0);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender", "DisableAntiSpyware", 1);
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows Defender\Spynet"))
             {
@@ -79,6 +76,14 @@ namespace Win10BloatRemover.Operations
                 key.SetValue("DontReportInfectionInformation", 1);
                 key.SetValue("DontOfferThroughWUAU", 1);
             }
+
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
+            // Turn off SmartScreen for Microsoft Store apps
+            RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost", "EnableWebContentEvaluation", 0);
+            // Turn off SmartScreen for Microsoft Edge
+            RegistryUtils.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenEnabled", valueName: null, 0);
+            RegistryUtils.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenPuaEnabled", valueName: null, 0);
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter", "EnabledV9", 0);
 
             using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             localMachine.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");

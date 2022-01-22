@@ -6,7 +6,7 @@ This configurable tool provides an interactive command-line interface to aggress
 
 Here's what it can do for you:
 
-* **Make system apps removable** by editing an internal system database. Thanks to this, apps like legacy Edge, Security Center and others can be uninstalled by this tool and also by the user in Settings app or via PowerShell commands. Take note that system apps can be reinstalled by Windows cumulative updates.  
+* **Make system apps removable** by editing an internal system database. Thanks to this, system UWP apps like legacy Edge and Security Center can be uninstalled in Settings app or via PowerShell commands. Take note that system apps can be reinstalled by Windows cumulative updates.  
 * **Remove pre-installed UWP apps:** uninstalls the apps specified by the user either for the current Windows user or for all users (see *Configuration* section below, options `UWPAppsToRemove` and `UWPAppsRemovalMode`). When apps are uninstalled for all users, their corresponding provisioned packages are deleted too (if present), so that they won't get reinstalled for new users or after feature updates. 
 * **Remove Microsoft Edge:** uninstalls the newer Chromium-based Edge and the legacy UWP version of the browser, which are both pre-installed in recent versions of the OS.
 * **Disable OS telemetry:** disables several Windows components that collect diagnostic and usage information such as Compatibility Telemetry, Inventory, Device Census, Customer Experience Improvement Program and others. It also deletes the services which are responsible for data reporting to Microsoft.
@@ -24,6 +24,8 @@ Be aware that while most of these operations can be reverted with a system resto
 
 Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable suggestions, cloud content and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created *before* those operations have been run, due to how user registry hives work.  
 Therefore, in order to have the maximum effect, it is recommended to **run this tool before creating any other user in the system.**
+
+It is also highly recommended to **re-run the operations every time a Windows feature update is installed** (especially if Windows Upgrade Assistant is used), since all system services and some default settings get restored by the upgrade process.
 
 👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**
 

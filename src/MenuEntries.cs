@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
@@ -51,7 +52,10 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
                 explanation += "\nServices, components and scheduled tasks used specifically by those apps will also " +
                                "be disabled or removed,\ntogether with any leftover data.";
 
-            return explanation + "\nIn order to remove some components of Xbox, you need to make system apps removable first.";
+            if (configuration.UWPAppsToRemove.Contains(UWPAppGroup.Xbox))
+                explanation += "\nIn order to remove some components of Xbox, you need to make system apps removable first.";
+
+            return explanation;
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
             => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new ServiceRemover(ui));

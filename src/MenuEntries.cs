@@ -63,14 +63,17 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
 
     class DefenderDisablingEntry : MenuEntry
     {
-        public override string FullName => "Disable Windows Defender";
+        public override string FullName => "Disable Windows Defender antivirus";
         public override string GetExplanation()
         {
             return
 @"IMPORTANT: Before starting, disable Tamper protection in Windows Security app under Virus & threat protection settings.
 
-Defender services will be removed and its antimalware engine will be disabled via Group Policies, together with
-SmartScreen feature.";
+Windows Defender antimalware engine and SmartScreen feature will be disabled via Group Policies, and services
+related to those features will be removed.
+Furthermore, Windows Security app will be prevented from running automatically at system start-up.
+
+Windows Defender Firewall will continue to work as intended.";
         }
 
         public override IOperation CreateNewOperation(IUserInterface ui)

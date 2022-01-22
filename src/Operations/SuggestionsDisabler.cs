@@ -68,6 +68,8 @@ namespace Win10BloatRemover.Operations
             // This is needed to disable Spotlight on Windows 10 Home and Pro
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "RotatingLockScreenEnabled", 0);
+            // Disable customized background images and text, suggestions, notifications, and tips in Microsoft Edge
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "SpotlightExperiencesAndRecommendationsEnabled", 0);
 
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "ContentDeliveryAllowed", 0);

@@ -39,8 +39,8 @@ namespace Win10BloatRemover
             Console.Write(text + " (y/N) ");
             string userInput = Console.ReadLine()?.Trim() ?? "";
             PrintEmptySpace();
-            bool userPressedY = userInput.Equals("y", StringComparison.InvariantCultureIgnoreCase);
-            return userPressedY ? UserChoice.Yes : UserChoice.No;
+            bool userDidConfirm = userInput.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
+            return userDidConfirm ? UserChoice.Yes : UserChoice.No;
         }
 
         private void PrintConsoleMessage(string text, ConsoleColor? color = null)

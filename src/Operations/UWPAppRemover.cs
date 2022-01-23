@@ -15,6 +15,13 @@ namespace Win10BloatRemover.Operations
         AllUsers
     }
 
+    enum UWPAppRemovalOutcome
+    {
+        Success,
+        NotInstalled,
+        Failure
+    }
+
     public enum UWPAppGroup
     {
         AlarmsAndClock,
@@ -147,7 +154,7 @@ namespace Win10BloatRemover.Operations
         {
             string[] appsInGroup = appNamesForGroup[appGroup];
             ui.PrintHeading($"Removing {appGroup} {(appsInGroup.Length == 1 ? "app" : "apps")}...");
-            int removedAppsForGroup = 0;
+            bool noErrorsEncountered = true;
             foreach (string appName in appsInGroup)
             {
                 // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
@@ -157,24 +164,43 @@ namespace Win10BloatRemover.Operations
                 // Also, in version 2004 uninstalling an app for all users raises an error if the provisioned package has not
                 // been already removed.
                 if (removalMode == UWPAppRemovalMode.AllUsers)
-                    UninstallAppProvisionedPackage(appName);
+                {
+                    var removalOutcome = UninstallAppProvisionedPackage(appName);
+                    if (removalOutcome == UWPAppRemovalOutcome.Failure)
+                        noErrorsEncountered = false;
+                }
 
-                bool removalSuccessful = UninstallApp(appName);
-                if (removalSuccessful)
-                    removedAppsForGroup++;
+                var appRemovalOutcome = UninstallApp(appName);
+                if (appRemovalOutcome == UWPAppRemovalOutcome.Success)
+                    removedApps++;
+                else if (appRemovalOutcome == UWPAppRemovalOutcome.Failure)
+                    noErrorsEncountered = false;
             }
-            removedApps += removedAppsForGroup;
-            if (removalMode == UWPAppRemovalMode.AllUsers && removedAppsForGroup > 0)
+            if (removalMode == UWPAppRemovalMode.AllUsers && noErrorsEncountered)
                 TryPerformPostUninstallOperations(appGroup);
         }
 
-        private bool UninstallApp(string appName)
+        private UWPAppRemovalOutcome UninstallAppProvisionedPackage(string appName)
+        {
+            var provisionedPackage = powerShell.Run("Get-AppxProvisionedPackage -Online")
+                .FirstOrDefault(package => package.DisplayName == appName);
+            if (provisionedPackage == null)
+                return UWPAppRemovalOutcome.NotInstalled;
+
+            ui.PrintMessage($"Removing provisioned package for app {appName}...");
+            powerShell.Run(
+                $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
+            );
+            return powerShell.Streams.Error.Count == 0 ? UWPAppRemovalOutcome.Success : UWPAppRemovalOutcome.Failure;
+        }
+
+        private UWPAppRemovalOutcome UninstallApp(string appName)
         {
             var packages = powerShell.Run(GetAppxPackageCommand(appName));
             if (packages.Length == 0)
             {
                 ui.PrintMessage($"App {appName} is not installed.");
-                return false;
+                return UWPAppRemovalOutcome.NotInstalled;
             }
 
             ui.PrintMessage($"Uninstalling app {appName}...");
@@ -183,7 +209,7 @@ namespace Win10BloatRemover.Operations
                 string command = RemoveAppxPackageCommand(package.PackageFullName);
                 powerShell.Run(command);
             }
-            return powerShell.Streams.Error.Count == 0;
+            return powerShell.Streams.Error.Count == 0 ? UWPAppRemovalOutcome.Success : UWPAppRemovalOutcome.Failure;
         }
 
         private string GetAppxPackageCommand(string appName)
@@ -200,19 +226,6 @@ namespace Win10BloatRemover.Operations
             if (removalMode == UWPAppRemovalMode.AllUsers)
                 command += "-AllUsers ";
             return command + $"-Package \"{fullPackageName}\"";
-        }
-
-        private void UninstallAppProvisionedPackage(string appName)
-        {
-            var provisionedPackage = powerShell.Run("Get-AppxProvisionedPackage -Online")
-                .FirstOrDefault(package => package.DisplayName == appName);
-            if (provisionedPackage != null)
-            {
-                ui.PrintMessage($"Removing provisioned package for app {appName}...");
-                powerShell.Run(
-                    $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
-                );
-            }
         }
 
         private void RestartExplorer()
@@ -235,8 +248,7 @@ namespace Win10BloatRemover.Operations
             }
             catch (Exception exc)
             {
-                ui.PrintError(
-                    $"An error occurred while performing post-uninstall/cleanup operations for app group {appGroup}: {exc.Message}");
+                ui.PrintError($"An error occurred while performing post-uninstall/cleanup operations: {exc.Message}");
             }
         }
 
@@ -248,7 +260,6 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveMapsServicesAndTasks()
         {
-            ui.PrintMessage("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] {
                 @"\Microsoft\Windows\Maps\MapsUpdateTask",
                 @"\Microsoft\Windows\Maps\MapsToastTask"
@@ -258,15 +269,14 @@ namespace Win10BloatRemover.Operations
 
         private void RemoveXboxServicesAndTasks()
         {
-            ui.PrintMessage("Removing app-related scheduled tasks and services...");
             new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" }, ui).Run();
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
             serviceRemover.BackupAndRemove("XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc");
+            ui.PrintMessage("Disabling Xbox Game Bar...");
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
         }
 
         private void RemoveMessagingService()
         {
-            ui.PrintMessage("Removing app-related services...");
             serviceRemover.BackupAndRemove("MessagingService");
         }
 
@@ -343,7 +353,7 @@ namespace Win10BloatRemover.Operations
 
         private void DisableStoreFeaturesAndServices()
         {
-            ui.PrintMessage("Writing values into the Registry...");
+            ui.PrintMessage("Disabling Microsoft Store features...");
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "RemoveWindowsStore", 1);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PushToInstall", "DisablePushToInstall", 1);
             RegistryUtils.SetForCurrentAndDefaultUser(
@@ -355,7 +365,6 @@ namespace Win10BloatRemover.Operations
                 "EnableWebContentEvaluation", 0
             );
 
-            ui.PrintMessage("Removing app-related services...");
             serviceRemover.BackupAndRemove("PushToInstall");
         }
     }

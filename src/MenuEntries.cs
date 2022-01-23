@@ -53,7 +53,7 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
                                "be disabled or removed,\ntogether with any leftover data.";
 
             if (configuration.UWPAppsToRemove.Contains(UWPAppGroup.Xbox))
-                explanation += "\nIn order to remove some components of Xbox, you need to make system apps removable first.";
+                explanation += "\n\nIn order to fully remove Xbox apps, you need to make system apps removable first.";
 
             return explanation;
         }

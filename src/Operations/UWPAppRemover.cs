@@ -360,10 +360,6 @@ namespace Win10BloatRemover.Operations
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
                 "SilentInstalledAppsEnabled", 0
             );
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost",
-                "EnableWebContentEvaluation", 0
-            );
 
             serviceRemover.BackupAndRemove("PushToInstall");
         }

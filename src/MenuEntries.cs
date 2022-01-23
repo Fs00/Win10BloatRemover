@@ -44,12 +44,12 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
             string impactedUsers = configuration.UWPAppsRemovalMode == UWPAppRemovalMode.CurrentUser
                 ? "the current user"
                 : "all present and future users";
-            string explanation = $"The following groups of UWP apps will be removed for {impactedUsers}:\n";
+            string explanation = $"The following groups of UWP apps will be removed for {impactedUsers}:";
             foreach (UWPAppGroup app in configuration.UWPAppsToRemove)
-                explanation += $"  {app}\n";
+                explanation += $"\n  {app}";
 
             if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.AllUsers)
-                explanation += "\nServices, components and scheduled tasks used specifically by those apps will also " +
+                explanation += "\n\nServices, components and scheduled tasks used specifically by those apps will also " +
                                "be disabled or removed,\ntogether with any leftover data.";
 
             if (configuration.UWPAppsToRemove.Contains(UWPAppGroup.Xbox))

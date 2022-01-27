@@ -2,7 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Threading;
 using Microsoft.Win32;
 using Win10BloatRemover.Operations;
 
@@ -49,6 +51,29 @@ namespace Win10BloatRemover.Utils
             // SpecialFolder.SystemX86 returns SysWOW64 folder on 64-bit systems
             string systemFolder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
             return $@"{systemFolder}\{executableName}.exe";
+        }
+
+        public static void CloseExplorer()
+        {
+            // This is the same as doing Ctrl+Shift+Right click on the system tray -> Exit Explorer
+            // Solution found at https://stackoverflow.com/a/5705965
+            IntPtr trayWindow = FindWindow("Shell_TrayWnd", null);
+            if (trayWindow != IntPtr.Zero)
+            {
+                PostMessage(trayWindow, 0x5B4, IntPtr.Zero, IntPtr.Zero);
+                Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for the process to gracefully exit
+            }
+            // If the Explorer option "Launch folder windows in a separate process" is enabled, that separate process
+            // remains active even after the shell is closed. We want to shut down that one too.
+            KillProcess("explorer");
+        }
+
+        public static void StartExplorer()
+        {
+            // We're launching the explorer.exe found in %windir% since that one starts up the shell
+            // if it's not running, whereas the ones in System32/SysWOW64 always open a new folder window
+            string windowsFolder = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            Process.Start($@"{windowsFolder}\explorer.exe");
         }
 
         public static void KillProcess(string processName)
@@ -145,5 +170,11 @@ namespace Win10BloatRemover.Utils
 
         public static string? RetrieveWindows10ReleaseId() =>
             Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", defaultValue: null)?.ToString();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string? className, string? windowName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool PostMessage(IntPtr windowHandle, uint message, IntPtr wParam, IntPtr lParam);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using System.Diagnostics;
 using System.IO;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
@@ -54,10 +53,10 @@ namespace Win10BloatRemover.Operations
         private void RemoveOneDriveLeftovers()
         {
             ui.PrintMessage("Removing OneDrive leftovers...");
-            OS.KillProcess("explorer");
+            OS.CloseExplorer();
             RemoveResidualFiles();
             RemoveResidualRegistryKeys();
-            Process.Start(OS.SystemExecutablePath("explorer"));
+            OS.StartExplorer();
         }
 
         private void RemoveResidualFiles()

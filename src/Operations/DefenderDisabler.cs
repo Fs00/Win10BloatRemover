@@ -74,6 +74,10 @@ namespace Win10BloatRemover.Operations
             }
 
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\smartscreen.exe",
+                "Debugger", @"%windir%\System32\taskkill.exe"
+            );
             // Turn off SmartScreen for Microsoft Store apps
             RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost", "EnableWebContentEvaluation", 0);
             // Turn off SmartScreen for Microsoft Edge

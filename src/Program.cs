@@ -65,8 +65,7 @@ namespace Win10BloatRemover
 
         private static void ShowWarningOnUnsupportedOS()
         {
-            string? installedWindows10Version = OS.RetrieveWindows10ReleaseId();
-            if (OS.IsWindows10() && IsWindows10VersionSupported(installedWindows10Version))
+            if (OS.IsWindows10() && IsWindows10VersionSupported(OS.WindowsReleaseId))
                 return;
 
             ConsoleHelpers.WriteLine("-- UNSUPPORTED WINDOWS VERSION --\n", ConsoleColor.DarkYellow);
@@ -77,7 +76,7 @@ namespace Win10BloatRemover
                 Console.WriteLine(
                     "You are running an older version of Windows 10 which is not supported by this version of the program.\n" +
                     "You should update your system or download an older version of the program which is compatible with this\n" +
-                    $"Windows 10 version ({installedWindows10Version}) at the following page:"
+                    $"Windows 10 version ({OS.WindowsReleaseId}) at the following page:"
                 );
                 ConsoleHelpers.WriteLine("  https://github.com/Fs00/Win10BloatRemover/releases/", ConsoleColor.Cyan);
             }
@@ -86,7 +85,7 @@ namespace Win10BloatRemover
                 "\nYou can still continue using this program, but BE AWARE that some features might work badly or not at all\n" +
                 "and could even have unintended effects on your system (including corruptions or instability)."
             );
-                
+
             Console.WriteLine("\nPress enter to continue, or another key to quit.");
             if (Console.ReadKey().Key != ConsoleKey.Enter)
                 Environment.Exit(-1);

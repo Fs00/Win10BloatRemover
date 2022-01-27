@@ -12,6 +12,12 @@ namespace Win10BloatRemover.Utils
 {
     static class OS
     {
+        private static readonly Lazy<string?> windowsReleaseId = new Lazy<string?>(() =>
+            (string?) Registry.GetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", defaultValue: null));
+
+        public static string? WindowsReleaseId => windowsReleaseId.Value;
+
         public static void StopServiceAndItsDependents(string name)
         {
             using var service = new ServiceController(name);
@@ -167,9 +173,6 @@ namespace Win10BloatRemover.Utils
             var windowsVersion = Environment.OSVersion.Version;
             return windowsVersion.Major == 10 && windowsVersion.Build < 21996;
         }
-
-        public static string? RetrieveWindows10ReleaseId() =>
-            Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", defaultValue: null)?.ToString();
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr FindWindow(string? className, string? windowName);

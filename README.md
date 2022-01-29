@@ -22,7 +22,7 @@ Here's what it can do for you:
 
 Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.
 
-Unless otherwise specified, operations are applied to all users in the system. However, some of them (in particular *Disable suggestions, cloud content and feedback requests* and *Tweak settings for privacy*) can not be fully applied to other users that have been created *before* those operations have been run, due to how user registry hives work.  
+Unless otherwise specified, operations are applied to all users in the system. However, some of them (*Disable suggestions, cloud content and feedback requests*, *Disable Windows Defender antivirus* and *Tweak settings for privacy*) can not be fully applied to other users that have been created *before* those operations have been run, due to how user registry hives work.  
 Therefore, in order to have the maximum effect, it is recommended to **run this tool before creating any other user in the system.**
 
 It is also highly recommended to **re-run the operations every time a Windows feature update is installed** (especially if Windows Upgrade Assistant is used), since all system services and some default settings get restored by the upgrade process.

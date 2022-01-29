@@ -72,8 +72,10 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
 Windows Defender antimalware engine and SmartScreen feature will be disabled via Group Policies, and services
 related to those features will be removed.
 Furthermore, Windows Security app will be prevented from running automatically at system start-up.
+Windows Defender Firewall will continue to work as intended.
 
-Windows Defender Firewall will continue to work as intended.";
+Be aware that SmartScreen for Microsoft Edge and Store apps will be disabled only for the currently logged in user
+and for new users created after running this procedure.";
         }
 
         public override IOperation CreateNewOperation(IUserInterface ui)

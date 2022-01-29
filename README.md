@@ -40,29 +40,29 @@ Inside the settings file, you will find the following options:
 Configures which pre-installed UWP apps should be uninstalled. Take note that you can't choose to remove single UWP packages but only groups of them, to make configuration less tricky and also because some apps are made of multiple packages (e.g. Xbox) which depend on common services or components that get removed by the program.
 
 **Allowed values:** an array which can contain the following values (each one represents a group of apps - a group can consist in a single app):
+* `"AlarmsAndClock"`
 * `"Bing"` (Weather, News, Finance and Sports)
-* `"Mobile"` (Your Phone and Mobile plans)
-* `"Xbox"` (Xbox app, Game Overlay and related services)
-* `"OfficeHub"` (My Office)
-* `"OneNote"`
+* `"Calculator"`
 * `"Camera"`
+* `"CommunicationsApps"` (Mail, Calendar and People)
 * `"Cortana"`
 * `"HelpAndFeedback"` (Feedback Hub, Get Help and Microsoft Tips)
 * `"Maps"`
-* `"Zune"` (Groove Music and Movies)
-* `"CommunicationsApps"` (Mail, Calendar and People)
 * `"Messaging"`
-* `"SolitaireCollection"`
-* `"StickyNotes"`
 * `"MixedReality"` (3D Viewer, Print 3D and Mixed Reality Portal)
+* `"Mobile"` (Your Phone and Mobile plans)
+* `"OfficeHub"` (My Office)
+* `"OneNote"`
 * `"Paint3D"`
-* `"Skype"`
 * `"Photos"` (after removal, legacy Photo Viewer will be restored for your convenience)
-* `"AlarmsAndClock"`
-* `"Calculator"`
+* `"Skype"`
 * `"SnipAndSketch"`
-* `"Store"`
+* `"SolitaireCollection"`
 * `"SoundRecorder"`
+* `"StickyNotes"`
+* `"Store"`
+* `"Xbox"` (Xbox app, Game Overlay and related services)
+* `"Zune"` (Groove Music and Movies)
 
 **Default value:** an array containing some of the app groups listed above
 

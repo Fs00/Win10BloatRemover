@@ -31,7 +31,7 @@ namespace Win10BloatRemover.Operations
             using (TokenPrivilege.Backup)
             using (TokenPrivilege.Restore)
             {
-                string temporaryDatabaseCopy = CopyStateRepositoryDatabaseTo($"{STATE_REPOSITORY_DB_NAME}.tmp");
+                string temporaryDatabaseCopy = CreateTemporaryStateRepositoryDatabaseCopy();
                 try
                 {
                     var outcome = EditStateRepositoryDatabase(temporaryDatabaseCopy);
@@ -48,12 +48,12 @@ namespace Win10BloatRemover.Operations
             }
         }
 
-        private string CopyStateRepositoryDatabaseTo(string databaseCopyPath)
+        private string CreateTemporaryStateRepositoryDatabaseCopy()
         {
             EnsureAppXServicesAreStopped();
-            var database = new FileInfo(STATE_REPOSITORY_DB_PATH);
-            FileInfo copiedDatabase = database.CopyTo(databaseCopyPath, overwrite: true);
-            return copiedDatabase.FullName;
+            var temporaryCopyPath = Path.Join(Path.GetTempPath(), $"srd-{DateTimeOffset.Now.ToUnixTimeSeconds()}.tmp");
+            File.Copy(STATE_REPOSITORY_DB_PATH, temporaryCopyPath, overwrite: true);
+            return temporaryCopyPath;
         }
 
         private EditingOutcome EditStateRepositoryDatabase(string databaseCopyPath)
@@ -79,8 +79,8 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Replacing original state repository database with the edited copy...");
             EnsureAppXServicesAreStopped();
-            // File.Copy can't be used to replace the file because it fails with access denied
-            // even though we have Restore privilege, so we need to use File.Move instead
+            // Neither File.Replace nor File.Copy can be used to replace the file because they return
+            // an access denied error even though we have Restore privilege, so we need to use File.Move instead
             File.Move(databaseCopyPath, STATE_REPOSITORY_DB_PATH, overwrite: true);
             ui.PrintMessage("Replacement successful.");
         }

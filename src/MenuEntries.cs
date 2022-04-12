@@ -243,8 +243,8 @@ backing them up).";
         {
             return 
 @"Feedback notifications and requests, apps suggestions, tips and cloud-based content (including Spotlight dynamic
-backgrounds and News and Interests) will be turned off by setting Group Policies accordingly and by disabling some
-related scheduled tasks.
+backgrounds, News and Interests and search highlights) will be turned off by setting Group Policies accordingly and
+by disabling some related scheduled tasks.
 
 Be aware that some of these features will be disabled only for the currently logged in user and for new users
 created after running this procedure.";

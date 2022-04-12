@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Microsoft.Data.Sqlite;
@@ -100,9 +99,13 @@ namespace Win10BloatRemover.Operations
                 }
                 catch
                 {
-                    Debug.WriteLine($"Failed attempt {currentAttempt}.");
                     if (currentAttempt == 5)
+                    {
+                        ui.PrintError("AppX system services could not be stopped. " +
+                                      "Retry and, if the error persists, try again after rebooting your PC.");
+                        ui.PrintEmptySpace();
                         throw;
+                    }
                     currentAttempt++;
                     Thread.Sleep(TimeSpan.FromMilliseconds(200));
                 }

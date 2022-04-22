@@ -118,13 +118,17 @@ namespace Win10BloatRemover.Operations
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform",
                 "NoGenTicket", 1
             );
+            // By setting these keys, we make sure that when someone tries to launch CompatTelRunner or DeviceCensus, the
+            // specified Debugger executable is launched instead (see https://devblogs.microsoft.com/oldnewthing/20070702-00/?p=26193).
+            // rundll32 was chosen since it does nothing and its exit code is 0 even when launched with invalid parameters.
+            string windowsFolder = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe",
-                "Debugger", @"%windir%\System32\taskkill.exe"
+                "Debugger", $@"{windowsFolder}\System32\rundll32.exe"
             );
             Registry.SetValue(
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\DeviceCensus.exe",
-                "Debugger", @"%windir%\System32\taskkill.exe"
+                "Debugger", $@"{windowsFolder}\System32\rundll32.exe"
             );
         }
 

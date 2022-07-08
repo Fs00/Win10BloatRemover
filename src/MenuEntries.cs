@@ -247,6 +247,7 @@ backing them up).";
   - Spotlight experiences and recommendations in Microsoft Edge
   - News and Interests
   - Search highlights
+  - Skype's Meet Now icon in the taskbar
   - automatic installation of suggested apps
   - cloud optimized content in the taskbar
 

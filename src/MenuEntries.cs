@@ -161,7 +161,7 @@ Make sure that Edge Chromium is not updating itself before proceeding.";
         public override string GetExplanation()
         {
             return
-@"Several default settings and policies will be changed to make Windows more respectful of user's privacy.
+@"Several default settings and policies will be changed to make Windows more respectful of users' privacy.
 These changes consist essentially of:
   - adjusting various options under Privacy section of Settings app (disable advertising ID, app launch tracking etc.)
   - preventing input data (inking/typing information, speech) from being sent to Microsoft to improve their services

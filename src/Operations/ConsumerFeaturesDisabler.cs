@@ -26,8 +26,11 @@ namespace Win10BloatRemover.Operations
             // Disable customized background images and text, suggestions, notifications, and tips in Microsoft Edge
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "SpotlightExperiencesAndRecommendationsEnabled", 0);
 
+            // Disable automatic apps installation
             RegistryUtils.SetForCurrentAndDefaultUser(
                 @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "ContentDeliveryAllowed", 0);
+            RegistryUtils.SetForCurrentAndDefaultUser(
+                @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SilentInstalledAppsEnabled", 0);
             // News and Interests
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds", "EnableFeeds", 0);
             // Search Highlights

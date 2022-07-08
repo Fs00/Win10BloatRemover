@@ -247,7 +247,8 @@ backing them up).";
   - Spotlight experiences and recommendations in Microsoft Edge
   - News and Interests
   - Search highlights
-  - Cloud optimized content in the taskbar
+  - automatic installation of suggested apps
+  - cloud optimized content in the taskbar
 
 Be aware that some of these features will be disabled only for the currently logged in user and for new users
 created after running this procedure.";

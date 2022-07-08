@@ -11,7 +11,6 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             DisableSuggestions();
-            DisableCloudContent();
             DisableFeedbackRequests();
         }
 
@@ -52,33 +51,6 @@ namespace Win10BloatRemover.Operations
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace", "AllowSuggestedAppsInWindowsInkWorkspace", 0);
             // Disables online tips and help for Settings app
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", "AllowOnlineTips", 0);
-        }
-
-        private void DisableCloudContent()
-        {
-            ui.PrintHeading("Disabling Spotlight, News and Interests and other cloud content via Registry edits...");
-
-            // These two policies apply only to Education and Enterprise editions
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableWindowsConsumerFeatures", 1);
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"Software\Policies\Microsoft\Windows\CloudContent", "DisableWindowsSpotlightFeatures", 1);
-            // Applies only to Pro, Education and Enterprise editions
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"Software\Policies\Microsoft\Windows\CloudContent", "DisableTailoredExperiencesWithDiagnosticData", 1);
-            // This is needed to disable Spotlight on Windows 10 Home and Pro
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "RotatingLockScreenEnabled", 0);
-            // Disable customized background images and text, suggestions, notifications, and tips in Microsoft Edge
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "SpotlightExperiencesAndRecommendationsEnabled", 0);
-
-            RegistryUtils.SetForCurrentAndDefaultUser(
-                @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "ContentDeliveryAllowed", 0);
-            // News and Interests
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds", "EnableFeeds", 0);
-            // Search Highlights
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search", "EnableDynamicContentInWSB", 0);
-            // Programmable taskbar
-            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableCloudOptimizedContent", 1);
         }
 
         private void DisableFeedbackRequests()

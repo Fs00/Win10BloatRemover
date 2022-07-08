@@ -236,18 +236,36 @@ backing them up).";
             => new ErrorReportingDisabler(ui, new ServiceRemover(ui));
     }
 
-    class SuggestionsDisablingEntry : MenuEntry
+    class ConsumerFeaturesDisablingEntry : MenuEntry
     {
-        public override string FullName => "Disable suggestions, cloud content and feedback requests";
+        public override string FullName => "Disable consumer features";
         public override string GetExplanation()
         {
-            return 
-@"Feedback notifications and requests, apps suggestions, tips and cloud-based content (including Spotlight dynamic
-backgrounds, News and Interests and search highlights) will be turned off by setting Group Policies accordingly and
-by disabling some related scheduled tasks.
+            return
+@"This procedure will disable the following cloud-powered features aimed at the consumer market:
+  - Windows Spotlight (dynamic lock screen backgrounds)
+  - Spotlight experiences and recommendations in Microsoft Edge
+  - News and Interests
+  - Search highlights
+  - Cloud optimized content in the taskbar
 
 Be aware that some of these features will be disabled only for the currently logged in user and for new users
 created after running this procedure.";
+        }
+        public override IOperation CreateNewOperation(IUserInterface ui) => new ConsumerFeaturesDisabler(ui);
+    }
+
+    class SuggestionsDisablingEntry : MenuEntry
+    {
+        public override string FullName => "Disable suggestions and feedback requests";
+        public override string GetExplanation()
+        {
+            return
+@"Feedback notifications and requests, apps suggestions and Windows tips will be turned off by changing
+Group Policies and system settings accordingly and by disabling some related scheduled tasks.
+
+If you are not using an Enterprise or Education edition of Windows, suggestions will be disabled only for the
+currently logged in user and for new users created after running this procedure.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui) => new SuggestionsDisabler(ui);
     }

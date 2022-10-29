@@ -5,7 +5,7 @@ jobs:
   build-release:
     runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Publish release build
       run: dotnet publish -c Release -p:PublishProfile=Standalone
     - name: Print published executable hash
@@ -13,7 +13,7 @@ jobs:
     - name: Copy Readme and License near published executable
       run: cp @('LICENSE', 'README.md') -Destination src/bin/Release/standalone
     - name: Upload release files
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v3
       with:
         name: Release ZIP
         path: src/bin/Release/standalone/*

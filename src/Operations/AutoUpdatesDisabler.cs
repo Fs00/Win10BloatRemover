@@ -23,6 +23,12 @@ namespace Win10BloatRemover.Operations
         private void DisableAutomaticStoreUpdates()
         {
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "AutoDownload", 2);
+            // The above policy does not work on Windows 10 Home, so we need to change the Store app setting
+            // to disable automatic updates for all users
+            Registry.SetValue(
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate",
+                "AutoDownload", 2
+            );
         }
 
         private void DisableAutomaticSpeechModelUpdates()

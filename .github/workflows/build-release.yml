@@ -15,6 +15,6 @@ jobs:
     - name: Upload release files
       uses: actions/upload-artifact@v3
       with:
-        name: Release ZIP
+        name: Win10BloatRemover_${{ github.ref_name }}
         path: src/bin/Release/standalone/*
         if-no-files-found: error

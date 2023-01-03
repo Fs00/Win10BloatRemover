@@ -94,7 +94,10 @@ and for new users created after running this procedure.";
 In order to be able to uninstall the latter (which may appear in Start menu once you uninstall the former),
 you need to make system apps removable.
 Take note that both browsers may be reinstalled after any Windows cumulative update.
-Make sure that Edge Chromium is not updating itself before proceeding.";
+Make sure that Edge Chromium is not updating itself before proceeding.
+
+Note that Edge WebView2 runtime will NOT be removed if it's installed, as it may be required
+by other programs installed on this PC.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
         {

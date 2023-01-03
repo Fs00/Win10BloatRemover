@@ -21,11 +21,11 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            UninstallEdgeChromiumIfPresent();
+            UninstallEdgeChromium();
             legacyEdgeRemover.Run();
         }
 
-        private void UninstallEdgeChromiumIfPresent()
+        private void UninstallEdgeChromium()
         {
             ui.PrintHeading("Removing Edge Chromium...");
             string? installerPath = RetrieveEdgeChromiumInstallerPath();
@@ -37,9 +37,9 @@ namespace Win10BloatRemover.Operations
 
             ui.PrintMessage("Running uninstaller...");
             OS.RunProcessBlocking(installerPath, "--uninstall --force-uninstall --msedge --system-level --verbose-logging");
-            // Since part of the uninstallation happens in another process launched by the installer, we wait
-            // for a reasonable amount of time to let this process do its work before continuing
-            Thread.Sleep(TimeSpan.FromSeconds(5));
+            // Since part of the uninstallation happens in another process launched by the installer,
+            // we want to let this process do its work before continuing
+            WaitForEdgeUninstallation(installerPath);
 
             RemoveEdgeLeftovers();
         }
@@ -64,6 +64,27 @@ namespace Win10BloatRemover.Operations
                 }
             }
             return null;
+        }
+
+        private void WaitForEdgeUninstallation(string edgeInstallerPath)
+        {
+            int waitedSeconds = 0;
+            var waitInterval = TimeSpan.FromSeconds(5);
+            while (waitedSeconds < 10)
+            {
+                Thread.Sleep(waitInterval);
+                bool edgeFilesRemoved = !File.Exists(edgeInstallerPath);
+                if (edgeFilesRemoved)
+                    return;
+
+                waitedSeconds += waitInterval.Seconds;
+            }
+
+            ui.PrintError("It seems that Edge Chromium is still installed despite our attempts to remove it.\n" +
+                          "Try again, and if this error still happens, you might want to report an issue on GitHub or check\n" +
+                          @"the Edge installer log in your %TEMP% directory.");
+            ui.PrintEmptySpace();
+            throw new Exception("Edge Chromium uninstallation wasn't completed successfully or took too long.");
         }
 
         private void RemoveEdgeLeftovers()

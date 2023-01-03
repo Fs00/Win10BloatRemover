@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -34,6 +35,13 @@ namespace Win10BloatRemover.Operations
                 ui.PrintMessage("Edge Chromium is not installed.");
                 return;
             }
+
+            // Recent versions of Edge Update (the latest at the moment of writing is 1.3.171.37) set a flag
+            // that blocks the uninstallation of Edge inside the following registry value.
+            // If we don't remove it, the uninstaller will simply do nothing.
+            Registry.LocalMachine.DeleteSubKeyValue(
+                @"SOFTWARE\Microsoft\EdgeUpdate\ClientState\{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}",
+                "experiment_control_labels");
 
             ui.PrintMessage("Running uninstaller...");
             OS.RunProcessBlocking(installerPath, "--uninstall --force-uninstall --msedge --system-level --verbose-logging");

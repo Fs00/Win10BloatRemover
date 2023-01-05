@@ -295,7 +295,7 @@ a new feature.";
         {
             Version programVersion = GetType().Assembly.GetName().Version!;
             return
-$@"Windows 10 Bloat Remover and Tweaker {programVersion.Major}.{programVersion.Minor} for Windows version {Program.MINIMUM_SUPPORTED_WINDOWS_VERSION} or higher
+$@"Windows 10 Bloat Remover and Tweaker version {programVersion.Major}.{programVersion.Minor}
 Developed by Fs00
 Official GitHub repository: github.com/Fs00/Win10BloatRemover
 

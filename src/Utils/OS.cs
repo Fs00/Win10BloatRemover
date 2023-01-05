@@ -12,11 +12,16 @@ namespace Win10BloatRemover.Utils
 {
     static class OS
     {
-        private static readonly Lazy<string?> windowsReleaseId = new Lazy<string?>(() =>
-            (string?) Registry.GetValue(
-                @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", defaultValue: null));
+        public static int WindowsBuild => Environment.OSVersion.Version.Build;
 
-        public static string? WindowsReleaseId => windowsReleaseId.Value;
+        public static string? GetWindowsVersionName()
+        {
+            string currentVersionKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+            // Starting from 20H2, the ReleaseId value always contains "2009". DisplayVersion contains the
+            // updated version name (e.g. "21H2") instead, but may not be present on older Windows versions
+            return (string?) Registry.GetValue(currentVersionKey, "DisplayVersion", defaultValue: null) ??
+                   (string?) Registry.GetValue(currentVersionKey, "ReleaseId", defaultValue: null);
+        }
 
         public static void StopServiceAndItsDependents(string name)
         {

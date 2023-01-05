@@ -7,7 +7,7 @@ namespace Win10BloatRemover
 {
     static class Program
     {
-        public const string MINIMUM_SUPPORTED_WINDOWS_VERSION = "2009";
+        private const int MINIMUM_SUPPORTED_WINDOWS_BUILD = 19044;  // 21H2 build
 
         private static void Main()
         {
@@ -66,7 +66,7 @@ namespace Win10BloatRemover
 
         private static void ShowWarningOnUnsupportedOS()
         {
-            if (OS.IsWindows10() && IsWindows10VersionSupported(OS.WindowsReleaseId))
+            if (OS.IsWindows10() && OS.WindowsBuild >= MINIMUM_SUPPORTED_WINDOWS_BUILD)
                 return;
 
             ConsoleHelpers.WriteLine("-- UNSUPPORTED WINDOWS VERSION --\n", ConsoleColor.DarkYellow);
@@ -77,7 +77,7 @@ namespace Win10BloatRemover
                 Console.WriteLine(
                     "You are running an older version of Windows 10 which is not supported by this version of the program.\n" +
                     "You should update your system or download an older version of the program which is compatible with this\n" +
-                    $"Windows 10 version ({OS.WindowsReleaseId}) at the following page:"
+                    $"Windows 10 version ({OS.GetWindowsVersionName()}) at the following page:"
                 );
                 ConsoleHelpers.WriteLine("  https://github.com/Fs00/Win10BloatRemover/releases/", ConsoleColor.Cyan);
             }
@@ -92,10 +92,6 @@ namespace Win10BloatRemover
                 Environment.Exit(-1);
         }
 
-        private static bool IsWindows10VersionSupported(string? windows10Version)
-        {
-            return string.Compare(windows10Version, MINIMUM_SUPPORTED_WINDOWS_VERSION) >= 0;
-        }
         
         private static Configuration LoadConfigurationFromFileOrDefault()
         {

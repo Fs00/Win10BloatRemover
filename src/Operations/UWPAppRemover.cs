@@ -300,8 +300,7 @@ namespace Win10BloatRemover.Operations
         private void Remove3DObjectsFolder()
         {
             ui.PrintMessage("Removing 3D Objects folder...");
-            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using RegistryKey key = localMachine.OpenSubKeyWritable(
+            using RegistryKey key = RegistryUtils.LocalMachine64.OpenSubKeyWritable(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace"
             );
             key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}", throwOnMissingSubKey: false);

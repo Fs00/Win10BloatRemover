@@ -81,11 +81,12 @@ namespace Win10BloatRemover.Operations
             RegistryUtils.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenPuaEnabled", valueName: null, 0);
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter", "EnabledV9", 0);
 
-            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            localMachine.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");
-            localMachine.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "SecurityHealth");
+            RegistryUtils.LocalMachine64.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");
+            RegistryUtils.LocalMachine64.DeleteSubKeyValue(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "SecurityHealth"
+            );
 
-            using RegistryKey notificationSettings = localMachine.CreateSubKey(
+            using RegistryKey notificationSettings = RegistryUtils.LocalMachine64.CreateSubKey(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance"
             );
             notificationSettings.SetValue("Enabled", 0);

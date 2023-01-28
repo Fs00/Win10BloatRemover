@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
@@ -25,8 +26,7 @@ namespace Win10BloatRemover.Operations
             Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "AutoDownload", 2);
             // The above policy does not work on Windows 10 Home, so we need to change the Store app setting
             // to disable automatic updates for all users
-            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using RegistryKey key = localMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate");
+            using var key = RegistryUtils.LocalMachine64.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate");
             key.SetValue("AutoDownload", 2);
         }
 

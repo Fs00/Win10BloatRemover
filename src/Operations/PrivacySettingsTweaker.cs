@@ -72,10 +72,9 @@ namespace Win10BloatRemover.Operations
 
         private void DenySensitivePermissionsToApps()
         {
-            using RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             foreach (string permission in appPermissionsToDeny)
             {
-                using var permissionKey = localMachine.CreateSubKey(
+                using var permissionKey = RegistryUtils.LocalMachine64.CreateSubKey(
                     $@"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\{permission}"
                 );
                 permissionKey.SetValue("Value", "Deny");

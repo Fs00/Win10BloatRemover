@@ -13,6 +13,8 @@ namespace Win10BloatRemover.Utils
         private static RegistryKey? defaultUserKey;
         public static RegistryKey DefaultUser => defaultUserKey ??= LoadDefaultUserHive();
 
+        public static readonly RegistryKey LocalMachine64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+
         private static RegistryKey LoadDefaultUserHive()
         {
             var loadExitCode = OS.RunProcessBlocking(

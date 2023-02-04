@@ -57,7 +57,7 @@ namespace Win10BloatRemover.Utils
             if (trayWindow != IntPtr.Zero)
             {
                 PostMessage(trayWindow, 0x5B4, IntPtr.Zero, IntPtr.Zero);
-                Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for the process to gracefully exit
+                Thread.Sleep(TimeSpan.FromSeconds(2)); // wait for the process to gracefully exit
             }
             // If the Explorer option "Launch folder windows in a separate process" is enabled, that separate process
             // remains active even after the shell is closed. We want to shut down that one too.

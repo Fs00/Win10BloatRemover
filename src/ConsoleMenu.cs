@@ -7,6 +7,8 @@ namespace Win10BloatRemover
 {
     class ConsoleMenu
     {
+        private const int FirstMenuEntryNumber = 1;
+
         private bool exitRequested = false;
         private readonly MenuEntry[] entries;
         private readonly RebootRecommendedFlag rebootFlag;
@@ -49,7 +51,7 @@ namespace Win10BloatRemover
             ConsoleHelpers.WriteLine("-- MENU --", ConsoleColor.Green);
             for (int i = 0; i < entries.Length; i++)
             {
-                ConsoleHelpers.Write($"{i}: ", ConsoleColor.Green);
+                ConsoleHelpers.Write($"{FirstMenuEntryNumber + i}: ", ConsoleColor.Green);
                 Console.WriteLine(entries[i].FullName);
             }
             Console.WriteLine();
@@ -73,9 +75,12 @@ namespace Win10BloatRemover
 
         private MenuEntry? GetEntryCorrespondingToUserInput(string userInput)
         {
-            bool inputIsNumeric = int.TryParse(userInput, out int entryIndex);
+            bool inputIsNumeric = int.TryParse(userInput, out int entryNumber);
             if (inputIsNumeric)
+            {
+                int entryIndex = entryNumber - FirstMenuEntryNumber;
                 return entries.ElementAtOrDefault(entryIndex);
+            }
 
             return null;
         }

@@ -291,12 +291,13 @@ a new feature.";
             return
 $@"Windows 10 Bloat Remover and Tweaker version {programVersion.Major}.{programVersion.Minor}
 Developed by Fs00
-Official GitHub repository: github.com/Fs00/Win10BloatRemover
+Official GitHub repository: https://github.com/Fs00/Win10BloatRemover
 
-Originally based on Windows 10 de-botnet guide by Federico Dossena: http://fdossena.com
-Credits to all open source projects whose work has been used to improve this software:
-  - privacy.sexy website: github.com/undergroundwires/privacy.sexy
-  - Debloat Windows 10 scripts: github.com/W4RH4WK/Debloat-Windows-10
+Originally based on Windows 10 de-botnet guide by Federico Dossena: https://fdossena.com
+Credits to all open source projects whose work has helped me to improve this software:
+  - privacy.sexy website: https://privacy.sexy
+  - Debloat Windows 10 scripts: https://github.com/W4RH4WK/Debloat-Windows-10
+  - AveYo's Edge removal script: https://github.com/AveYo/fox
 
 This software is released under BSD 3-Clause Clear license (continue to read full text).";
         }

@@ -12,7 +12,7 @@ namespace Win10BloatRemover.Operations
         private readonly IUserInterface ui;
         private readonly ServiceRemover serviceRemover;
 
-        public bool IsRebootRecommended { get; private set; }
+        public bool IsRebootRecommended => serviceRemover.IsRebootRecommended;
 
         public ErrorReportingDisabler(IUserInterface ui, ServiceRemover serviceRemover)
         {
@@ -39,7 +39,6 @@ namespace Win10BloatRemover.Operations
         {
             ui.PrintHeading("Backing up and removing error reporting services...");
             serviceRemover.BackupAndRemove(errorReportingServices);
-            IsRebootRecommended = serviceRemover.IsRebootRecommended;
         }
         
         private void DisableErrorReportingScheduledTasks()

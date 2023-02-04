@@ -11,26 +11,6 @@ namespace Win10BloatRemover
         public abstract IOperation CreateNewOperation(IUserInterface ui);
     }
 
-    class SystemAppsRemovalEnablingEntry : MenuEntry
-    {
-        public override string FullName => "Make system apps removable";
-        public override string GetExplanation()
-        {
-            return
-@"This procedure will edit an internal database to allow the removal of system UWP apps such as legacy Edge and
-Security Center via PowerShell (used by this tool) and in Settings app.
-It is recommended to create a system restore point before proceeding.
-
-It is generally safe to remove only those system apps that can be found in Start menu.
-Certain ""hidden"" apps are there to provide critical OS functionality, and therefore uninstalling them may lead
-to an unstable or unusable system: BE CAREFUL.
-
-Remember also that any system app may be reinstalled after any Windows cumulative update.
-Before starting, make sure that Microsoft Store is not installing/updating apps in the background.";
-        }
-        public override IOperation CreateNewOperation(IUserInterface ui) => new SystemAppsRemovalEnabler(ui);
-    }
-
     class UWPAppRemovalEntry : MenuEntry
     {
         private readonly Configuration configuration;

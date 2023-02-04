@@ -15,8 +15,6 @@ namespace Win10BloatRemover.Utils
             Enable = 0x2
         }
 
-        public static TokenPrivilege Backup => new TokenPrivilege("SeBackupPrivilege");
-        public static TokenPrivilege Restore => new TokenPrivilege("SeRestorePrivilege");
         public static TokenPrivilege TakeOwnership => new TokenPrivilege("SeTakeOwnershipPrivilege");
 
         private readonly string privilegeName;

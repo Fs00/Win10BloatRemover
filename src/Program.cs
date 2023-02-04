@@ -28,7 +28,6 @@ namespace Win10BloatRemover
         private static MenuEntry[] CreateMenuEntries(Configuration configuration, RebootRecommendedFlag rebootFlag)
         {
             return new MenuEntry[] {
-                new SystemAppsRemovalEnablingEntry(),
                 new UWPAppRemovalEntry(configuration),
                 new EdgeRemovalEntry(),
                 new OneDriveRemovalEntry(),

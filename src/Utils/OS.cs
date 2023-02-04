@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Runtime.InteropServices;
-using System.ServiceProcess;
 using System.Threading;
 using Microsoft.Win32;
 using Win10BloatRemover.Operations;
@@ -21,20 +20,6 @@ namespace Win10BloatRemover.Utils
             // updated version name (e.g. "21H2") instead, but may not be present on older Windows versions
             return (string?) Registry.GetValue(currentVersionKey, "DisplayVersion", defaultValue: null) ??
                    (string?) Registry.GetValue(currentVersionKey, "ReleaseId", defaultValue: null);
-        }
-
-        public static void StopServiceAndItsDependents(string name)
-        {
-            using var service = new ServiceController(name);
-            foreach (var dependent in service.DependentServices)
-                StopServiceAndItsDependents(dependent.ServiceName);
-
-            if (service.Status != ServiceControllerStatus.Stopped)
-            {
-                if (service.Status != ServiceControllerStatus.StopPending)
-                    service.Stop(stopDependentServices: false);
-                service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(5));
-            }
         }
 
         public static void RebootPC()

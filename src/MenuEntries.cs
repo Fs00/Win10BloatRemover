@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
@@ -52,9 +51,6 @@ Before starting, make sure that Microsoft Store is not installing/updating apps 
                 explanation += "\n\nServices, components and scheduled tasks used specifically by those apps will also " +
                                "be disabled or removed,\ntogether with any leftover data.";
 
-            if (configuration.UWPAppsToRemove.Contains(UWPAppGroup.Xbox))
-                explanation += "\n\nIn order to fully remove Xbox apps, you need to make system apps removable first.";
-
             return explanation;
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
@@ -90,10 +86,8 @@ and for new users created after running this procedure.";
         public override string GetExplanation()
         {
             return
-@"Both Edge Chromium and legacy Edge browser will be uninstalled from the system.
-In order to be able to uninstall the latter (which may appear in Start menu once you uninstall the former),
-you need to make system apps removable.
-Take note that both browsers may be reinstalled after any Windows cumulative update.
+@"Both Edge Chromium and legacy Edge browser (which appears in Start menu once you remove the former)
+will be uninstalled from the system.
 Make sure that Edge Chromium is not updating itself before proceeding.
 
 Note that Edge WebView2 runtime will NOT be removed if it's installed, as it may be required

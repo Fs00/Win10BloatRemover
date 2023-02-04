@@ -15,11 +15,7 @@ namespace Win10BloatRemover
 
         public void PrintWarning(string text) => PrintConsoleMessage(text, ConsoleColor.DarkYellow);
 
-        public void PrintNotice(string text)
-        {
-            PrintEmptySpace();
-            PrintConsoleMessage(text, ConsoleColor.Cyan);
-        }
+        public void PrintNotice(string text) => PrintConsoleMessage(text, ConsoleColor.Cyan);
 
         public void PrintHeading(string text)
         {

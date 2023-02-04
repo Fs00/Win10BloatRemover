@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Management.Automation;
 using Win10BloatRemover.Utils;
@@ -206,6 +205,19 @@ namespace Win10BloatRemover.Operations
             ui.PrintMessage($"Uninstalling app {appName}...");
             foreach (var package in packages) // some apps have both x86 and x64 variants installed
             {
+                if (IsSystemApp(package))
+                {
+                    if (removalMode == UWPAppRemovalMode.AllUsers)
+                        MakeSystemAppRemovable(package);
+                    else
+                    {
+                        // Even though removing a system app for a single user is technically possible, we disallow that
+                        // since cumulative updates would reinstall the app anyway, unless we prevent its reinstallation for all users
+                        ui.PrintNotice("Uninstallation skipped. This is a system app, and therefore can only be removed for all users.");
+                        continue;
+                    }
+                }
+
                 string command = RemoveAppxPackageCommand(package.PackageFullName);
                 powerShell.Run(command);
             }
@@ -226,6 +238,43 @@ namespace Win10BloatRemover.Operations
             if (removalMode == UWPAppRemovalMode.AllUsers)
                 command += "-AllUsers ";
             return command + $"-Package \"{fullPackageName}\"";
+        }
+
+        private bool IsSystemApp(dynamic package)
+        {
+            string systemAppsFolder = $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SystemApps";
+            return package.InstallLocation.StartsWith(systemAppsFolder);
+        }
+
+        private void MakeSystemAppRemovable(dynamic package)
+        {
+            using var appxStoreKey = RegistryUtils.LocalMachine64.OpenSubKeyWritable(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
+            );
+            AddEndOfLifeKeysForPackage(package.PackageFullName, appxStoreKey);
+
+            // This prevents the app from being installed for new users and after cumulative updates
+            RemovePackageFromInboxAppsRegistry(package.Name, appxStoreKey);
+        }
+
+        private void AddEndOfLifeKeysForPackage(string packageFullName, RegistryKey appxStoreKey)
+        {
+            var allUserSids = appxStoreKey.GetSubKeyNames().Where(keyName => keyName.StartsWith("S-1-5-"));
+            foreach (string userSid in allUserSids)
+                appxStoreKey.CreateSubKey($@"EndOfLife\{userSid}\{packageFullName}");
+        }
+
+        private void RemovePackageFromInboxAppsRegistry(string packageName, RegistryKey appxStoreKey)
+        {
+            // The InboxApplications subkey has some special permissions that prevent it from being opened with write permissions.
+            // Therefore we need to open it with read permissions and then use the parent key (which has been opened
+            // with write permissions) to delete its subkeys.
+            using var inboxAppsRegistry = appxStoreKey.OpenSubKey("InboxApplications")!;
+            string? inboxAppKey = inboxAppsRegistry.GetSubKeyNames()
+                .FirstOrDefault(inboxAppName => inboxAppName.StartsWith($"{packageName}_"));
+
+            if (inboxAppKey != null)
+                appxStoreKey.DeleteSubKeyTree($@"InboxApplications\{inboxAppKey}");
         }
 
         private void RestartExplorer()

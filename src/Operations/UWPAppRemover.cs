@@ -1,8 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Management.Automation;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
 
@@ -12,13 +10,6 @@ namespace Win10BloatRemover.Operations
     {
         CurrentUser,
         AllUsers
-    }
-
-    enum UWPAppRemovalOutcome
-    {
-        Success,
-        NotInstalled,
-        Failure
     }
 
     public enum UWPAppGroup
@@ -108,19 +99,21 @@ namespace Win10BloatRemover.Operations
         private readonly UWPAppGroup[] appsToRemove;
         private readonly UWPAppRemovalMode removalMode;
         private readonly IUserInterface ui;
+        private readonly AppxRemover appxRemover;
         private readonly ServiceRemover serviceRemover;
 
-        private /*lateinit*/ PowerShell powerShell;
-        private int removedApps = 0;
+        private int totalRemovedApps = 0;
 
         public bool IsRebootRecommended { get; private set; }
 
         #nullable disable warnings
-        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui, ServiceRemover serviceRemover)
+        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui,
+                             AppxRemover appxRemover, ServiceRemover serviceRemover)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;
             this.ui = ui;
+            this.appxRemover = appxRemover;
             this.serviceRemover = serviceRemover;
 
             postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
@@ -139,13 +132,10 @@ namespace Win10BloatRemover.Operations
 
         public void Run()
         {
-            using (powerShell = PowerShellExtensions.CreateWithImportedModules("AppX", "Dism").WithOutput(ui))
-            {
-                foreach (UWPAppGroup appGroup in appsToRemove)
-                    UninstallAppsOfGroup(appGroup);
-            }
+            foreach (UWPAppGroup appGroup in appsToRemove)
+                UninstallAppsOfGroup(appGroup);
 
-            if (removedApps > 0)
+            if (totalRemovedApps > 0)
                 RestartExplorer();
         }
 
@@ -153,128 +143,16 @@ namespace Win10BloatRemover.Operations
         {
             string[] appsInGroup = appNamesForGroup[appGroup];
             ui.PrintHeading($"Removing {appGroup} {(appsInGroup.Length == 1 ? "app" : "apps")}...");
-            bool noErrorsEncountered = true;
-            foreach (string appName in appsInGroup)
-            {
-                // Starting from OS version 1909, the PowerShell command used by UninstallApp should already remove
-                // the corresponding provisioned package when the app is removed for all users.
-                // Since this behavior is not officially documented and seems not to be consistent across all Windows versions,
-                // we want to make sure that the provisioned package gets uninstalled to provide a consistent behavior.
-                // Also, in version 2004 uninstalling an app for all users raises an error if the provisioned package has not
-                // been already removed.
-                if (removalMode == UWPAppRemovalMode.AllUsers)
-                {
-                    var removalOutcome = UninstallAppProvisionedPackage(appName);
-                    if (removalOutcome == UWPAppRemovalOutcome.Failure)
-                        noErrorsEncountered = false;
-                }
 
-                var appRemovalOutcome = UninstallApp(appName);
-                if (appRemovalOutcome == UWPAppRemovalOutcome.Success)
-                    removedApps++;
-                else if (appRemovalOutcome == UWPAppRemovalOutcome.Failure)
-                    noErrorsEncountered = false;
-            }
-            if (removalMode == UWPAppRemovalMode.AllUsers && noErrorsEncountered)
+            var result = removalMode switch {
+                UWPAppRemovalMode.CurrentUser => appxRemover.RemoveAppsForCurrentUser(appsInGroup),
+                UWPAppRemovalMode.AllUsers => appxRemover.RemoveAppsForAllUsers(appsInGroup)
+            };
+
+            totalRemovedApps += result.RemovedApps;
+
+            if (removalMode == UWPAppRemovalMode.AllUsers && result.FailedRemovals == 0)
                 TryPerformPostUninstallOperations(appGroup);
-        }
-
-        private UWPAppRemovalOutcome UninstallAppProvisionedPackage(string appName)
-        {
-            var provisionedPackage = powerShell.Run("Get-AppxProvisionedPackage -Online")
-                .FirstOrDefault(package => package.DisplayName == appName);
-            if (provisionedPackage == null)
-                return UWPAppRemovalOutcome.NotInstalled;
-
-            ui.PrintMessage($"Removing provisioned package for app {appName}...");
-            powerShell.Run(
-                $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
-            );
-            return powerShell.Streams.Error.Count == 0 ? UWPAppRemovalOutcome.Success : UWPAppRemovalOutcome.Failure;
-        }
-
-        private UWPAppRemovalOutcome UninstallApp(string appName)
-        {
-            var packages = powerShell.Run(GetAppxPackageCommand(appName));
-            if (packages.Length == 0)
-            {
-                ui.PrintMessage($"App {appName} is not installed.");
-                return UWPAppRemovalOutcome.NotInstalled;
-            }
-
-            ui.PrintMessage($"Uninstalling app {appName}...");
-            foreach (var package in packages) // some apps have both x86 and x64 variants installed
-            {
-                if (IsSystemApp(package))
-                {
-                    if (removalMode == UWPAppRemovalMode.AllUsers)
-                        MakeSystemAppRemovable(package);
-                    else
-                    {
-                        // Even though removing a system app for a single user is technically possible, we disallow that
-                        // since cumulative updates would reinstall the app anyway, unless we prevent its reinstallation for all users
-                        ui.PrintNotice("Uninstallation skipped. This is a system app, and therefore can only be removed for all users.");
-                        continue;
-                    }
-                }
-
-                string command = RemoveAppxPackageCommand(package.PackageFullName);
-                powerShell.Run(command);
-            }
-            return powerShell.Streams.Error.Count == 0 ? UWPAppRemovalOutcome.Success : UWPAppRemovalOutcome.Failure;
-        }
-
-        private string GetAppxPackageCommand(string appName)
-        {
-            string command = "Get-AppxPackage ";
-            if (removalMode == UWPAppRemovalMode.AllUsers)
-                command += "-AllUsers ";
-            return command + $"-Name \"{appName}\"";
-        }
-
-        private string RemoveAppxPackageCommand(string fullPackageName)
-        {
-            string command = "Remove-AppxPackage ";
-            if (removalMode == UWPAppRemovalMode.AllUsers)
-                command += "-AllUsers ";
-            return command + $"-Package \"{fullPackageName}\"";
-        }
-
-        private bool IsSystemApp(dynamic package)
-        {
-            string systemAppsFolder = $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SystemApps";
-            return package.InstallLocation.StartsWith(systemAppsFolder);
-        }
-
-        private void MakeSystemAppRemovable(dynamic package)
-        {
-            using var appxStoreKey = RegistryUtils.LocalMachine64.OpenSubKeyWritable(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
-            );
-            AddEndOfLifeKeysForPackage(package.PackageFullName, appxStoreKey);
-
-            // This prevents the app from being installed for new users and after cumulative updates
-            RemovePackageFromInboxAppsRegistry(package.Name, appxStoreKey);
-        }
-
-        private void AddEndOfLifeKeysForPackage(string packageFullName, RegistryKey appxStoreKey)
-        {
-            var allUserSids = appxStoreKey.GetSubKeyNames().Where(keyName => keyName.StartsWith("S-1-5-"));
-            foreach (string userSid in allUserSids)
-                appxStoreKey.CreateSubKey($@"EndOfLife\{userSid}\{packageFullName}");
-        }
-
-        private void RemovePackageFromInboxAppsRegistry(string packageName, RegistryKey appxStoreKey)
-        {
-            // The InboxApplications subkey has some special permissions that prevent it from being opened with write permissions.
-            // Therefore we need to open it with read permissions and then use the parent key (which has been opened
-            // with write permissions) to delete its subkeys.
-            using var inboxAppsRegistry = appxStoreKey.OpenSubKey("InboxApplications")!;
-            string? inboxAppKey = inboxAppsRegistry.GetSubKeyNames()
-                .FirstOrDefault(inboxAppName => inboxAppName.StartsWith($"{packageName}_"));
-
-            if (inboxAppKey != null)
-                appxStoreKey.DeleteSubKeyTree($@"InboxApplications\{inboxAppKey}");
         }
 
         private void RestartExplorer()

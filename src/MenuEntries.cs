@@ -1,5 +1,6 @@
 ﻿using System;
 using Win10BloatRemover.Operations;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover
 {
@@ -34,7 +35,7 @@ namespace Win10BloatRemover
             return explanation;
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new ServiceRemover(ui));
+            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new AppxRemover(ui), new ServiceRemover(ui));
     }
 
     class DefenderDisablingEntry : MenuEntry
@@ -79,7 +80,8 @@ by other programs installed on this PC.";
                 new UWPAppRemover(
                     new[] { UWPAppGroup.EdgeUWP },
                     UWPAppRemovalMode.AllUsers,
-                    ui, new ServiceRemover(ui)
+                    ui, new AppxRemover(ui),
+                    new ServiceRemover(ui)
                 )
             );
         }

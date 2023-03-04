@@ -6,13 +6,13 @@ using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations
 {
-    public enum UWPAppRemovalMode
+    public enum UwpAppRemovalMode
     {
         CurrentUser,
         AllUsers
     }
 
-    public enum UWPAppGroup
+    public enum UwpAppGroup
     {
         AlarmsAndClock,
         Bing,               // Weather, News, Finance and Sports
@@ -40,50 +40,50 @@ namespace Win10BloatRemover.Operations
         Zune                // Groove Music and Movies
     }
 
-    public class UWPAppRemover : IOperation
+    public class UwpAppGroupRemover : IOperation
     {
         // This dictionary contains the exact apps names corresponding to every defined group
-        private static readonly Dictionary<UWPAppGroup, string[]> appNamesForGroup = new Dictionary<UWPAppGroup, string[]> {
-            { UWPAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
-            { UWPAppGroup.Bing, new[] {
+        private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new Dictionary<UwpAppGroup, string[]> {
+            { UwpAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
+            { UwpAppGroup.Bing, new[] {
                 "Microsoft.BingNews",
                 "Microsoft.BingWeather",
                 "Microsoft.BingFinance",
                 "Microsoft.BingSports"
             } },
-            { UWPAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
-            { UWPAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
-            { UWPAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
-            { UWPAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
-            { UWPAppGroup.EdgeUWP, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
-            { UWPAppGroup.HelpAndFeedback, new[] {
+            { UwpAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
+            { UwpAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
+            { UwpAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
+            { UwpAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
+            { UwpAppGroup.EdgeUWP, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
+            { UwpAppGroup.HelpAndFeedback, new[] {
                 "Microsoft.WindowsFeedbackHub",
                 "Microsoft.GetHelp",
                 "Microsoft.Getstarted"
             } },
-            { UWPAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
-            { UWPAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
-            { UWPAppGroup.MixedReality, new[] {
+            { UwpAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
+            { UwpAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
+            { UwpAppGroup.MixedReality, new[] {
                 "Microsoft.Microsoft3DViewer",
                 "Microsoft.Print3D",
                 "Microsoft.MixedReality.Portal"
             } },
-            { UWPAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
-            { UWPAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
-            { UWPAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
-            { UWPAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
-            { UWPAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
-            { UWPAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
-            { UWPAppGroup.SnipAndSketch, new[] { "Microsoft.ScreenSketch" } },
-            { UWPAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
-            { UWPAppGroup.SoundRecorder, new[] { "Microsoft.WindowsSoundRecorder" } },
-            { UWPAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
-            { UWPAppGroup.Store, new[] {
+            { UwpAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
+            { UwpAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
+            { UwpAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
+            { UwpAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
+            { UwpAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
+            { UwpAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
+            { UwpAppGroup.SnipAndSketch, new[] { "Microsoft.ScreenSketch" } },
+            { UwpAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
+            { UwpAppGroup.SoundRecorder, new[] { "Microsoft.WindowsSoundRecorder" } },
+            { UwpAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
+            { UwpAppGroup.Store, new[] {
                 "Microsoft.WindowsStore",
                 "Microsoft.StorePurchaseApp",
                 "Microsoft.Services.Store.Engagement",
             } },
-            { UWPAppGroup.Xbox, new[] {
+            { UwpAppGroup.Xbox, new[] {
                 "Microsoft.XboxGameCallableUI",
                 "Microsoft.XboxSpeechToTextOverlay",
                 "Microsoft.XboxApp",
@@ -92,12 +92,12 @@ namespace Win10BloatRemover.Operations
                 "Microsoft.XboxIdentityProvider",
                 "Microsoft.Xbox.TCUI"
             } },
-            { UWPAppGroup.Zune, new[] { "Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
+            { UwpAppGroup.Zune, new[] { "Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
         };
 
-        private readonly Dictionary<UWPAppGroup, Action> postUninstallOperationsForGroup;
-        private readonly UWPAppGroup[] appsToRemove;
-        private readonly UWPAppRemovalMode removalMode;
+        private readonly Dictionary<UwpAppGroup, Action> postUninstallOperationsForGroup;
+        private readonly UwpAppGroup[] appsToRemove;
+        private readonly UwpAppRemovalMode removalMode;
         private readonly IUserInterface ui;
         private readonly AppxRemover appxRemover;
         private readonly ServiceRemover serviceRemover;
@@ -107,7 +107,7 @@ namespace Win10BloatRemover.Operations
         public bool IsRebootRecommended { get; private set; }
 
         #nullable disable warnings
-        public UWPAppRemover(UWPAppGroup[] appsToRemove, UWPAppRemovalMode removalMode, IUserInterface ui,
+        public UwpAppGroupRemover(UwpAppGroup[] appsToRemove, UwpAppRemovalMode removalMode, IUserInterface ui,
                              AppxRemover appxRemover, ServiceRemover serviceRemover)
         {
             this.appsToRemove = appsToRemove;
@@ -116,42 +116,42 @@ namespace Win10BloatRemover.Operations
             this.appxRemover = appxRemover;
             this.serviceRemover = serviceRemover;
 
-            postUninstallOperationsForGroup = new Dictionary<UWPAppGroup, Action> {
-                { UWPAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
-                { UWPAppGroup.Cortana, HideCortanaFromTaskBar },
-                { UWPAppGroup.Maps, RemoveMapsServicesAndTasks },
-                { UWPAppGroup.Messaging, RemoveMessagingService },
-                { UWPAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
-                { UWPAppGroup.Photos, RestoreWindowsPhotoViewer },
-                { UWPAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
-                { UWPAppGroup.Xbox, RemoveXboxServicesAndTasks },
-                { UWPAppGroup.Store, DisableStoreFeaturesAndServices }
+            postUninstallOperationsForGroup = new Dictionary<UwpAppGroup, Action> {
+                { UwpAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
+                { UwpAppGroup.Cortana, HideCortanaFromTaskBar },
+                { UwpAppGroup.Maps, RemoveMapsServicesAndTasks },
+                { UwpAppGroup.Messaging, RemoveMessagingService },
+                { UwpAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
+                { UwpAppGroup.Photos, RestoreWindowsPhotoViewer },
+                { UwpAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
+                { UwpAppGroup.Xbox, RemoveXboxServicesAndTasks },
+                { UwpAppGroup.Store, DisableStoreFeaturesAndServices }
             };
         }
         #nullable restore warnings
 
         public void Run()
         {
-            foreach (UWPAppGroup appGroup in appsToRemove)
+            foreach (UwpAppGroup appGroup in appsToRemove)
                 UninstallAppsOfGroup(appGroup);
 
             if (totalRemovedApps > 0)
                 RestartExplorer();
         }
 
-        private void UninstallAppsOfGroup(UWPAppGroup appGroup)
+        private void UninstallAppsOfGroup(UwpAppGroup appGroup)
         {
             string[] appsInGroup = appNamesForGroup[appGroup];
             ui.PrintHeading($"Removing {appGroup} {(appsInGroup.Length == 1 ? "app" : "apps")}...");
 
             var result = removalMode switch {
-                UWPAppRemovalMode.CurrentUser => appxRemover.RemoveAppsForCurrentUser(appsInGroup),
-                UWPAppRemovalMode.AllUsers => appxRemover.RemoveAppsForAllUsers(appsInGroup)
+                UwpAppRemovalMode.CurrentUser => appxRemover.RemoveAppsForCurrentUser(appsInGroup),
+                UwpAppRemovalMode.AllUsers => appxRemover.RemoveAppsForAllUsers(appsInGroup)
             };
 
             totalRemovedApps += result.RemovedApps;
 
-            if (removalMode == UWPAppRemovalMode.AllUsers && result.FailedRemovals == 0)
+            if (removalMode == UwpAppRemovalMode.AllUsers && result.FailedRemovals == 0)
                 TryPerformPostUninstallOperations(appGroup);
         }
 
@@ -162,7 +162,7 @@ namespace Win10BloatRemover.Operations
             OS.StartExplorer();
         }
 
-        private void TryPerformPostUninstallOperations(UWPAppGroup appGroup)
+        private void TryPerformPostUninstallOperations(UwpAppGroup appGroup)
         {
             try
             {

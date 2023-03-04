@@ -21,21 +21,21 @@ namespace Win10BloatRemover
         public override string FullName => "Remove UWP apps";
         public override string GetExplanation()
         {
-            string impactedUsers = configuration.UWPAppsRemovalMode == UWPAppRemovalMode.CurrentUser
+            string impactedUsers = configuration.UWPAppsRemovalMode == UwpAppRemovalMode.CurrentUser
                 ? "the current user"
                 : "all present and future users";
             string explanation = $"The following groups of UWP apps will be removed for {impactedUsers}:";
-            foreach (UWPAppGroup app in configuration.UWPAppsToRemove)
+            foreach (UwpAppGroup app in configuration.UWPAppsToRemove)
                 explanation += $"\n  {app}";
 
-            if (configuration.UWPAppsRemovalMode == UWPAppRemovalMode.AllUsers)
+            if (configuration.UWPAppsRemovalMode == UwpAppRemovalMode.AllUsers)
                 explanation += "\n\nServices, components and scheduled tasks used specifically by those apps will also " +
                                "be disabled or removed,\ntogether with any leftover data.";
 
             return explanation;
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
-            => new UWPAppRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new AppxRemover(ui), new ServiceRemover(ui));
+            => new UwpAppGroupRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode, ui, new AppxRemover(ui), new ServiceRemover(ui));
     }
 
     class DefenderDisablingEntry : MenuEntry
@@ -77,9 +77,9 @@ by other programs installed on this PC.";
         public override IOperation CreateNewOperation(IUserInterface ui)
         {
             return new EdgeRemover(ui,
-                new UWPAppRemover(
-                    new[] { UWPAppGroup.EdgeUWP },
-                    UWPAppRemovalMode.AllUsers,
+                new UwpAppGroupRemover(
+                    new[] { UwpAppGroup.EdgeUWP },
+                    UwpAppRemovalMode.AllUsers,
                     ui, new AppxRemover(ui),
                     new ServiceRemover(ui)
                 )

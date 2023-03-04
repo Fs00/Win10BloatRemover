@@ -15,11 +15,11 @@ namespace Win10BloatRemover
         public string[] ServicesToRemove { private set; get; }
 
         [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
-        public UWPAppGroup[] UWPAppsToRemove { private set; get; }
+        public UwpAppGroup[] UWPAppsToRemove { private set; get; }
 
         [JsonProperty(Required = Required.Always)]
         [JsonConverter(typeof(StringEnumConverter))]
-        public UWPAppRemovalMode UWPAppsRemovalMode { private set; get; }
+        public UwpAppRemovalMode UWPAppsRemovalMode { private set; get; }
 
         [JsonProperty(Required = Required.Always)]
         public string[] ScheduledTasksToDisable { private set; get; }
@@ -76,17 +76,17 @@ namespace Win10BloatRemover
                 "TroubleshootingSvc"
             },
             UWPAppsToRemove = new[] {   
-                UWPAppGroup.Bing,
-                UWPAppGroup.Cortana,
-                UWPAppGroup.CommunicationsApps,
-                UWPAppGroup.OneNote,
-                UWPAppGroup.OfficeHub,
-                UWPAppGroup.HelpAndFeedback,
-                UWPAppGroup.Maps,
-                UWPAppGroup.Messaging,
-                UWPAppGroup.Mobile,
-                UWPAppGroup.Skype,
-                UWPAppGroup.Zune
+                UwpAppGroup.Bing,
+                UwpAppGroup.Cortana,
+                UwpAppGroup.CommunicationsApps,
+                UwpAppGroup.OneNote,
+                UwpAppGroup.OfficeHub,
+                UwpAppGroup.HelpAndFeedback,
+                UwpAppGroup.Maps,
+                UwpAppGroup.Messaging,
+                UwpAppGroup.Mobile,
+                UwpAppGroup.Skype,
+                UwpAppGroup.Zune
             },
             WindowsFeaturesToRemove = new[] {
                 "App.StepsRecorder",
@@ -113,7 +113,7 @@ namespace Win10BloatRemover
                 @"\Microsoft\Windows\Diagnosis\Scheduled",
                 @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
             },
-            UWPAppsRemovalMode = UWPAppRemovalMode.AllUsers
+            UWPAppsRemovalMode = UwpAppRemovalMode.AllUsers
         };
     }
 

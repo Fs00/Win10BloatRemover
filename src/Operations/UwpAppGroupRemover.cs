@@ -20,7 +20,6 @@ namespace Win10BloatRemover.Operations
         Camera,
         CommunicationsApps,
         Cortana,
-        EdgeUWP,
         HelpAndFeedback,
         Maps,
         Messaging,
@@ -55,7 +54,6 @@ namespace Win10BloatRemover.Operations
             { UwpAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
             { UwpAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
             { UwpAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
-            { UwpAppGroup.EdgeUWP, new[] { "Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient" } },
             { UwpAppGroup.HelpAndFeedback, new[] {
                 "Microsoft.WindowsFeedbackHub",
                 "Microsoft.GetHelp",

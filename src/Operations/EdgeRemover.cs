@@ -12,18 +12,18 @@ namespace Win10BloatRemover.Operations
     public class EdgeRemover : IOperation
     {
         private readonly IUserInterface ui;
-        private readonly IOperation legacyEdgeRemover;
+        private readonly AppxRemover appxRemover;
 
-        public EdgeRemover(IUserInterface ui, IOperation legacyEdgeRemover)
+        public EdgeRemover(IUserInterface ui, AppxRemover appxRemover)
         {
             this.ui = ui;
-            this.legacyEdgeRemover = legacyEdgeRemover;
+            this.appxRemover = appxRemover;
         }
 
         public void Run()
         {
             UninstallEdgeChromium();
-            legacyEdgeRemover.Run();
+            UninstallLegacyEdgeApps();
         }
 
         private void UninstallEdgeChromium()
@@ -50,6 +50,12 @@ namespace Win10BloatRemover.Operations
             WaitForEdgeUninstallation(installerPath);
 
             RemoveEdgeLeftovers();
+        }
+
+        private void UninstallLegacyEdgeApps()
+        {
+            ui.PrintHeading("Removing legacy Edge...");
+            appxRemover.RemoveAppsForAllUsers("Microsoft.MicrosoftEdge", "Microsoft.MicrosoftEdgeDevToolsClient");
         }
 
         private string? RetrieveEdgeChromiumInstallerPath()

@@ -76,14 +76,7 @@ by other programs installed on this PC.";
         }
         public override IOperation CreateNewOperation(IUserInterface ui)
         {
-            return new EdgeRemover(ui,
-                new UwpAppGroupRemover(
-                    new[] { UwpAppGroup.EdgeUWP },
-                    UwpAppRemovalMode.AllUsers,
-                    ui, new AppxRemover(ui),
-                    new ServiceRemover(ui)
-                )
-            );
+            return new EdgeRemover(ui, new AppxRemover(ui));
         }
     }
 

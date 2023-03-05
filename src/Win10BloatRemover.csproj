@@ -3,9 +3,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PlatformTarget>x86</PlatformTarget>
     <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <PropertyGroup>
+	<AssemblyTitle>Windows 10 Bloat Remover</AssemblyTitle>
+	<Product>Windows 10 Bloat Remover</Product>
+	<Copyright>Developed by Fs00</Copyright>
+	<Version>4.3</Version>
   </PropertyGroup>
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>

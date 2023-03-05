@@ -1,8 +1,9 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Linq;
-using System.Management.Automation;
 using Win10BloatRemover.Operations;
+using Windows.ApplicationModel;
+using Windows.Management.Deployment;
 
 namespace Win10BloatRemover.Utils
 {
@@ -29,26 +30,16 @@ namespace Win10BloatRemover.Utils
 
         private readonly IUserInterface ui;
 
-        private /*lateinit*/ PowerShell powerShell = default!;
-
         public AppxRemover(IUserInterface ui) => this.ui = ui;
 
         public Result RemoveAppsForCurrentUser(params string[] appNames)
         {
-            using (powerShell = PowerShellExtensions.CreateWithImportedModules("AppX").WithOutput(ui))
-            {
-                var removalMethod = new CurrentUserRemovalMethod(ui, powerShell);
-                return PerformAppsRemoval(appNames, removalMethod);
-            }
+            return PerformAppsRemoval(appNames, new CurrentUserRemovalMethod(ui));
         }
 
         public Result RemoveAppsForAllUsers(params string[] appNames)
         {
-            using (powerShell = PowerShellExtensions.CreateWithImportedModules("AppX", "Dism").WithOutput(ui))
-            {
-                var removalMethod = new AllUsersRemovalMethod(ui, powerShell);
-                return PerformAppsRemoval(appNames, removalMethod);
-            }
+            return PerformAppsRemoval(appNames, new AllUsersRemovalMethod(ui));
         }
 
         private Result PerformAppsRemoval(string[] appNames, RemovalMethod removalMethod)
@@ -68,6 +59,7 @@ namespace Win10BloatRemover.Utils
         private abstract class RemovalMethod
         {
             protected readonly IUserInterface ui;
+            protected readonly PackageManager packageManager = new PackageManager();
 
             protected RemovalMethod(IUserInterface ui) => this.ui = ui;
 
@@ -85,34 +77,60 @@ namespace Win10BloatRemover.Utils
                 ui.PrintMessage($"Uninstalling app {appName}...");
                 foreach (var package in appPackages)
                 {
-                    var outcome = RemoveAppPackage(package);
+                    var outcome = TryRemoveAppPackage(package);
                     if (outcome == RemovalOutcome.Failure)
                         return outcome;
                 }
                 return RemovalOutcome.Success;
             }
 
-            protected bool IsSystemApp(dynamic package)
+            private RemovalOutcome TryRemoveAppPackage(Package package)
             {
-                string systemAppsFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SystemApps";
-                return package.InstallLocation.StartsWith(systemAppsFolder);
+                try
+                {
+                    return RemoveAppPackage(package);
+                }
+                catch (Exception exc)
+                {
+                    PrintUninstallationError(exc);
+                    return RemovalOutcome.Failure;
+                }
             }
 
-            protected abstract dynamic[] GetAppPackages(string appName);
-            protected abstract RemovalOutcome RemoveAppPackage(dynamic package);
+            protected void PrintUninstallationError(Exception exc)
+            {
+                string errorMessage = "Uninstallation failed: ";
+                if (exc.InnerException != null)
+                    errorMessage += exc.InnerException.Message;
+                else
+                    errorMessage += exc.Message;
+
+                ui.PrintError(errorMessage);
+            }
+
+            protected bool IsSystemApp(Package package)
+            {
+                string systemAppsFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SystemApps";
+                return package.InstalledPath.StartsWith(systemAppsFolder);
+            }
+
+            protected abstract Package[] GetAppPackages(string appName);
+            protected abstract RemovalOutcome RemoveAppPackage(Package package);
         }
 
         private class CurrentUserRemovalMethod : RemovalMethod
         {
-            private readonly PowerShell powerShell;
+            public CurrentUserRemovalMethod(IUserInterface ui) : base(ui) {}
 
-            public CurrentUserRemovalMethod(IUserInterface ui, PowerShell powerShell) : base(ui)
-                => this.powerShell = powerShell;
+            protected override Package[] GetAppPackages(string appName)
+            {
+                const string currentUser = "";
+                return packageManager.FindPackagesForUser(currentUser)
+                        .Where(package => package.Id.Name == appName)
+                        .ToArray();
+            }
 
-            protected override dynamic[] GetAppPackages(string appName)
-                => powerShell.Run($"Get-AppxPackage -Name {appName}");
-
-            protected override RemovalOutcome RemoveAppPackage(dynamic package)
+            protected override RemovalOutcome RemoveAppPackage(Package package)
             {
                 if (IsSystemApp(package))
                 {
@@ -122,17 +140,14 @@ namespace Win10BloatRemover.Utils
                     return RemovalOutcome.Failure;
                 }
 
-                powerShell.Run($"Remove-AppxPackage -Package {package.PackageFullName}");
-                return powerShell.Streams.Error.Count == 0 ? RemovalOutcome.Success : RemovalOutcome.Failure;
+                packageManager.RemovePackageAsync(package.Id.FullName).AsTask().Wait();
+                return RemovalOutcome.Success;
             }
         }
 
         private class AllUsersRemovalMethod : RemovalMethod
         {
-            private readonly PowerShell powerShell;
-
-            public AllUsersRemovalMethod(IUserInterface ui, PowerShell powerShell) : base(ui)
-                => this.powerShell = powerShell;
+            public AllUsersRemovalMethod(IUserInterface ui) : base(ui) {}
 
             public override RemovalOutcome RemovePackagesForApp(string appName)
             {
@@ -147,39 +162,49 @@ namespace Win10BloatRemover.Utils
 
             private RemovalOutcome RemoveAppProvisionedPackage(string appName)
             {
-                var provisionedPackage = powerShell.Run("Get-AppxProvisionedPackage -Online")
-                    .FirstOrDefault(package => package.DisplayName == appName);
+                var provisionedPackage = packageManager.FindProvisionedPackages()
+                    .FirstOrDefault(package => package.Id.Name == appName);
                 if (provisionedPackage == null)
                     return RemovalOutcome.NotInstalled;
 
                 ui.PrintMessage($"Removing provisioned package for app {appName}...");
-                powerShell.Run(
-                    $"Remove-AppxProvisionedPackage -Online -PackageName \"{provisionedPackage.PackageName}\""
-                );
-                return powerShell.Streams.Error.Count == 0 ? RemovalOutcome.Success : RemovalOutcome.Failure;
+                try
+                {
+                    packageManager.DeprovisionPackageForAllUsersAsync(provisionedPackage.Id.FamilyName).AsTask().Wait();
+                    return RemovalOutcome.Success;
+                }
+                catch (Exception exc)
+                {
+                    PrintUninstallationError(exc);
+                    return RemovalOutcome.Failure;
+                }
             }
 
-            protected override dynamic[] GetAppPackages(string appName)
-                => powerShell.Run($"Get-AppxPackage -AllUsers -Name {appName}");
+            protected override Package[] GetAppPackages(string appName)
+            {
+                return packageManager.FindPackages()
+                        .Where(package => package.Id.Name == appName)
+                        .ToArray();
+            }
 
-            protected override RemovalOutcome RemoveAppPackage(dynamic package)
+            protected override RemovalOutcome RemoveAppPackage(Package package)
             {
                 if (IsSystemApp(package))
                     MakeSystemAppRemovable(package);
 
-                powerShell.Run($"Remove-AppxPackage -AllUsers -Package {package.PackageFullName}");
-                return powerShell.Streams.Error.Count == 0 ? RemovalOutcome.Success : RemovalOutcome.Failure;
+                packageManager.RemovePackageAsync(package.Id.FullName, RemovalOptions.RemoveForAllUsers).AsTask().Wait();
+                return RemovalOutcome.Success;
             }
 
-            private void MakeSystemAppRemovable(dynamic package)
+            private void MakeSystemAppRemovable(Package package)
             {
                 using var appxStoreKey = RegistryUtils.LocalMachine64.OpenSubKeyWritable(
                     @"SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
                 );
-                AddEndOfLifeKeysForPackage(package.PackageFullName, appxStoreKey);
+                AddEndOfLifeKeysForPackage(package.Id.FullName, appxStoreKey);
 
                 // This prevents the app from being installed for new users and after cumulative updates
-                RemovePackageFromInboxAppsRegistry(package.Name, appxStoreKey);
+                RemovePackageFromInboxAppsRegistry(package.Id.Name, appxStoreKey);
             }
 
             private void AddEndOfLifeKeysForPackage(string packageFullName, RegistryKey appxStoreKey)

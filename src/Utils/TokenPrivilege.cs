@@ -89,6 +89,7 @@ namespace Win10BloatRemover.Utils
         private const int TOKEN_ADJUST_PRIVILEGES = 0x20;
 
         [DllImport("advapi32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool AdjustTokenPrivileges(IntPtr tokenHandle,
                                                          bool disableAllPrivileges,
                                                          ref TokenPrivileges newState,
@@ -97,12 +98,15 @@ namespace Win10BloatRemover.Utils
                                                          IntPtr returnLength);
 
         [DllImport("kernel32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr GetCurrentProcess();
 
         [DllImport("advapi32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool OpenProcessToken(IntPtr processHandle, int desiredAccess, out IntPtr tokenHandle);
 
         [DllImport("advapi32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool LookupPrivilegeValue(string? systemName, string privilegeName, out Luid privilegeLuid);
         #endregion
     }

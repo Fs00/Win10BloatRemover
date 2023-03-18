@@ -13,8 +13,12 @@
 	<Version>4.3</Version>
   </PropertyGroup>
   <PropertyGroup>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+	<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+	<AnalysisModeNaming>All</AnalysisModeNaming>
+	<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+	<AnalysisModeReliability>All</AnalysisModeReliability>
+	<AnalysisModeSecurity>All</AnalysisModeSecurity>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\App.manifest</ApplicationManifest>

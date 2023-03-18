@@ -73,7 +73,7 @@ namespace Win10BloatRemover
             return chosenEntry!;
         }
 
-        private MenuEntry? GetEntryCorrespondingToUserInput(string userInput)
+        private MenuEntry? GetEntryCorrespondingToUserInput(string? userInput)
         {
             bool inputIsNumeric = int.TryParse(userInput, out int entryNumber);
             if (inputIsNumeric)

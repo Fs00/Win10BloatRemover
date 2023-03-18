@@ -10,7 +10,8 @@ namespace Win10BloatRemover.Operations
         public void Run()
         {
             Stream licenseFile = GetType().Assembly.GetManifestResourceStream("Win10BloatRemover.Resources.License.txt")!;
-            string licenseText = new StreamReader(licenseFile).ReadToEnd();
+            using var licenseFileStream = new StreamReader(licenseFile);
+            string licenseText = licenseFileStream.ReadToEnd();
             ui.PrintNotice(licenseText);
         }
     }

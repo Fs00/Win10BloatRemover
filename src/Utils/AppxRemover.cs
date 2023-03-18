@@ -9,17 +9,7 @@ namespace Win10BloatRemover.Utils
 {
     public class AppxRemover
     {
-        public struct Result
-        {
-            public int RemovedApps { private set; get; }
-            public int FailedRemovals { private set; get; }
-
-            public Result(int removedApps, int failedRemovals)
-            {
-                RemovedApps = removedApps;
-                FailedRemovals = failedRemovals;
-            }
-        }
+        public readonly record struct Result(int RemovedApps, int FailedRemovals);
 
         private enum RemovalOutcome
         {

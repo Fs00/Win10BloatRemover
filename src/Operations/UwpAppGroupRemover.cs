@@ -142,14 +142,13 @@ namespace Win10BloatRemover.Operations
             string[] appsInGroup = appNamesForGroup[appGroup];
             ui.PrintHeading($"Removing {appGroup} {(appsInGroup.Length == 1 ? "app" : "apps")}...");
 
-            var result = removalMode switch {
-                UwpAppRemovalMode.CurrentUser => appxRemover.RemoveAppsForCurrentUser(appsInGroup),
-                UwpAppRemovalMode.AllUsers => appxRemover.RemoveAppsForAllUsers(appsInGroup)
-            };
+            (int removedApps, int failedRemovals) = removalMode == UwpAppRemovalMode.CurrentUser
+                ? appxRemover.RemoveAppsForCurrentUser(appsInGroup)
+                : appxRemover.RemoveAppsForAllUsers(appsInGroup);
 
-            totalRemovedApps += result.RemovedApps;
+            totalRemovedApps += removedApps;
 
-            if (removalMode == UwpAppRemovalMode.AllUsers && result.FailedRemovals == 0)
+            if (removalMode == UwpAppRemovalMode.AllUsers && failedRemovals == 0)
                 TryPerformPostUninstallOperations(appGroup);
         }
 

@@ -6,7 +6,7 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover
 {
-    public class Configuration
+    public class AppConfiguration
     {
         private const string CONFIGURATION_FILE_NAME = "config.json";
 
@@ -28,7 +28,7 @@ namespace Win10BloatRemover
         public string[] WindowsFeaturesToRemove { private set; get; }
         #nullable restore warnings
 
-        public static Configuration LoadOrCreateFile()
+        public static AppConfiguration LoadOrCreateFile()
         { 
             if (File.Exists(CONFIGURATION_FILE_NAME))
             {
@@ -40,19 +40,19 @@ namespace Win10BloatRemover
             return Default;
         }
 
-        private static Configuration LoadFromFile()
+        private static AppConfiguration LoadFromFile()
         {
             try
             {
                 string settingsFileContent = File.ReadAllText(CONFIGURATION_FILE_NAME);
-                var parsedConfiguration = JsonConvert.DeserializeObject<Configuration>(settingsFileContent);
+                var parsedConfiguration = JsonConvert.DeserializeObject<AppConfiguration>(settingsFileContent);
                 if (parsedConfiguration == null)
                     throw new Exception("The file is empty.");
                 return parsedConfiguration;
             }
             catch (Exception exc)
             {
-                throw new ConfigurationLoadException(exc.Message);
+                throw new AppConfigurationLoadException(exc.Message);
             }
         }
 
@@ -65,11 +65,11 @@ namespace Win10BloatRemover
             }
             catch (Exception exc)
             {
-                throw new ConfigurationWriteException(exc.Message);
+                throw new AppConfigurationWriteException(exc.Message);
             }
         }
 
-        public static readonly Configuration Default = new Configuration {
+        public static readonly AppConfiguration Default = new AppConfiguration {
             ServicesToRemove = new[] {
                 "dmwappushservice",
                 "RetailDemo",
@@ -117,18 +117,18 @@ namespace Win10BloatRemover
         };
     }
 
-    abstract class ConfigurationException : Exception
+    abstract class AppConfigurationException : Exception
     {
-        protected ConfigurationException(string message) : base(message) {}
+        protected AppConfigurationException(string message) : base(message) {}
     }
 
-    class ConfigurationLoadException : ConfigurationException
+    class AppConfigurationLoadException : AppConfigurationException
     {
-        public ConfigurationLoadException(string message) : base(message) {}
+        public AppConfigurationLoadException(string message) : base(message) {}
     }
 
-    class ConfigurationWriteException : ConfigurationException
+    class AppConfigurationWriteException : AppConfigurationException
     {
-        public ConfigurationWriteException(string message) : base(message) {}
+        public AppConfigurationWriteException(string message) : base(message) {}
     }
 }

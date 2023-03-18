@@ -14,9 +14,9 @@ namespace Win10BloatRemover
 
     class UWPAppRemovalEntry : MenuEntry
     {
-        private readonly Configuration configuration;
+        private readonly AppConfiguration configuration;
 
-        public UWPAppRemovalEntry(Configuration configuration) => this.configuration = configuration;
+        public UWPAppRemovalEntry(AppConfiguration configuration) => this.configuration = configuration;
 
         public override string FullName => "Remove UWP apps";
         public override string GetExplanation()
@@ -93,9 +93,9 @@ by other programs installed on this PC.";
 
     class ServicesRemovalEntry : MenuEntry
     {
-        private readonly Configuration configuration;
+        private readonly AppConfiguration configuration;
 
-        public ServicesRemovalEntry(Configuration configuration) => this.configuration = configuration;
+        public ServicesRemovalEntry(AppConfiguration configuration) => this.configuration = configuration;
 
         public override string FullName => "Remove miscellaneous services";
         public override string GetExplanation()
@@ -111,9 +111,9 @@ by other programs installed on this PC.";
 
     class WindowsFeaturesRemovalEntry : MenuEntry
     {
-        private readonly Configuration configuration;
+        private readonly AppConfiguration configuration;
 
-        public WindowsFeaturesRemovalEntry(Configuration configuration) => this.configuration = configuration;
+        public WindowsFeaturesRemovalEntry(AppConfiguration configuration) => this.configuration = configuration;
 
         public override string FullName => "Remove Windows features";
         public override string GetExplanation()
@@ -179,9 +179,9 @@ Program and Compatibility Assistant.";
 
     class ScheduledTasksDisablingEntry : MenuEntry
     {
-        private readonly Configuration configuration;
+        private readonly AppConfiguration configuration;
 
-        public ScheduledTasksDisablingEntry(Configuration configuration) => this.configuration = configuration;
+        public ScheduledTasksDisablingEntry(AppConfiguration configuration) => this.configuration = configuration;
 
         public override string FullName => "Disable miscellaneous scheduled tasks";
         public override string GetExplanation()

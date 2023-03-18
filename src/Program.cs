@@ -25,7 +25,7 @@ namespace Win10BloatRemover
             menu.RunLoopUntilExitRequested();
         }
 
-        private static MenuEntry[] CreateMenuEntries(Configuration configuration, RebootRecommendedFlag rebootFlag)
+        private static MenuEntry[] CreateMenuEntries(AppConfiguration configuration, RebootRecommendedFlag rebootFlag)
         {
             return new MenuEntry[] {
                 new UWPAppRemovalEntry(configuration),
@@ -90,28 +90,27 @@ namespace Win10BloatRemover
             if (Console.ReadKey().Key != ConsoleKey.Enter)
                 Environment.Exit(-1);
         }
-
         
-        private static Configuration LoadConfigurationFromFileOrDefault()
+        private static AppConfiguration LoadConfigurationFromFileOrDefault()
         {
             try
             {
-                return Configuration.LoadOrCreateFile();
+                return AppConfiguration.LoadOrCreateFile();
             }
-            catch (ConfigurationException exc)
+            catch (AppConfigurationException exc)
             {
                 PrintConfigurationErrorMessage(exc);
-                return Configuration.Default;
+                return AppConfiguration.Default;
             }
         }
 
-        private static void PrintConfigurationErrorMessage(ConfigurationException exc)
+        private static void PrintConfigurationErrorMessage(AppConfigurationException exc)
         {
             string errorMessage = "";
-            if (exc is ConfigurationLoadException)
+            if (exc is AppConfigurationLoadException)
                 errorMessage = $"An error occurred while loading settings file: {exc.Message}\n" +
                                 "Default settings have been loaded instead.\n";
-            else if (exc is ConfigurationWriteException)
+            else if (exc is AppConfigurationWriteException)
                 errorMessage = $"Couldn't write default configuration to settings file: {exc.Message}\n";
 
             ConsoleHelpers.WriteLine(errorMessage, ConsoleColor.DarkYellow);

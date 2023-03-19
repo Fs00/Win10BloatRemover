@@ -13,9 +13,11 @@ namespace Win10BloatRemover
         {
             using var consoleListener = new ConsoleTraceListener();
             Trace.Listeners.Add(consoleListener);
-            Console.Title = "Windows 10 Bloat Remover and Tweaker";
 
-            EnsureProgramIsRunningAsAdmin();
+            Console.Title = "Windows 10 Bloat Remover and Tweaker";
+            if (!HasAdministratorRights())
+                Console.Title += " (unprivileged)";
+
             ShowWarningOnUnsupportedOS();
             RegisterExitEventHandlers();
 
@@ -45,16 +47,6 @@ namespace Win10BloatRemover
                 new AboutEntry(),
                 new QuitEntry(rebootFlag)
             };
-        }
-
-        private static void EnsureProgramIsRunningAsAdmin()
-        {
-            if (!Program.HasAdministratorRights())
-            {
-                ConsoleHelpers.WriteLine("This application needs to be run with administrator rights!", ConsoleColor.Red);
-                Console.ReadKey();
-                Environment.Exit(-1);
-            }
         }
 
         private static bool HasAdministratorRights()

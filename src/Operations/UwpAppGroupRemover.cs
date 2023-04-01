@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
 
@@ -106,7 +107,7 @@ namespace Win10BloatRemover.Operations
 
         #nullable disable warnings
         public UwpAppGroupRemover(UwpAppGroup[] appsToRemove, UwpAppRemovalMode removalMode, IUserInterface ui,
-                             AppxRemover appxRemover, ServiceRemover serviceRemover)
+                                  AppxRemover appxRemover, ServiceRemover serviceRemover)
         {
             this.appsToRemove = appsToRemove;
             this.removalMode = removalMode;

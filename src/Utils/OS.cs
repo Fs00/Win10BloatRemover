@@ -5,7 +5,7 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Win32;
-using Win10BloatRemover.Operations;
+using Win10BloatRemover.UI;
 
 namespace Win10BloatRemover.Utils
 {

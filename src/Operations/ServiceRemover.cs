@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations

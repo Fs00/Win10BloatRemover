@@ -1,9 +1,6 @@
 ﻿using System;
-using Win10BloatRemover.Operations;
-using Win10BloatRemover.Utils;
-using static Win10BloatRemover.Operations.IUserInterface;
 
-namespace Win10BloatRemover
+namespace Win10BloatRemover.UI
 {
     class ConsoleUserInterface : IUserInterface
     {

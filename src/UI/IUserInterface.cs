@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Win10BloatRemover.Operations
+namespace Win10BloatRemover.UI
 {
     public interface IMessagePrinter
     {
@@ -12,14 +12,14 @@ namespace Win10BloatRemover.Operations
         void PrintEmptySpace();
     }
 
+    public enum UserChoice
+    {
+        Yes,
+        No
+    }
+
     public interface IUserInterface : IMessagePrinter
     {
-        public enum UserChoice
-        {
-            Yes,
-            No
-        }
-
         UserChoice AskUserConsent(string text);
 
         void ThrowIfUserDenies(string text)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using Microsoft.PowerShell;
-using Win10BloatRemover.Operations;
+using Win10BloatRemover.UI;
 
 namespace Win10BloatRemover.Utils
 {

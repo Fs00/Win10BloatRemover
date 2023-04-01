@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Win10BloatRemover.Operations;
-using Win10BloatRemover.Utils;
 
-namespace Win10BloatRemover
+namespace Win10BloatRemover.UI
 {
     class ConsoleMenu
     {

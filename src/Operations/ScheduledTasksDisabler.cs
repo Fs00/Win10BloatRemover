@@ -1,4 +1,5 @@
-﻿using Win10BloatRemover.Utils;
+﻿using Win10BloatRemover.UI;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {

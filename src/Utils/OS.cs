@@ -81,19 +81,6 @@ namespace Win10BloatRemover.Utils
             }
         }
 
-        public static void KillChildProcesses(this Process process)
-        {
-            using var searcher = new ManagementObjectSearcher(
-                $"Select * From Win32_Process Where ParentProcessID={process.Id}"
-            );
-            foreach (var managementObject in searcher.Get())
-            {
-                using var child = Process.GetProcessById(Convert.ToInt32(managementObject["ProcessID"]));
-                child.KillChildProcesses();
-                child.Kill();
-            }
-        }
-
         public static ExitCode RunProcessBlocking(string name, string args)
         {
             using var process = CreateProcessInstance(name, args);

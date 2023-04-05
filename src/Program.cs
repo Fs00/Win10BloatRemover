@@ -20,7 +20,7 @@ namespace Win10BloatRemover
                 Console.Title += " (unprivileged)";
 
             ShowWarningOnUnsupportedOS();
-            RegisterExitEventHandlers();
+            RegisterTerminationHandler();
 
             var configuration = LoadConfigurationFromFileOrDefault();
             var rebootFlag = new RebootRecommendedFlag();
@@ -111,9 +111,8 @@ namespace Win10BloatRemover
             Console.ReadKey();
         }
 
-        private static void RegisterExitEventHandlers()
+        private static void RegisterTerminationHandler()
         {
-            #if !DEBUG
             bool cancelKeyPressedOnce = false;
             Console.CancelKeyPress += (sender, args) => {
                 if (!cancelKeyPressedOnce)
@@ -122,13 +121,7 @@ namespace Win10BloatRemover
                     cancelKeyPressedOnce = true;
                     args.Cancel = true;
                 }
-                else
-                    Process.GetCurrentProcess().KillChildProcesses();
             };
-            #endif
-
-            // Executed when the user closes the window. This handler is not fired when process is terminated with Ctrl+C
-            AppDomain.CurrentDomain.ProcessExit += (sender, args) => Process.GetCurrentProcess().KillChildProcesses();
         }
     }
 }

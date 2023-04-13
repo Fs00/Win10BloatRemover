@@ -37,12 +37,7 @@ namespace Win10BloatRemover.Operations
                 return;
             }
 
-            // Recent versions of Edge Update (the latest at the moment of writing is 1.3.171.37) set a flag
-            // that blocks the uninstallation of Edge inside the following registry value.
-            // If we don't remove it, the uninstaller will simply do nothing.
-            Registry.LocalMachine.DeleteSubKeyValue(
-                @"SOFTWARE\Microsoft\EdgeUpdate\ClientState\{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}",
-                "experiment_control_labels");
+            RemoveEdgeUninstallationBlockers();
 
             ui.PrintMessage("Running uninstaller...");
             OS.RunProcessBlocking(installerPath, "--uninstall --force-uninstall --msedge --system-level --verbose-logging");
@@ -79,6 +74,19 @@ namespace Win10BloatRemover.Operations
                 }
             }
             return null;
+        }
+
+        private void RemoveEdgeUninstallationBlockers()
+        {
+            // Some versions of Edge Update set a flag inside the following registry value that blocks Edge uninstallation.
+            // If we don't remove it, the uninstaller will simply do nothing.
+            Registry.LocalMachine.DeleteSubKeyValue(
+                @"SOFTWARE\Microsoft\EdgeUpdate\ClientState\{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}",
+                "experiment_control_labels");
+
+            // Latest versions of Edge (112 and newer for sure, maybe some previous ones too) don't check the
+            // above registry value, but they refuse to uninstall themselves if the following one is missing.
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdateDev", "AllowUninstall", 1);
         }
 
         private void WaitForEdgeUninstallation(string edgeInstallerPath)

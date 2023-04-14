@@ -1,28 +1,27 @@
 ﻿using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
 
-namespace Win10BloatRemover.Operations
+namespace Win10BloatRemover.Operations;
+
+class AskForRebootOperation : IOperation
 {
-    class AskForRebootOperation : IOperation
+    private readonly IUserInterface ui;
+    private readonly RebootRecommendedFlag rebootFlag;
+
+    public AskForRebootOperation(IUserInterface ui, RebootRecommendedFlag rebootFlag)
     {
-        private readonly IUserInterface ui;
-        private readonly RebootRecommendedFlag rebootFlag;
+        this.ui = ui;
+        this.rebootFlag = rebootFlag;
+    }
 
-        public AskForRebootOperation(IUserInterface ui, RebootRecommendedFlag rebootFlag)
+    public void Run()
+    {
+        if (rebootFlag.IsRebootRecommended)
         {
-            this.ui = ui;
-            this.rebootFlag = rebootFlag;
-        }
-
-        public void Run()
-        {
-            if (rebootFlag.IsRebootRecommended)
-            {
-                ui.PrintWarning("You have executed one or more operations that require a system reboot to take full effect.");
-                var choice = ui.AskUserConsent("Do you want to reboot now?");
-                if (choice == UserChoice.Yes)
-                    OS.RebootPC();
-            }
+            ui.PrintWarning("You have executed one or more operations that require a system reboot to take full effect.");
+            var choice = ui.AskUserConsent("Do you want to reboot now?");
+            if (choice == UserChoice.Yes)
+                OS.RebootPC();
         }
     }
 }

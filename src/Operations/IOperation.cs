@@ -1,8 +1,7 @@
-﻿namespace Win10BloatRemover.Operations
+﻿namespace Win10BloatRemover.Operations;
+
+public interface IOperation
 {
-    public interface IOperation
-    {
-        void Run();
-        bool IsRebootRecommended => false;
-    }
+    void Run();
+    bool IsRebootRecommended => false;
 }

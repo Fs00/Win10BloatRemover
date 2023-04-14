@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using System.Management.Automation;
+﻿using Microsoft.Dism;
+using System;
+using System.Linq;
 using Win10BloatRemover.UI;
-using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations
 {
@@ -10,55 +10,65 @@ namespace Win10BloatRemover.Operations
         private readonly string[] featuresToRemove;
         private readonly IUserInterface ui;
 
-        private /*lateinit*/ PowerShell powerShell;
-
         public bool IsRebootRecommended { get; private set; }
 
-        #nullable disable warnings
         public FeaturesRemover(string[] featuresToRemove, IUserInterface ui)
         {
             this.featuresToRemove = featuresToRemove;
             this.ui = ui;
         }
-        #nullable restore warnings
 
         public void Run()
         {
-            using (powerShell = PowerShellExtensions.CreateWithImportedModules("Dism").WithOutput(ui))
+            DismApi.Initialize(DismLogLevel.LogErrorsWarningsInfo);
+            try
             {
-                foreach (string capabilityName in featuresToRemove)
-                    RemoveCapabilitiesWhoseNameStartsWith(capabilityName);
+                using var session = DismApi.OpenOnlineSessionEx(new DismSessionOptions { ThrowExceptionOnRebootRequired = false });
+                var capabilities = DismApi.GetCapabilities(session);
+                foreach (string featureName in featuresToRemove)
+                    RemoveCapabilitiesMatchingName(featureName, capabilities, session);
+
+                IsRebootRecommended = session.RebootRequired;
+            }
+            finally
+            {
+                DismApi.Shutdown();
             }
         }
 
-        private void RemoveCapabilitiesWhoseNameStartsWith(string capabilityName)
+        private void RemoveCapabilitiesMatchingName(string featureName, DismCapabilityCollection capabilities, DismSession session)
         {
-            var capabilities = powerShell.Run($"Get-WindowsCapability -Online -Name {capabilityName}*");
-            if (capabilities.Length == 0)
+            var matchingCapabilities = capabilities.Where(capability => capability.Name.StartsWith(featureName));
+            if (!matchingCapabilities.Any())
             {
-                ui.PrintWarning($"No features found with name {capabilityName}.");
+                ui.PrintWarning($"No features found with name {featureName}.");
                 return;
             }
 
-            foreach (var capability in capabilities)
-                RemoveCapability(capability);
+            foreach (var capability in matchingCapabilities)
+                TryRemoveCapability(capability, session);
         }
 
-        private void RemoveCapability(dynamic capability)
+        private void TryRemoveCapability(DismCapability capability, DismSession session)
         {
-            if (capability.State.ToString() != "Installed")
+            if (capability.State != DismPackageFeatureState.Installed)
             {
                 ui.PrintMessage($"Feature {capability.Name} is not installed.");
                 return;
             }
 
-            ui.PrintMessage($"Removing feature {capability.Name}...");
-            var result = powerShell.Run($"Remove-WindowsCapability -Online -Name {capability.Name}").First();
-            if (result.RestartNeeded)
-                IsRebootRecommended = true;
+            try
+            {
+                ui.PrintMessage($"Removing feature {capability.Name}...");
+                DismApi.RemoveCapability(session, capability.Name);
 
-            if (capability.Name.StartsWith("Hello.Face"))
-                new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();
+                if (capability.Name.StartsWith("Hello.Face"))
+                    new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();
+            }
+            catch (Exception exc)
+            {
+                ui.PrintError($"Feature {capability.Name} could not be removed: {exc.Message}");
+            }
         }
     }
 }

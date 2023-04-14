@@ -1,6 +1,4 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
 using Env = System.Environment;
@@ -43,7 +41,7 @@ public enum UwpAppGroup
 public class UwpAppGroupRemover : IOperation
 {
     // This dictionary contains the exact apps names corresponding to every defined group
-    private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new Dictionary<UwpAppGroup, string[]> {
+    private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new() {
         { UwpAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
         { UwpAppGroup.Bing, new[] {
             "Microsoft.BingNews",
@@ -105,7 +103,6 @@ public class UwpAppGroupRemover : IOperation
 
     public bool IsRebootRecommended { get; private set; }
 
-    #nullable disable warnings
     public UwpAppGroupRemover(UwpAppGroup[] appsToRemove, UwpAppRemovalMode removalMode, IUserInterface ui,
                               AppxRemover appxRemover, ServiceRemover serviceRemover)
     {
@@ -127,7 +124,6 @@ public class UwpAppGroupRemover : IOperation
             { UwpAppGroup.Store, DisableStoreFeaturesAndServices }
         };
     }
-    #nullable restore warnings
 
     public void Run()
     {

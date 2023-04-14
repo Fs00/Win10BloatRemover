@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Security.Principal;
 using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;

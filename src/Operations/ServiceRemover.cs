@@ -1,9 +1,6 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
 

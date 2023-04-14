@@ -1,6 +1,4 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Linq;
 using Win10BloatRemover.UI;
 using Windows.ApplicationModel;
 using Windows.Management.Deployment;

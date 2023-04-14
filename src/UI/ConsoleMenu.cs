@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Win10BloatRemover.Operations;
+﻿using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover.UI;
 

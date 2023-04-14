@@ -1,7 +1,5 @@
 ﻿using Microsoft.Win32;
-using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;

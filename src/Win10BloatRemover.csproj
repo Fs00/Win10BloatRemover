@@ -4,24 +4,13 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <PlatformTarget>x86</PlatformTarget>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
 	<AssemblyTitle>Windows 10 Bloat Remover</AssemblyTitle>
 	<Product>Windows 10 Bloat Remover</Product>
 	<Copyright>Developed by Fs00</Copyright>
 	<Version>4.3</Version>
-  </PropertyGroup>
-  <PropertyGroup>
-	<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-	<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-	<AnalysisModeNaming>All</AnalysisModeNaming>
-	<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-	<AnalysisModeReliability>All</AnalysisModeReliability>
-	<AnalysisModeSecurity>All</AnalysisModeSecurity>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\License.txt" />
@@ -35,4 +24,22 @@
     <PackageReference Include="Microsoft.Dism" Version="2.5.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
+  <ItemGroup>
+	<TrimmerRootAssembly Include="Newtonsoft.Json" />
+  </ItemGroup>
+  <PropertyGroup>
+	<InvariantGlobalization>true</InvariantGlobalization>
+	<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+	<EventSourceSupport>false</EventSourceSupport>
+	<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+  </PropertyGroup>
+  <PropertyGroup>
+	<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+	<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+	<AnalysisModeNaming>All</AnalysisModeNaming>
+	<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+	<AnalysisModeReliability>All</AnalysisModeReliability>
+	<AnalysisModeSecurity>All</AnalysisModeSecurity>
+	<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+  </PropertyGroup>
 </Project>

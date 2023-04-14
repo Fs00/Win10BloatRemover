@@ -68,7 +68,7 @@ public class AppConfiguration
         }
     }
 
-    public static readonly AppConfiguration Default = new AppConfiguration {
+    public static readonly AppConfiguration Default = new() {
         ServicesToRemove = new[] {
             "dmwappushservice",
             "RetailDemo",
@@ -78,12 +78,14 @@ public class AppConfiguration
             UwpAppGroup.Bing,
             UwpAppGroup.Cortana,
             UwpAppGroup.CommunicationsApps,
-            UwpAppGroup.OneNote,
-            UwpAppGroup.OfficeHub,
             UwpAppGroup.HelpAndFeedback,
             UwpAppGroup.Maps,
             UwpAppGroup.Messaging,
+            UwpAppGroup.MixedReality,
             UwpAppGroup.Mobile,
+            UwpAppGroup.OneNote,
+            UwpAppGroup.OfficeHub,
+            UwpAppGroup.SolitaireCollection,
             UwpAppGroup.Skype,
             UwpAppGroup.Zune
         },

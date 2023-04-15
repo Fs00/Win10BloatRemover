@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover;
@@ -9,23 +9,18 @@ public class AppConfiguration
 {
     private const string CONFIGURATION_FILE_NAME = "config.json";
 
-    #nullable disable warnings
-    [JsonProperty(Required = Required.Always)]
-    public string[] ServicesToRemove { private set; get; }
+    public required string[] ServicesToRemove { get; init; }
+    public required UwpAppGroup[] UWPAppsToRemove { get; init; }
+    public required UwpAppRemovalMode UWPAppsRemovalMode { get; init; }
+    public required string[] ScheduledTasksToDisable { get; init; }
+    public required string[] WindowsFeaturesToRemove { get; init; }
 
-    [JsonProperty(Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
-    public UwpAppGroup[] UWPAppsToRemove { private set; get; }
-
-    [JsonProperty(Required = Required.Always)]
-    [JsonConverter(typeof(StringEnumConverter))]
-    public UwpAppRemovalMode UWPAppsRemovalMode { private set; get; }
-
-    [JsonProperty(Required = Required.Always)]
-    public string[] ScheduledTasksToDisable { private set; get; }
-
-    [JsonProperty(Required = Required.Always)]
-    public string[] WindowsFeaturesToRemove { private set; get; }
-    #nullable restore warnings
+    private static readonly JsonSerializerOptions serializerOptions = new() {
+        AllowTrailingCommas = true,
+        Converters = { new JsonStringEnumConverter() },
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        WriteIndented = true
+    };
 
     public static AppConfiguration LoadOrCreateFile()
     { 
@@ -44,9 +39,9 @@ public class AppConfiguration
         try
         {
             string settingsFileContent = File.ReadAllText(CONFIGURATION_FILE_NAME);
-            var parsedConfiguration = JsonConvert.DeserializeObject<AppConfiguration>(settingsFileContent);
+            var parsedConfiguration = JsonSerializer.Deserialize<AppConfiguration>(settingsFileContent, serializerOptions);
             if (parsedConfiguration == null)
-                throw new Exception("The file is empty.");
+                throw new Exception("The file does not contain a valid configuration.");
             return parsedConfiguration;
         }
         catch (Exception exc)
@@ -59,7 +54,7 @@ public class AppConfiguration
     {
         try
         {
-            string settingsFileContent = JsonConvert.SerializeObject(this, Formatting.Indented);
+            string settingsFileContent = JsonSerializer.Serialize(this, serializerOptions);
             File.WriteAllText(CONFIGURATION_FILE_NAME, settingsFileContent);
         }
         catch (Exception exc)

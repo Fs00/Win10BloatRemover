@@ -128,7 +128,7 @@ static class OS
         }
         catch (Exception exc)
         {
-            printer.PrintError($"An error occurred when deleting folder {path}: {exc.Message}");
+            printer.PrintWarning($"An error occurred while deleting folder {path}: {exc.Message}");
         }
     }
 

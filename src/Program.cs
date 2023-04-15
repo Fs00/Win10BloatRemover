@@ -98,14 +98,14 @@ static class Program
 
     private static void PrintConfigurationErrorMessage(AppConfigurationException exc)
     {
-        string errorMessage = "";
         if (exc is AppConfigurationLoadException)
-            errorMessage = $"An error occurred while loading settings file: {exc.Message}\n" +
-                            "Default settings have been loaded instead.\n";
+        {
+            ConsoleHelpers.WriteLine($"An error occurred while loading settings file:\n{exc.Message}\n", ConsoleColor.Red);
+            Console.WriteLine("Default settings have been loaded instead.\n");
+        }
         else if (exc is AppConfigurationWriteException)
-            errorMessage = $"Couldn't write default configuration to settings file: {exc.Message}\n";
+            ConsoleHelpers.WriteLine($"Default settings file could not be created: {exc.Message}\n", ConsoleColor.DarkYellow);
 
-        ConsoleHelpers.WriteLine(errorMessage, ConsoleColor.DarkYellow);
         Console.WriteLine("Press a key to continue to the main menu.");
         Console.ReadKey();
     }

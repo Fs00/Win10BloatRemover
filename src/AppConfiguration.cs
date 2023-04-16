@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Win10BloatRemover.Operations;
@@ -38,7 +39,7 @@ public class AppConfiguration
     {
         try
         {
-            string settingsFileContent = File.ReadAllText(CONFIGURATION_FILE_NAME);
+            string settingsFileContent = File.ReadAllText(CONFIGURATION_FILE_NAME, Encoding.UTF8);
             var parsedConfiguration = JsonSerializer.Deserialize<AppConfiguration>(settingsFileContent, serializerOptions);
             if (parsedConfiguration == null)
                 throw new Exception("The file does not contain a valid configuration.");
@@ -54,8 +55,8 @@ public class AppConfiguration
     {
         try
         {
-            string settingsFileContent = JsonSerializer.Serialize(this, serializerOptions);
-            File.WriteAllText(CONFIGURATION_FILE_NAME, settingsFileContent);
+            byte[] settingsFileContent = JsonSerializer.SerializeToUtf8Bytes(this, serializerOptions);
+            File.WriteAllBytes(CONFIGURATION_FILE_NAME, settingsFileContent);
         }
         catch (Exception exc)
         {

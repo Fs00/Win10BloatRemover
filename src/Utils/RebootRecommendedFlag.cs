@@ -1,4 +1,4 @@
-﻿namespace Win10BloatRemover;
+﻿namespace Win10BloatRemover.Utils;
 
 class RebootRecommendedFlag
 {

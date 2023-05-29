@@ -40,7 +40,6 @@ public enum UwpAppGroup
 
 public class UwpAppGroupRemover : IOperation
 {
-    // This dictionary contains the exact apps names corresponding to every defined group
     private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new() {
         { UwpAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
         { UwpAppGroup.Bing, new[] {
@@ -75,11 +74,7 @@ public class UwpAppGroupRemover : IOperation
         { UwpAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
         { UwpAppGroup.SoundRecorder, new[] { "Microsoft.WindowsSoundRecorder" } },
         { UwpAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
-        { UwpAppGroup.Store, new[] {
-            "Microsoft.WindowsStore",
-            "Microsoft.StorePurchaseApp",
-            "Microsoft.Services.Store.Engagement",
-        } },
+        { UwpAppGroup.Store, new[] { "Microsoft.WindowsStore", "Microsoft.StorePurchaseApp" } },
         { UwpAppGroup.Xbox, new[] {
             "Microsoft.XboxGameCallableUI",
             "Microsoft.XboxSpeechToTextOverlay",

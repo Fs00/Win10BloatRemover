@@ -105,7 +105,7 @@ class ConsoleMenu
             if (operation.IsRebootRecommended)
             {
                 ConsoleHelpers.WriteLine("\nA system reboot is recommended.", ConsoleColor.Cyan);
-                rebootFlag.SetRebootRecommended();
+                rebootFlag.SetRecommended();
             }
 
             if (entry.ShouldQuit)

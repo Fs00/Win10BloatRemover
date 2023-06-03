@@ -96,7 +96,8 @@ public class UwpAppGroupRemover : IOperation
 
     private int totalRemovedApps = 0;
 
-    public bool IsRebootRecommended { get; private set; }
+    private readonly RebootRecommendedFlag rebootFlag = new RebootRecommendedFlag();
+    public bool IsRebootRecommended => rebootFlag.IsRebootRecommended;
 
     public UwpAppGroupRemover(UwpAppGroup[] appsToRemove, UwpAppRemovalMode removalMode, IUserInterface ui,
                               AppxRemover appxRemover, ServiceRemover serviceRemover)
@@ -159,7 +160,6 @@ public class UwpAppGroupRemover : IOperation
             {
                 ui.PrintEmptySpace();
                 postUninstallOperationsForGroup[appGroup]();
-                IsRebootRecommended = true;
             }
         }
         catch (Exception exc)
@@ -176,24 +176,23 @@ public class UwpAppGroupRemover : IOperation
 
     private void RemoveMapsServicesAndTasks()
     {
-        new ScheduledTasksDisabler(new[] {
-            @"\Microsoft\Windows\Maps\MapsUpdateTask",
-            @"\Microsoft\Windows\Maps\MapsToastTask"
-        }, ui).Run();
-        serviceRemover.BackupAndRemove("MapsBroker", "lfsvc");
+        DisableScheduledTasks(@"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask");
+        RemoveServices("MapsBroker", "lfsvc");
     }
 
     private void RemoveXboxServicesAndTasks()
     {
-        new ScheduledTasksDisabler(new[] { @"Microsoft\XblGameSave\XblGameSaveTask" }, ui).Run();
-        serviceRemover.BackupAndRemove("XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc");
+        DisableScheduledTasks(@"Microsoft\XblGameSave\XblGameSaveTask");
+        RemoveServices("XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc");
+
         ui.PrintMessage("Disabling Xbox Game Bar...");
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
+        rebootFlag.SetRecommended();
     }
 
     private void RemoveMessagingService()
     {
-        serviceRemover.BackupAndRemove("MessagingService");
+        RemoveServices("MessagingService");
     }
 
     private void RemovePaint3DContextMenuEntries()
@@ -263,7 +262,9 @@ public class UwpAppGroupRemover : IOperation
 
     private void RemoveOneSyncServiceFeature()
     {
-        new FeaturesRemover(new[] { "OneCoreUAP.OneSync" }, ui).Run();
+        var featuresRemover = new FeaturesRemover(new[] { "OneCoreUAP.OneSync" }, ui);
+        featuresRemover.Run();
+        rebootFlag.UpdateIfNeeded(featuresRemover.IsRebootRecommended);
     }
 
     private void DisableStoreFeaturesAndServices()
@@ -275,7 +276,19 @@ public class UwpAppGroupRemover : IOperation
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
             "SilentInstalledAppsEnabled", 0
         );
+        rebootFlag.SetRecommended();
 
-        serviceRemover.BackupAndRemove("PushToInstall");
+        RemoveServices("PushToInstall");
+    }
+
+    private void DisableScheduledTasks(params string[] scheduledTasks)
+    {
+        new ScheduledTasksDisabler(scheduledTasks, ui).Run();
+    }
+
+    private void RemoveServices(params string[] services)
+    {
+        serviceRemover.BackupAndRemove(services);
+        rebootFlag.UpdateIfNeeded(serviceRemover.IsRebootRecommended);
     }
 }

@@ -22,9 +22,9 @@ public class FeaturesRemover : IOperation
         try
         {
             using var session = DismApi.OpenOnlineSessionEx(new DismSessionOptions { ThrowExceptionOnRebootRequired = false });
-            var capabilities = DismApi.GetCapabilities(session);
+            var allCapabilities = DismApi.GetCapabilities(session);
             foreach (string featureName in featuresToRemove)
-                RemoveCapabilitiesMatchingName(featureName, capabilities, session);
+                RemoveCapabilitiesMatchingName(featureName, allCapabilities, session);
 
             IsRebootRecommended = session.RebootRequired;
         }
@@ -34,9 +34,9 @@ public class FeaturesRemover : IOperation
         }
     }
 
-    private void RemoveCapabilitiesMatchingName(string featureName, DismCapabilityCollection capabilities, DismSession session)
+    private void RemoveCapabilitiesMatchingName(string featureName, DismCapabilityCollection allCapabilities, DismSession session)
     {
-        var matchingCapabilities = capabilities.Where(capability => capability.Name.StartsWith(featureName));
+        var matchingCapabilities = allCapabilities.Where(capability => capability.Name.StartsWith(featureName));
         if (!matchingCapabilities.Any())
         {
             ui.PrintWarning($"No features found with name {featureName}.");

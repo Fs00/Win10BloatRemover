@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
+using System.Threading;
 using Win10BloatRemover.UI;
 using Windows.ApplicationModel;
+using Windows.Foundation;
 using Windows.Management.Deployment;
 
 namespace Win10BloatRemover.Utils;
@@ -44,6 +46,12 @@ public class AppxRemover
         return new Result(removedApps, failedRemovals);
     }
 
+    private static bool IsSystemApp(Package package)
+    {
+        string systemAppsFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SystemApps";
+        return package.InstalledPath.StartsWith(systemAppsFolder);
+    }
+
     private abstract class RemovalMethod
     {
         protected readonly IUserInterface ui;
@@ -65,41 +73,36 @@ public class AppxRemover
             ui.PrintMessage($"Uninstalling app {appName}...");
             foreach (var package in appPackages)
             {
-                var outcome = TryRemoveAppPackage(package);
+                var outcome = RemoveAppPackage(package);
                 if (outcome == RemovalOutcome.Failure)
                     return outcome;
             }
             return RemovalOutcome.Success;
         }
 
-        private RemovalOutcome TryRemoveAppPackage(Package package)
+        protected RemovalOutcome HandleResult(IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> operation)
         {
-            try
+            using var completionEvent = new ManualResetEvent(false);
+            operation.Completed = (_, _) => { completionEvent.Set(); };
+            completionEvent.WaitOne();
+
+            if (operation.Status == AsyncStatus.Completed)
+                return RemovalOutcome.Success;
+            else
             {
-                return RemoveAppPackage(package);
-            }
-            catch (Exception exc)
-            {
-                PrintUninstallationError(exc);
+                PrintError(operation);
                 return RemovalOutcome.Failure;
             }
         }
 
-        protected void PrintUninstallationError(Exception exc)
+        private void PrintError(IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> operation)
         {
-            string errorMessage = "Uninstallation failed: ";
-            if (exc.InnerException != null)
-                errorMessage += exc.InnerException.Message;
-            else
-                errorMessage += exc.Message;
+            DeploymentResult result = operation.GetResults();
+            string errorMessage = operation.ErrorCode?.Message ?? "Unknown error occurred";
+            if (result.ExtendedErrorCode != null)
+                errorMessage += $": {result.ExtendedErrorCode.Message}";
 
             ui.PrintError(errorMessage);
-        }
-
-        protected bool IsSystemApp(Package package)
-        {
-            string systemAppsFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SystemApps";
-            return package.InstalledPath.StartsWith(systemAppsFolder);
         }
 
         protected abstract Package[] GetAppPackages(string appName);
@@ -128,8 +131,7 @@ public class AppxRemover
                 return RemovalOutcome.Failure;
             }
 
-            packageManager.RemovePackageAsync(package.Id.FullName).AsTask().Wait();
-            return RemovalOutcome.Success;
+            return HandleResult(packageManager.RemovePackageAsync(package.Id.FullName));
         }
     }
 
@@ -156,16 +158,9 @@ public class AppxRemover
                 return RemovalOutcome.NotInstalled;
 
             ui.PrintMessage($"Removing provisioned package for app {appName}...");
-            try
-            {
-                packageManager.DeprovisionPackageForAllUsersAsync(provisionedPackage.Id.FamilyName).AsTask().Wait();
-                return RemovalOutcome.Success;
-            }
-            catch (Exception exc)
-            {
-                PrintUninstallationError(exc);
-                return RemovalOutcome.Failure;
-            }
+            return HandleResult(
+                packageManager.DeprovisionPackageForAllUsersAsync(provisionedPackage.Id.FamilyName)
+            );
         }
 
         protected override Package[] GetAppPackages(string appName)
@@ -180,8 +175,9 @@ public class AppxRemover
             if (IsSystemApp(package))
                 MakeSystemAppRemovable(package);
 
-            packageManager.RemovePackageAsync(package.Id.FullName, RemovalOptions.RemoveForAllUsers).AsTask().Wait();
-            return RemovalOutcome.Success;
+            return HandleResult(
+                packageManager.RemovePackageAsync(package.Id.FullName, RemovalOptions.RemoveForAllUsers)
+            );
         }
 
         private void MakeSystemAppRemovable(Package package)

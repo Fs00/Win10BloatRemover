@@ -36,8 +36,7 @@ static class OS
 
     public static void ExecuteWindowsPromptCommand(string command, IMessagePrinter printer)
     {
-        Debug.WriteLine($"Command executed: {command}");
-        RunProcessBlockingWithOutput(SystemExecutablePath("cmd"), $@"/c ""{command}""", printer);
+        RunProcessBlockingWithOutput(SystemExecutablePath("cmd"), $@"/q /c ""{command}""", printer);
     }
 
     public static string SystemExecutablePath(string executableName)

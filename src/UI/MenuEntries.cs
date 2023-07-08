@@ -133,10 +133,10 @@ class PrivacySettingsTweakEntry : MenuEntry
             news and other services for your Microsoft account
           - denying access to sensitive data (location, documents, activities, account details, diagnostic info) to
             all UWP apps by default
+          - denying location access to Windows search
           - disabling voice activation for voice assistants (so that they can't always be listening)
           - disabling cloud synchronization of sensitive data (user activities, clipboard, text messages, passwords
             and app data)
-          - disabling web search in bottom search bar
 
         Whereas almost all of these settings are applied for all users, some of them will only be changed for the current
         user and for new users created after running this procedure.
@@ -207,6 +207,7 @@ class ConsumerFeaturesDisablingEntry : MenuEntry
           - Spotlight experiences and recommendations in Microsoft Edge
           - News and Interests
           - Search highlights
+          - Bing search in Windows search bar
           - Skype's Meet Now icon in the taskbar
           - automatic installation of suggested apps
           - cloud optimized content in the taskbar

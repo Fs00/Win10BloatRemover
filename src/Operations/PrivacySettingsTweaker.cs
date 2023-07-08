@@ -23,7 +23,7 @@ public class PrivacySettingsTweaker : IOperation
         AdjustPrivacySettings();
         DisableSensitiveDataSynchronization();
         DenySensitivePermissionsToApps();
-        DisableWebAndLocationAccessToSearch();
+        DenyLocationAccessToSearch();
     }
 
     private void AdjustPrivacySettings()
@@ -83,14 +83,8 @@ public class PrivacySettingsTweaker : IOperation
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy", "LetAppsActivateWithVoice", 2);
     }
 
-    private void DisableWebAndLocationAccessToSearch()
+    private void DenyLocationAccessToSearch()
     {
-        using RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Search");
-        key.SetValue("AllowSearchToUseLocation", 0);
-        key.SetValue("DisableWebSearch", 1);
-        key.SetValue("ConnectedSearchUseWeb", 0);
-
-        // This is required to disable web search on Home and Pro editions
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Policies\Microsoft\Windows\Explorer", "DisableSearchBoxSuggestions", 1);
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search", "AllowSearchToUseLocation", 0);
     }
 }

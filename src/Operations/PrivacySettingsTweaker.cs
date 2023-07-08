@@ -89,5 +89,8 @@ public class PrivacySettingsTweaker : IOperation
         key.SetValue("AllowSearchToUseLocation", 0);
         key.SetValue("DisableWebSearch", 1);
         key.SetValue("ConnectedSearchUseWeb", 0);
+
+        // This is required to disable web search on Home and Pro editions
+        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Policies\Microsoft\Windows\Explorer", "DisableSearchBoxSuggestions", 1);
     }
 }

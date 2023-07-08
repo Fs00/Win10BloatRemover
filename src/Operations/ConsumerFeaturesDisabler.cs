@@ -9,6 +9,8 @@ public class ConsumerFeaturesDisabler : IOperation
     private readonly IUserInterface ui;
     public ConsumerFeaturesDisabler(IUserInterface ui) => this.ui = ui;
 
+    public bool IsRebootRecommended { get; private set; }
+
     public void Run()
     {
         ui.PrintMessage("Writing values into the Registry...");
@@ -39,6 +41,8 @@ public class ConsumerFeaturesDisabler : IOperation
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search", "EnableDynamicContentInWSB", 0);
         // Programmable taskbar
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableCloudOptimizedContent", 1);
+
+        IsRebootRecommended = true;
     }
 
 }

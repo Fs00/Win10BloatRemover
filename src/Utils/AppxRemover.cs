@@ -99,8 +99,8 @@ public class AppxRemover
         {
             DeploymentResult result = operation.GetResults();
             string errorMessage = operation.ErrorCode?.Message ?? "Unknown error occurred";
-            if (result.ExtendedErrorCode != null)
-                errorMessage += $": {result.ExtendedErrorCode.Message}";
+            if (!string.IsNullOrEmpty(result.ErrorText))
+                errorMessage += $"\n{result.ErrorText}";
 
             ui.PrintError(errorMessage);
         }

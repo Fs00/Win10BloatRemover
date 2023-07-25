@@ -33,10 +33,25 @@ public class DefenderDisabler : IOperation
 
     public void Run()
     {
+        CheckForTamperProtection();
         DowngradeAntimalwarePlatform();
         EditWindowsRegistryKeys();
         RemoveDefenderServices();
         DisableDefenderScheduledTasks();
+    }
+
+    private void CheckForTamperProtection()
+    {
+        using var defenderFeaturesKey = RegistryUtils.LocalMachine64.OpenSubKey(@"SOFTWARE\Microsoft\Windows Defender\Features");
+        var tamperProtectionSetting = (int?) defenderFeaturesKey?.GetValue("TamperProtection");
+        if (tamperProtectionSetting == 5)
+        {
+            ui.PrintError("Defender antivirus cannot be disabled as tamper protection is still enabled.\n" +
+                          "In order to proceed, you need to open Windows Security app, go to \"Virus & threat protection\" -> \"Virus & threat\n" +
+                          "protection settings\" -> \"Manage settings\", turn off Tamper protection and then try again.");
+            ui.PrintEmptySpace();
+            throw new Exception("Defender tamper protection has been detected.");
+        }
     }
 
     // DisableAntiSpyware policy is not honored anymore on Defender antimalware platform version 4.18.2007.8+
@@ -51,7 +66,7 @@ public class DefenderDisabler : IOperation
         {
             ui.PrintWarning(
                 "Antimalware platform downgrade failed. This is likely happened because you have already disabled Windows Defender.\n" +
-                "If this is not your case, you can proceed anyway but be aware that Defender will not be disabled fully " +
+                "If this is not your case, you can proceed anyway but be aware that Defender will not be fully disabled\n" +
                 "if the antimalware platform has been updated to version 4.18.2007.8 or higher through Windows Update.");
             ui.ThrowIfUserDenies("Do you want to continue?");
         }

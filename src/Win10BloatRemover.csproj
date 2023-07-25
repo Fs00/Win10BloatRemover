@@ -10,7 +10,7 @@
 	<AssemblyTitle>Windows 10 Bloat Remover</AssemblyTitle>
 	<Product>Windows 10 Bloat Remover</Product>
 	<Copyright>Developed by Fs00</Copyright>
-	<Version>4.3</Version>
+	<Version>5.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\License.txt" />

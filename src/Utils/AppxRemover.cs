@@ -48,8 +48,7 @@ public class AppxRemover
 
     private static bool IsSystemApp(Package package)
     {
-        string systemAppsFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.Windows)}\SystemApps";
-        return package.InstalledPath.StartsWith(systemAppsFolder);
+        return package.SignatureKind == PackageSignatureKind.System;
     }
 
     private abstract class RemovalMethod

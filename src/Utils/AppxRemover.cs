@@ -97,7 +97,7 @@ public class AppxRemover
         private void PrintError(IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> operation)
         {
             DeploymentResult result = operation.GetResults();
-            string errorMessage = operation.ErrorCode?.Message ?? "Unknown error occurred";
+            string errorMessage = operation.ErrorCode?.Message?.Trim() ?? "Unknown error occurred";
             if (!string.IsNullOrEmpty(result.ErrorText))
                 errorMessage += $"\n{result.ErrorText}";
 

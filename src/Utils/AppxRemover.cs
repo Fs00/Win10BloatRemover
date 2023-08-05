@@ -1,5 +1,4 @@
-﻿using Microsoft.Dism;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.Threading;
 using Win10BloatRemover.UI;
 using Windows.ApplicationModel;
@@ -30,8 +29,8 @@ public class AppxRemover
 
     public Result RemoveAppsForAllUsers(params string[] appNames)
     {
-        using var allUsersRemovalMethod = new AllUsersRemovalMethod(ui);
-        return PerformAppsRemoval(appNames, allUsersRemovalMethod);
+        using var dismClient = new DismClient();
+        return PerformAppsRemoval(appNames, new AllUsersRemovalMethod(ui, dismClient));
     }
 
     private Result PerformAppsRemoval(string[] appNames, RemovalMethod removalMethod)
@@ -136,22 +135,13 @@ public class AppxRemover
         }
     }
 
-    private class AllUsersRemovalMethod : RemovalMethod, IDisposable
+    private class AllUsersRemovalMethod : RemovalMethod
     {
-        private readonly Lazy<DismSession> dismSession = new Lazy<DismSession>(() => {
-            DismApi.Initialize(DismLogLevel.LogErrorsWarningsInfo);
-            return DismApi.OpenOnlineSessionEx(new DismSessionOptions { ThrowExceptionOnRebootRequired = false });
-        });
+        private readonly DismClient dismClient;
 
-        public AllUsersRemovalMethod(IUserInterface ui) : base(ui) {}
-
-        public void Dispose()
+        public AllUsersRemovalMethod(IUserInterface ui, DismClient dismClient) : base(ui)
         {
-            if (dismSession.IsValueCreated)
-            {
-                dismSession.Value.Dispose();
-                DismApi.Shutdown();
-            }
+            this.dismClient = dismClient;
         }
 
         public override RemovalOutcome RemovePackagesForApp(string appName)
@@ -167,15 +157,14 @@ public class AppxRemover
 
         private RemovalOutcome RemoveAppProvisionedPackage(string appName)
         {
-            var provisionedPackage = DismApi.GetProvisionedAppxPackages(dismSession.Value)
-                .FirstOrDefault(package => package.DisplayName == appName);
+            var provisionedPackage = dismClient.FindAppxProvisionedPackageByName(appName);
             if (provisionedPackage == null)
                 return RemovalOutcome.NotInstalled;
 
             ui.PrintMessage($"Removing provisioned package for app {appName}...");
             try
             {
-                DismApi.RemoveProvisionedAppxPackage(dismSession.Value, provisionedPackage.PackageName);
+                dismClient.RemoveAppxProvisionedPackage(provisionedPackage.PackageName);
                 return RemovalOutcome.Success;
             }
             catch (Exception exc)

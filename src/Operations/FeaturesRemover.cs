@@ -1,5 +1,6 @@
 ﻿using Microsoft.Dism;
 using Win10BloatRemover.UI;
+using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
@@ -18,23 +19,15 @@ public class FeaturesRemover : IOperation
 
     public void Run()
     {
-        DismApi.Initialize(DismLogLevel.LogErrorsWarningsInfo);
-        try
-        {
-            using var session = DismApi.OpenOnlineSessionEx(new DismSessionOptions { ThrowExceptionOnRebootRequired = false });
-            var allCapabilities = DismApi.GetCapabilities(session);
-            foreach (string featureName in featuresToRemove)
-                RemoveCapabilitiesMatchingName(featureName, allCapabilities, session);
+        using var dismClient = new DismClient();
+        var allCapabilities = dismClient.GetCapabilities();
+        foreach (string featureName in featuresToRemove)
+            RemoveCapabilitiesMatchingName(featureName, allCapabilities, dismClient);
 
-            IsRebootRecommended = session.RebootRequired;
-        }
-        finally
-        {
-            DismApi.Shutdown();
-        }
+        IsRebootRecommended = dismClient.IsRebootRequired;
     }
 
-    private void RemoveCapabilitiesMatchingName(string featureName, DismCapabilityCollection allCapabilities, DismSession session)
+    private void RemoveCapabilitiesMatchingName(string featureName, DismCapabilityCollection allCapabilities, DismClient dismClient)
     {
         var matchingCapabilities = allCapabilities.Where(capability => capability.Name.StartsWith(featureName));
         if (!matchingCapabilities.Any())
@@ -44,10 +37,10 @@ public class FeaturesRemover : IOperation
         }
 
         foreach (var capability in matchingCapabilities)
-            TryRemoveCapability(capability, session);
+            TryRemoveCapability(capability, dismClient);
     }
 
-    private void TryRemoveCapability(DismCapability capability, DismSession session)
+    private void TryRemoveCapability(DismCapability capability, DismClient dismClient)
     {
         if (capability.State != DismPackageFeatureState.Installed)
         {
@@ -58,7 +51,7 @@ public class FeaturesRemover : IOperation
         try
         {
             ui.PrintMessage($"Removing feature {capability.Name}...");
-            DismApi.RemoveCapability(session, capability.Name);
+            dismClient.RemoveCapability(capability.Name);
 
             if (capability.Name.StartsWith("Hello.Face"))
                 new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();

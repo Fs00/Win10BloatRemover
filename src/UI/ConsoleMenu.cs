@@ -1,4 +1,5 @@
-﻿using Win10BloatRemover.Operations;
+﻿using System.Diagnostics;
+using Win10BloatRemover.Operations;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.UI;
@@ -119,9 +120,7 @@ class ConsoleMenu
         catch (Exception exc)
         {
             ConsoleHelpers.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
-            #if DEBUG
-            ConsoleHelpers.WriteLine(exc.StackTrace, ConsoleColor.Red);
-            #endif
+            Trace.WriteLine(exc.StackTrace);
             Console.WriteLine();
         }
 

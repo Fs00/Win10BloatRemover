@@ -78,17 +78,16 @@ static class OS
         }
     }
 
-    public static ExitCode RunProcessBlocking(string name, string args)
+    public static ExitCode RunProcessBlocking(string fileName, string args)
     {
-        using var process = CreateProcessInstance(name, args);
+        using var process = CreateProcessInstance(fileName, args);
         process.Start();
-        process.WaitForExit();
-        return new ExitCode(process.ExitCode);
+        return process.WaitForExitCode();
     }
 
-    public static ExitCode RunProcessBlockingWithOutput(string name, string args, IMessagePrinter printer)
+    public static ExitCode RunProcessBlockingWithOutput(string fileName, string args, IMessagePrinter printer)
     {
-        using var process = CreateProcessInstance(name, args);
+        using var process = CreateProcessInstance(fileName, args);
         process.OutputDataReceived += (_, evt) => {
             if (!string.IsNullOrEmpty(evt.Data))
                 printer.PrintMessage(evt.Data);
@@ -101,15 +100,14 @@ static class OS
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        process.WaitForExit();
-        return new ExitCode(process.ExitCode);
+        return process.WaitForExitCode();
     }
 
-    private static Process CreateProcessInstance(string name, string args)
+    private static Process CreateProcessInstance(string fileName, string args)
     {
         return new Process {
             StartInfo = new ProcessStartInfo {
-                FileName = name,
+                FileName = fileName,
                 Arguments = args,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -117,6 +115,13 @@ static class OS
                 CreateNoWindow = true
             }
         };
+    }
+
+    private static ExitCode WaitForExitCode(this Process process)
+    {
+        process.WaitForExit();
+        Trace.WriteLine($"-- Process {process.StartInfo.FileName} exited with code {process.ExitCode}");
+        return new ExitCode(process.ExitCode);
     }
 
     public static void TryDeleteDirectoryIfExists(string path, IMessagePrinter printer)

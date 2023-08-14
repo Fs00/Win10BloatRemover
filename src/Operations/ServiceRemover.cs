@@ -129,7 +129,6 @@ public class ServiceRemover
         {
             // Unstoppable (but not protected) system services are not removable with SC,
             // but can be removed by deleting their Registry keys
-            Debug.WriteLine($"SC removal failed with exit code {scExitCode} for service {service}.");
             DeleteServiceRegistryKey(service);
         }
     }

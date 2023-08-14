@@ -9,10 +9,10 @@ static class Program
 {
     private const int MINIMUM_SUPPORTED_WINDOWS_BUILD = 19044;  // 21H2 build
 
-    private static void Main()
+    private static void Main(string[] args)
     {
-        using var consoleListener = new ConsoleTraceListener();
-        Trace.Listeners.Add(consoleListener);
+        if (IsTraceOutputEnabled(args))
+            Trace.Listeners.Add(new ConsoleTraceListener());
 
         Console.Title = "Windows 10 Bloat Remover and Tweaker";
         if (!HasAdministratorRights())
@@ -26,6 +26,8 @@ static class Program
         var menu = new ConsoleMenu(CreateMenuEntries(configuration, rebootFlag), rebootFlag);
         menu.RunLoopUntilExitRequested();
     }
+
+    private static bool IsTraceOutputEnabled(string[] args) => args.Contains("--show-trace-output");
 
     private static MenuEntry[] CreateMenuEntries(AppConfiguration configuration, RebootRecommendedFlag rebootFlag)
     {

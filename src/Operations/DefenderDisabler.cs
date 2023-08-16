@@ -42,9 +42,12 @@ public class DefenderDisabler : IOperation
 
     private void CheckForTamperProtection()
     {
+        const int ENABLED_AUTOMATICALLY = 1;
+        const int ENABLED_BY_USER = 5;
+
         using var defenderFeaturesKey = RegistryUtils.LocalMachine64.OpenSubKey(@"SOFTWARE\Microsoft\Windows Defender\Features");
         var tamperProtectionSetting = (int?) defenderFeaturesKey?.GetValue("TamperProtection");
-        if (tamperProtectionSetting == 5)
+        if (tamperProtectionSetting is ENABLED_AUTOMATICALLY or ENABLED_BY_USER)
         {
             ui.PrintError("Defender antivirus cannot be disabled as tamper protection is still enabled.\n" +
                           "In order to proceed, you need to open Windows Security app, go to \"Virus & threat protection\" -> \"Virus & threat\n" +

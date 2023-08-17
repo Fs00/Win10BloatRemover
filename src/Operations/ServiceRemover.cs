@@ -51,7 +51,8 @@ public class ServiceRemover
     public ServiceRemover(IUserInterface ui, DateTime now)
     {
         this.ui = ui;
-        backupDirectory = new DirectoryInfo($"servicesBackup_{now:yyyy-MM-dd_HH-mm-ss}");
+        string backupDirectoryPath = Path.Join(AppContext.BaseDirectory, $"servicesBackup_{now:yyyy-MM-dd_HH-mm-ss}");
+        backupDirectory = new DirectoryInfo(backupDirectoryPath);
     }
 
     public void BackupAndRemove(params string[] servicesToRemove)

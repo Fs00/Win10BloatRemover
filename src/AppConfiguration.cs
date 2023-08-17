@@ -8,14 +8,13 @@ namespace Win10BloatRemover;
 
 public class AppConfiguration
 {
-    private const string CONFIGURATION_FILE_NAME = "config.json";
-
     public required string[] ServicesToRemove { get; init; }
     public required UwpAppGroup[] UWPAppsToRemove { get; init; }
     public required UwpAppRemovalMode UWPAppsRemovalMode { get; init; }
     public required string[] ScheduledTasksToDisable { get; init; }
     public required string[] WindowsFeaturesToRemove { get; init; }
 
+    private static readonly string configurationFilePath = Path.Join(AppContext.BaseDirectory, "config.json");
     private static readonly JsonSerializerOptions serializerOptions = new() {
         AllowTrailingCommas = true,
         Converters = { new JsonStringEnumConverter() },
@@ -25,7 +24,7 @@ public class AppConfiguration
 
     public static AppConfiguration LoadOrCreateFile()
     { 
-        if (File.Exists(CONFIGURATION_FILE_NAME))
+        if (File.Exists(configurationFilePath))
         {
             var loadedConfiguration = LoadFromFile();
             return loadedConfiguration;
@@ -39,7 +38,7 @@ public class AppConfiguration
     {
         try
         {
-            string settingsFileContent = File.ReadAllText(CONFIGURATION_FILE_NAME, Encoding.UTF8);
+            string settingsFileContent = File.ReadAllText(configurationFilePath, Encoding.UTF8);
             var parsedConfiguration = JsonSerializer.Deserialize<AppConfiguration>(settingsFileContent, serializerOptions);
             if (parsedConfiguration == null)
                 throw new Exception("The file does not contain a valid configuration.");
@@ -56,7 +55,7 @@ public class AppConfiguration
         try
         {
             byte[] settingsFileContent = JsonSerializer.SerializeToUtf8Bytes(this, serializerOptions);
-            File.WriteAllBytes(CONFIGURATION_FILE_NAME, settingsFileContent);
+            File.WriteAllBytes(configurationFilePath, settingsFileContent);
         }
         catch (Exception exc)
         {

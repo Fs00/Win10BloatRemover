@@ -6,28 +6,32 @@ This configurable tool provides an interactive command-line interface to aggress
 
 Here's what it can do for you:
 
-* **Make system apps removable** by editing an internal system database. Thanks to this, system UWP apps like legacy Edge and Security Center can be uninstalled in Settings app or via PowerShell commands. Take note that system apps can be reinstalled by Windows cumulative updates.  
 * **Remove pre-installed UWP apps:** uninstalls the apps specified by the user either for the current Windows user or for all users (see *Configuration* section below, options `UWPAppsToRemove` and `UWPAppsRemovalMode`). When apps are uninstalled for all users, their corresponding provisioned packages are deleted too (if present), so that they won't get reinstalled for new users or after feature updates. 
 * **Remove Microsoft Edge:** uninstalls the newer Chromium-based Edge and the legacy UWP version of the browser, which are both pre-installed in recent versions of the OS.
 * **Disable OS telemetry:** disables several Windows components that collect diagnostic and usage information such as Compatibility Telemetry, Inventory, Device Census, Customer Experience Improvement Program and others. It also deletes the services which are responsible for data reporting to Microsoft.
 * **Remove system services:** deletes - not just disables - the services specified by the user (see *Configuration* section below, option `ServicesToRemove`) after backing up their Registry keys, so that you can restore them if anything breaks.
 * **Tweak Windows settings for enhanced privacy:** makes Windows more privacy-respectful by turning off certain system features that put your personal data at risk, such as inking/typing personalization, app launch tracking, clipboard/text messages synchronization, voice activation and some more. Take note that the goal here is to provide a mindful balance that leans towards privacy, without sacrificing too much in terms of user experience.
-* **Disable Windows Defender:** disables the antivirus (*not* the firewall) that comes pre-installed on the OS and removes its background services. It also disables SmartScreen protection, as [it sends sensitive data to Microsoft](https://www.bleepingcomputer.com/news/microsoft/windows-10-smartscreen-sends-urls-and-app-names-to-microsoft/). *Only for tech-savvy users!⚠️*
+* **Disable Windows Defender:** disables the antivirus (*not* the firewall) that comes pre-installed on the OS and removes its background services. It also disables SmartScreen protection, as [it sends sensitive data to Microsoft](https://www.bleepingcomputer.com/news/microsoft/windows-10-smartscreen-sends-urls-and-app-names-to-microsoft/). *Only for tech-savvy users!*
 * **Remove OneDrive** using the uninstaller provided by Microsoft, its folder in Explorer sidebar will also be hidden. Furthermore, its automatic setup will be disabled to prevent the app from being installed for new users.
-* **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities) specified by the user (see *Configuration* section below, option `WindowsFeaturesToRemove`).
-* **Disable automatic updates:** prevents automatic download and installing of Windows and Store apps updates through Group Policies. Take note that **automatic Windows Updates can't be disabled on Windows 10 Home.**
+* **Remove Windows features:** uninstalls the [Feature-On-Demand (FOD) capabilities](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/features-on-demand-v2--capabilities?view=windows-10) specified by the user (see *Configuration* section below, option `WindowsFeaturesToRemove`).
+* **Disable automatic updates:** prevents automatic download and installation of Windows and Store apps updates. Take note that **automatic Windows Updates cannot be disabled on Windows 10 Home.**
 * **Disable Windows Error Reporting (WER)**: thanks to this, Windows will no longer "check for a solution to the problem" when a program crashes.
-* **Disable suggestions, cloud-based content** (including Spotlight and News and Interests) **and feedback requests** through Group Policies
+* **Disable consumer features**: turns off several superfluous and distracting features such as Spotlight, News and Interests, Search highlights, Meet Now, automatic installation of suggested apps and some more.
+* **Disable suggestions and feedback requests** by changing relevant Group Policies and system settings
 * **Disable scheduled tasks** specified by the user (see *Configuration* section below, option `ScheduledTasksToDisable`)
 
 Be aware that while most of these operations can be reverted with a system restore point, **some of them cannot** (uninstalling FODs/provisioned app packages), and carry over after major Windows updates and full system restores.
 
-Unless otherwise specified, operations are applied to all users in the system. However, some of them (*Disable suggestions, cloud content and feedback requests*, *Disable Windows Defender antivirus* and *Tweak settings for privacy*) can not be fully applied to other users that have been created *before* those operations have been run, due to how user registry hives work.  
+Unless otherwise specified, operations are applied to all users in the system. However, some of them (*Remove OneDrive*, *Disable suggestions and feedback requests*, *Disable consumer features*, *Disable Windows Defender antivirus* and *Tweak settings for privacy*) can not be fully applied to other users that have been created *before* those operations have been run.  
 Therefore, in order to have the maximum effect, it is recommended to **run this tool before creating any other user in the system.**
 
 It is also highly recommended to **re-run the operations every time a Windows feature update is installed** (especially if Windows Upgrade Assistant is used), since all system services and some default settings get restored by the upgrade process.
 
 👉 **Head to [Releases](https://github.com/Fs00/Win10BloatRemover/releases) to download the latest version.**
+
+⚠️ In some rare cases, **Windows Defender might identify the tool as a malware** and quarantine it.  
+This is obviously a false positive and is likely due to the fact that the techniques used to disable Defender may resemble some malware-like behavior to the antivirus.  
+Release artifacts are built by GitHub Actions from the source code stored in this repository and are provided as-is, with no modifications.
 
 ## Configuration
 Program settings are stored in [JSON format](https://en.wikipedia.org/wiki/JSON) in a file called *config.json*, located in the same folder as the program's executable. If said file is not found (e.g. when launching the tool for the first time), it is created containing the default settings.
@@ -67,7 +71,7 @@ Configures which pre-installed UWP apps should be uninstalled. Take note that yo
 **Default value:** an array containing some of the app groups listed above
 
 ### `UWPAppsRemovalMode`
-Configures whether to remove UWP apps for all present and future users (which is the default) or just for the current user. Take note that trying to remove system apps only for the current user might not always work.
+Configures whether to remove UWP apps for all present and future users (which is the default) or just for the current user.
 
 **Allowed values:** `"AllUsers"` or `"CurrentUser"`  
 **Default value:** `"AllUsers"`
@@ -104,5 +108,6 @@ You can find the names of all FOD capabilities available for your system (includ
 ## Credits
 This tool was originally based on Federico Dossena's [Windows 10 de-botnet guide](https://github.com/adolfintel/Windows10-Privacy), which is now discontinued.  
 Over time, the program evolved on its own, taking sometimes inspiration from the work made by other open source developers:
-  - [**privacy.sexy** website](https://github.com/undergroundwires/privacy.sexy) by @undergroundwires
-  - [**Debloat Windows 10** scripts](https://github.com/W4RH4WK/Debloat-Windows-10) by @W4RH4WK
+  - [**privacy.sexy** website](https://privacy.sexy) by [@undergroundwires](https://github.com/undergroundwires)
+  - [**Debloat Windows 10** scripts](https://github.com/W4RH4WK/Debloat-Windows-10) by [@W4RH4WK](https://github.com/W4RH4WK)
+  - [Edge Removal script](https://github.com/AveYo/fox) by [@AveYo](https://github.com/AveYo)

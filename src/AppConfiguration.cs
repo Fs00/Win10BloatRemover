@@ -15,12 +15,6 @@ public class AppConfiguration
     public required string[] WindowsFeaturesToRemove { get; init; }
 
     private static readonly string configurationFilePath = Path.Join(AppContext.BaseDirectory, "config.json");
-    private static readonly JsonSerializerOptions serializerOptions = new() {
-        AllowTrailingCommas = true,
-        Converters = { new JsonStringEnumConverter() },
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        WriteIndented = true
-    };
 
     public static AppConfiguration LoadOrCreateFile()
     { 
@@ -39,7 +33,7 @@ public class AppConfiguration
         try
         {
             string settingsFileContent = File.ReadAllText(configurationFilePath, Encoding.UTF8);
-            var parsedConfiguration = JsonSerializer.Deserialize<AppConfiguration>(settingsFileContent, serializerOptions);
+            var parsedConfiguration = JsonSerializer.Deserialize(settingsFileContent, AppConfigurationSerializerContext.Default.AppConfiguration);
             if (parsedConfiguration == null)
                 throw new Exception("The file does not contain a valid configuration.");
             return parsedConfiguration;
@@ -54,7 +48,7 @@ public class AppConfiguration
     {
         try
         {
-            byte[] settingsFileContent = JsonSerializer.SerializeToUtf8Bytes(this, serializerOptions);
+            byte[] settingsFileContent = JsonSerializer.SerializeToUtf8Bytes(this, AppConfigurationSerializerContext.Default.AppConfiguration);
             File.WriteAllBytes(configurationFilePath, settingsFileContent);
         }
         catch (Exception exc)
@@ -112,6 +106,15 @@ public class AppConfiguration
         UWPAppsRemovalMode = UwpAppRemovalMode.AllUsers
     };
 }
+
+[JsonSerializable(typeof(AppConfiguration))]
+[JsonSourceGenerationOptions(
+    AllowTrailingCommas = true,
+    ReadCommentHandling = JsonCommentHandling.Skip,
+    WriteIndented = true,
+    UseStringEnumConverter = true
+)]
+internal partial class AppConfigurationSerializerContext : JsonSerializerContext {}
 
 abstract class AppConfigurationException : Exception
 {

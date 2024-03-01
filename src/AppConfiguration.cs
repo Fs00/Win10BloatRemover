@@ -116,17 +116,6 @@ public class AppConfiguration
 )]
 internal partial class AppConfigurationSerializerContext : JsonSerializerContext {}
 
-abstract class AppConfigurationException : Exception
-{
-    protected AppConfigurationException(string message) : base(message) {}
-}
-
-class AppConfigurationLoadException : AppConfigurationException
-{
-    public AppConfigurationLoadException(string message) : base(message) {}
-}
-
-class AppConfigurationWriteException : AppConfigurationException
-{
-    public AppConfigurationWriteException(string message) : base(message) {}
-}
+abstract class AppConfigurationException(string message) : Exception(message) {}
+class AppConfigurationLoadException(string message) : AppConfigurationException(message) {}
+class AppConfigurationWriteException(string message) : AppConfigurationException(message) {}

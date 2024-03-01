@@ -4,11 +4,8 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class AutoUpdatesDisabler : IOperation
+public class AutoUpdatesDisabler(IUserInterface ui) : IOperation
 {
-    private readonly IUserInterface ui;
-    public AutoUpdatesDisabler(IUserInterface ui) => this.ui = ui;
-
     public void Run()
     {
         ui.PrintMessage("Writing values into the Registry...");

@@ -8,17 +8,8 @@ using Version = System.Version;
 
 namespace Win10BloatRemover.Operations;
 
-public class EdgeRemover : IOperation
+public class EdgeRemover(IUserInterface ui, AppxRemover appxRemover) : IOperation
 {
-    private readonly IUserInterface ui;
-    private readonly AppxRemover appxRemover;
-
-    public EdgeRemover(IUserInterface ui, AppxRemover appxRemover)
-    {
-        this.ui = ui;
-        this.appxRemover = appxRemover;
-    }
-
     public void Run()
     {
         UninstallEdgeChromium();

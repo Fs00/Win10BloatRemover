@@ -4,21 +4,13 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.UI;
 
-class ConsoleMenu
+class ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
 {
     private const int FirstMenuEntryNumber = 1;
 
     private bool exitRequested = false;
-    private readonly MenuEntry[] entries;
-    private readonly RebootRecommendedFlag rebootFlag;
 
     private static readonly Version programVersion = typeof(ConsoleMenu).Assembly.GetName().Version!;
-
-    public ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
-    {
-        this.entries = entries;
-        this.rebootFlag = rebootFlag;
-    }
 
     public void RunLoopUntilExitRequested()
     {

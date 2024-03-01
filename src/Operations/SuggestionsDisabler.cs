@@ -4,11 +4,8 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class SuggestionsDisabler : IOperation
+public class SuggestionsDisabler(IUserInterface ui) : IOperation
 {
-    private readonly IUserInterface ui;
-    public SuggestionsDisabler(IUserInterface ui) => this.ui = ui;
-
     public void Run()
     {
         DisableSuggestions();

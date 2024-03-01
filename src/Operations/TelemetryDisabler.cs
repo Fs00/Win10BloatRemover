@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class TelemetryDisabler : IOperation
+public class TelemetryDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
     private static readonly string[] telemetryServices = [
         "DiagTrack",
@@ -34,16 +34,7 @@ public class TelemetryDisabler : IOperation
         @"\Microsoft\Windows\PI\Sqm-Tasks"
     ];
 
-    private readonly IUserInterface ui;
-    private readonly ServiceRemover serviceRemover;
-
     public bool IsRebootRecommended { get; private set; }
-
-    public TelemetryDisabler(IUserInterface ui, ServiceRemover serviceRemover)
-    {
-        this.ui = ui;
-        this.serviceRemover = serviceRemover;
-    }
 
     public void Run()
     {

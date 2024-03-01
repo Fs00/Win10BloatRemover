@@ -6,12 +6,8 @@ using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations;
 
-public class OneDriveRemover : IOperation
+public class OneDriveRemover(IUserInterface ui) : IOperation
 {
-    private readonly IUserInterface ui;
-
-    public OneDriveRemover(IUserInterface ui) => this.ui = ui;
-
     public void Run()
     {
         DisableOneDrive();

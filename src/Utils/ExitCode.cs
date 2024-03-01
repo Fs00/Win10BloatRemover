@@ -1,13 +1,8 @@
 ﻿namespace Win10BloatRemover.Utils;
 
-public readonly struct ExitCode
+public readonly struct ExitCode(int code)
 {
-    private readonly int code;
-
-    public ExitCode(int code)
-    {
-        this.code = code;
-    }
+    private readonly int code = code;
 
     public bool IsSuccessful() => code == 0;
     public bool IsNotSuccessful() => !IsSuccessful();

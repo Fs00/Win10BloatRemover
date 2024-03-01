@@ -2,15 +2,8 @@
 
 namespace Win10BloatRemover.Operations;
 
-public class BrowserOpener : IOperation
+public class BrowserOpener(string url) : IOperation
 {
-    private readonly string url;
-
-    public BrowserOpener(string url)
-    {
-        this.url = url;
-    }
-
     public void Run()
     {
         var startInfo = new ProcessStartInfo {

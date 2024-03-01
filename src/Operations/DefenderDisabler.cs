@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class DefenderDisabler : IOperation
+public class DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
     private static readonly string[] defenderServices = [
         "wscsvc",
@@ -20,16 +20,7 @@ public class DefenderDisabler : IOperation
         @"\Microsoft\Windows\Windows Defender\Windows Defender Verification"
     ];
 
-    private readonly IUserInterface ui;
-    private readonly ServiceRemover serviceRemover;
-
     public bool IsRebootRecommended { get; private set; }
-
-    public DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover)
-    {
-        this.ui = ui;
-        this.serviceRemover = serviceRemover;
-    }
 
     public void Run()
     {

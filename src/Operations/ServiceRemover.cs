@@ -1,25 +1,13 @@
 ﻿using Microsoft.Win32;
-using System.Diagnostics;
 using System.IO;
 using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class ServiceRemovalOperation : IOperation
+public class ServiceRemovalOperation(string[] servicesToRemove, IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
-    private readonly string[] servicesToRemove;
-    private readonly IUserInterface ui;
-    private readonly ServiceRemover serviceRemover;
-
     public bool IsRebootRecommended => serviceRemover.IsRebootRecommended;
-
-    public ServiceRemovalOperation(string[] servicesToRemove, IUserInterface ui, ServiceRemover serviceRemover)
-    {
-        this.servicesToRemove = servicesToRemove;
-        this.ui = ui;
-        this.serviceRemover = serviceRemover;
-    }
 
     public void Run()
     {

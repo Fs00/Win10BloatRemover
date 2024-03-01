@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class PrivacySettingsTweaker : IOperation
+public class PrivacySettingsTweaker(IUserInterface ui) : IOperation
 {
     private static readonly string[] appPermissionsToDeny = [
         "location",
@@ -13,9 +13,6 @@ public class PrivacySettingsTweaker : IOperation
         "appDiagnostics",
         "userAccountInformation"
     ];
-
-    private readonly IUserInterface ui;
-    public PrivacySettingsTweaker(IUserInterface ui) => this.ui = ui;
 
     public void Run()
     {

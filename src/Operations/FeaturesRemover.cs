@@ -4,18 +4,9 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class FeaturesRemover : IOperation
+public class FeaturesRemover(string[] featuresToRemove, IUserInterface ui) : IOperation
 {
-    private readonly string[] featuresToRemove;
-    private readonly IUserInterface ui;
-
     public bool IsRebootRecommended { get; private set; }
-
-    public FeaturesRemover(string[] featuresToRemove, IUserInterface ui)
-    {
-        this.featuresToRemove = featuresToRemove;
-        this.ui = ui;
-    }
 
     public void Run()
     {

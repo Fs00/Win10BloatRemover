@@ -7,7 +7,7 @@ using Windows.Management.Deployment;
 
 namespace Win10BloatRemover.Utils;
 
-public class AppxRemover
+public class AppxRemover(IUserInterface ui)
 {
     public readonly record struct Result(int RemovedApps, int FailedRemovals);
 
@@ -17,10 +17,6 @@ public class AppxRemover
         Success,
         Failure
     }
-
-    private readonly IUserInterface ui;
-
-    public AppxRemover(IUserInterface ui) => this.ui = ui;
 
     public Result RemoveAppsForCurrentUser(params string[] appNames)
     {
@@ -52,12 +48,10 @@ public class AppxRemover
         return package.SignatureKind == PackageSignatureKind.System;
     }
 
-    private abstract class RemovalMethod
+    private abstract class RemovalMethod(IUserInterface ui)
     {
-        protected readonly IUserInterface ui;
+        protected readonly IUserInterface ui = ui;
         protected readonly PackageManager packageManager = new PackageManager();
-
-        protected RemovalMethod(IUserInterface ui) => this.ui = ui;
 
         public virtual RemovalOutcome RemovePackagesForApp(string appName)
         {
@@ -109,10 +103,8 @@ public class AppxRemover
         protected abstract RemovalOutcome RemoveAppPackage(Package package);
     }
 
-    private class CurrentUserRemovalMethod : RemovalMethod
+    private class CurrentUserRemovalMethod(IUserInterface ui) : RemovalMethod(ui)
     {
-        public CurrentUserRemovalMethod(IUserInterface ui) : base(ui) {}
-
         protected override Package[] GetAppPackages(string appName)
         {
             const string currentUser = "";
@@ -135,15 +127,8 @@ public class AppxRemover
         }
     }
 
-    private class AllUsersRemovalMethod : RemovalMethod
+    private class AllUsersRemovalMethod(IUserInterface ui, DismClient dismClient) : RemovalMethod(ui)
     {
-        private readonly DismClient dismClient;
-
-        public AllUsersRemovalMethod(IUserInterface ui, DismClient dismClient) : base(ui)
-        {
-            this.dismClient = dismClient;
-        }
-
         public override RemovalOutcome RemovePackagesForApp(string appName)
         {
             // Starting from version 2004, uninstalling an app for all users raises an error

@@ -3,23 +3,14 @@ using Win10BloatRemover.UI;
 
 namespace Win10BloatRemover.Operations;
 
-public class ErrorReportingDisabler : IOperation
+public class ErrorReportingDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
     private static readonly string[] errorReportingServices = ["WerSvc", "wercplsupport"];
     private static readonly string[] errorReportingScheduledTasks = [
         @"\Microsoft\Windows\Windows Error Reporting\QueueReporting"
     ];
 
-    private readonly IUserInterface ui;
-    private readonly ServiceRemover serviceRemover;
-
     public bool IsRebootRecommended => serviceRemover.IsRebootRecommended;
-
-    public ErrorReportingDisabler(IUserInterface ui, ServiceRemover serviceRemover)
-    {
-        this.ui = ui;
-        this.serviceRemover = serviceRemover;
-    }
 
     public void Run()
     {

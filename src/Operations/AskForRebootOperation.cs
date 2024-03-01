@@ -3,17 +3,8 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-class AskForRebootOperation : IOperation
+class AskForRebootOperation(IUserInterface ui, RebootRecommendedFlag rebootFlag) : IOperation
 {
-    private readonly IUserInterface ui;
-    private readonly RebootRecommendedFlag rebootFlag;
-
-    public AskForRebootOperation(IUserInterface ui, RebootRecommendedFlag rebootFlag)
-    {
-        this.ui = ui;
-        this.rebootFlag = rebootFlag;
-    }
-
     public void Run()
     {
         if (rebootFlag.IsRebootRecommended)

@@ -11,12 +11,8 @@ abstract class MenuEntry
     public abstract IOperation CreateNewOperation(IUserInterface ui);
 }
 
-class UWPAppRemovalEntry : MenuEntry
+class UWPAppRemovalEntry(AppConfiguration configuration) : MenuEntry
 {
-    private readonly AppConfiguration configuration;
-
-    public UWPAppRemovalEntry(AppConfiguration configuration) => this.configuration = configuration;
-
     public override string FullName => "Remove UWP apps";
     public override string GetExplanation()
     {
@@ -83,12 +79,8 @@ class OneDriveRemovalEntry : MenuEntry
     public override IOperation CreateNewOperation(IUserInterface ui) => new OneDriveRemover(ui);
 }
 
-class ServicesRemovalEntry : MenuEntry
+class ServicesRemovalEntry(AppConfiguration configuration) : MenuEntry
 {
-    private readonly AppConfiguration configuration;
-
-    public ServicesRemovalEntry(AppConfiguration configuration) => this.configuration = configuration;
-
     public override string FullName => "Remove miscellaneous services";
     public override string GetExplanation()
     {
@@ -102,12 +94,8 @@ class ServicesRemovalEntry : MenuEntry
         => new ServiceRemovalOperation(configuration.ServicesToRemove, ui, new ServiceRemover(ui));
 }
 
-class WindowsFeaturesRemovalEntry : MenuEntry
+class WindowsFeaturesRemovalEntry(AppConfiguration configuration) : MenuEntry
 {
-    private readonly AppConfiguration configuration;
-
-    public WindowsFeaturesRemovalEntry(AppConfiguration configuration) => this.configuration = configuration;
-
     public override string FullName => "Remove Windows features";
     public override string GetExplanation()
     {
@@ -168,12 +156,8 @@ class AutoUpdatesDisablingEntry : MenuEntry
     public override IOperation CreateNewOperation(IUserInterface ui) => new AutoUpdatesDisabler(ui);
 }
 
-class ScheduledTasksDisablingEntry : MenuEntry
+class ScheduledTasksDisablingEntry(AppConfiguration configuration) : MenuEntry
 {
-    private readonly AppConfiguration configuration;
-
-    public ScheduledTasksDisablingEntry(AppConfiguration configuration) => this.configuration = configuration;
-
     public override string FullName => "Disable miscellaneous scheduled tasks";
     public override string GetExplanation()
     {
@@ -269,12 +253,8 @@ class AboutEntry : MenuEntry
     public override IOperation CreateNewOperation(IUserInterface ui) => new LicensePrinter(ui);
 }
 
-class QuitEntry : MenuEntry
+class QuitEntry(RebootRecommendedFlag rebootFlag) : MenuEntry
 {
-    private readonly RebootRecommendedFlag rebootFlag;
-
-    public QuitEntry(RebootRecommendedFlag rebootFlag) => this.rebootFlag = rebootFlag;
-
     public override string FullName => "Exit the application";
     public override bool ShouldQuit => true;
     public override string GetExplanation() => "Are you sure?";

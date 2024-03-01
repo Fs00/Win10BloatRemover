@@ -48,31 +48,20 @@ class TokenPrivilege : IDisposable
     private const int ERROR_NOT_ALL_ASSIGNED = 1300;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct TokenPrivileges
+    private struct TokenPrivileges(Luid luid, uint attributes)
     {
         // We can use this struct only with one privilege since CLR doesn't support marshalling dynamic-sized arrays
-        public TokenPrivileges(Luid luid, uint attributes)
-        {
-            Count = 1;
-            Privileges = [new LuidAndAttributes(luid, attributes)];
-        }
+        private uint Count = 1;
 
-        private uint Count;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
-        private LuidAndAttributes[] Privileges;
+        private LuidAndAttributes[] Privileges = [new LuidAndAttributes(luid, attributes)];
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private readonly struct LuidAndAttributes
+    private readonly struct LuidAndAttributes(Luid luid, uint attributes)
     {
-        public LuidAndAttributes(Luid luid, uint attributes)
-        {
-            Luid = luid;
-            Attributes = attributes;
-        }
-
-        private readonly Luid Luid;
-        private readonly uint Attributes;
+        private readonly Luid Luid = luid;
+        private readonly uint Attributes = attributes;
     }
 
     [StructLayout(LayoutKind.Sequential)]

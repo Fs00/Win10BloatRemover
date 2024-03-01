@@ -3,11 +3,8 @@ using Win10BloatRemover.UI;
 
 namespace Win10BloatRemover.Operations;
 
-public class LicensePrinter : IOperation
+public class LicensePrinter(IUserInterface ui) : IOperation
 {
-    private readonly IUserInterface ui;
-    public LicensePrinter(IUserInterface ui) => this.ui = ui;
-
     public void Run()
     {
         Stream licenseFile = GetType().Assembly.GetManifestResourceStream("Win10BloatRemover.Resources.License.txt")!;

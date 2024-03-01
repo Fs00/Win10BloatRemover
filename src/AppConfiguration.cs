@@ -58,12 +58,12 @@ public class AppConfiguration
     }
 
     public static readonly AppConfiguration Default = new() {
-        ServicesToRemove = new[] {
+        ServicesToRemove = [
             "dmwappushservice",
             "RetailDemo",
             "TroubleshootingSvc"
-        },
-        UWPAppsToRemove = new[] {   
+        ],
+        UWPAppsToRemove = [   
             UwpAppGroup.Bing,
             UwpAppGroup.Cortana,
             UwpAppGroup.CommunicationsApps,
@@ -77,16 +77,16 @@ public class AppConfiguration
             UwpAppGroup.SolitaireCollection,
             UwpAppGroup.Skype,
             UwpAppGroup.Zune
-        },
-        WindowsFeaturesToRemove = new[] {
+        ],
+        WindowsFeaturesToRemove = [
             "App.StepsRecorder",
             "App.Support.QuickAssist",
             "App.WirelessDisplay.Connect",
             "Browser.InternetExplorer",
             "Hello.Face",
             "MathRecognizer"
-        },
-        ScheduledTasksToDisable = new[] {
+        ],
+        ScheduledTasksToDisable = [
             @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
             @"\Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
             @"\Microsoft\Windows\DiskFootprint\Diagnostics",
@@ -102,7 +102,7 @@ public class AppConfiguration
             @"\Microsoft\Windows\Subscription\LicenseAcquisition",
             @"\Microsoft\Windows\Diagnosis\Scheduled",
             @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
-        },
+        ],
         UWPAppsRemovalMode = UwpAppRemovalMode.AllUsers
     };
 }

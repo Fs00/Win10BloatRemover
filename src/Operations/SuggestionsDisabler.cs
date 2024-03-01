@@ -62,9 +62,9 @@ public class SuggestionsDisabler : IOperation
             "DoNotShowFeedbackNotifications", 1);
         RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Siuf\Rules", "NumberOfSIUFInPeriod", 0);
 
-        new ScheduledTasksDisabler(new[] {
+        new ScheduledTasksDisabler([
             @"\Microsoft\Windows\Feedback\Siuf\DmClient",
             @"\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload"
-        }, ui).Run();
+        ], ui).Run();
     }
 }

@@ -31,7 +31,7 @@ static class Program
 
     private static MenuEntry[] CreateMenuEntries(AppConfiguration configuration, RebootRecommendedFlag rebootFlag)
     {
-        return new MenuEntry[] {
+        return [
             new UWPAppRemovalEntry(configuration),
             new EdgeRemovalEntry(),
             new OneDriveRemovalEntry(),
@@ -48,7 +48,7 @@ static class Program
             new NewGitHubIssueEntry(),
             new AboutEntry(),
             new QuitEntry(rebootFlag)
-        };
+        ];
     }
 
     private static bool HasAdministratorRights()

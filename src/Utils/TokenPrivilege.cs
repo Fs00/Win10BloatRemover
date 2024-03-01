@@ -54,9 +54,7 @@ class TokenPrivilege : IDisposable
         public TokenPrivileges(Luid luid, uint attributes)
         {
             Count = 1;
-            Privileges = new[] {
-                new LuidAndAttributes(luid, attributes)
-            };
+            Privileges = [new LuidAndAttributes(luid, attributes)];
         }
 
         private uint Count;

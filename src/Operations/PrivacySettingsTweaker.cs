@@ -6,13 +6,13 @@ namespace Win10BloatRemover.Operations;
 
 public class PrivacySettingsTweaker : IOperation
 {
-    private static readonly string[] appPermissionsToDeny = {
+    private static readonly string[] appPermissionsToDeny = [
         "location",
         "documentsLibrary",
         "userDataTasks",
         "appDiagnostics",
         "userAccountInformation"
-    };
+    ];
 
     private readonly IUserInterface ui;
     public PrivacySettingsTweaker(IUserInterface ui) => this.ui = ui;

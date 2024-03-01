@@ -6,20 +6,20 @@ namespace Win10BloatRemover.Operations;
 
 public class TelemetryDisabler : IOperation
 {
-    private static readonly string[] telemetryServices = {
+    private static readonly string[] telemetryServices = [
         "DiagTrack",
         "diagsvc",
         "diagnosticshub.standardcollector.service",
         "PcaSvc"
-    };
+    ];
 
-    private static readonly string[] protectedTelemetryServices = {
+    private static readonly string[] protectedTelemetryServices = [
         "DPS",
         "WdiSystemHost",
         "WdiServiceHost"
-    };
+    ];
 
-    private static readonly string[] telemetryScheduledTasks = {
+    private static readonly string[] telemetryScheduledTasks = [
         @"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
         @"\Microsoft\Windows\Application Experience\PcaPatchDbTask",
         @"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
@@ -32,7 +32,7 @@ public class TelemetryDisabler : IOperation
         @"\Microsoft\Windows\Device Information\Device User",
         @"\Microsoft\Windows\NetTrace\GatherNetworkInfo",
         @"\Microsoft\Windows\PI\Sqm-Tasks"
-    };
+    ];
 
     private readonly IUserInterface ui;
     private readonly ServiceRemover serviceRemover;

@@ -6,19 +6,19 @@ namespace Win10BloatRemover.Operations;
 
 public class DefenderDisabler : IOperation
 {
-    private static readonly string[] defenderServices = {
+    private static readonly string[] defenderServices = [
         "wscsvc",
         "Sense",
         "SgrmBroker",
         "SgrmAgent"
-    };
+    ];
 
-    private static readonly string[] defenderScheduledTasks = {
+    private static readonly string[] defenderScheduledTasks = [
         @"\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance",
         @"\Microsoft\Windows\Windows Defender\Windows Defender Cleanup",
         @"\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan",
         @"\Microsoft\Windows\Windows Defender\Windows Defender Verification"
-    };
+    ];
 
     private readonly IUserInterface ui;
     private readonly ServiceRemover serviceRemover;

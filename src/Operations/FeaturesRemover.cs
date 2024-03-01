@@ -54,7 +54,7 @@ public class FeaturesRemover : IOperation
             dismClient.RemoveCapability(capability.Name);
 
             if (capability.Name.StartsWith("Hello.Face"))
-                new ScheduledTasksDisabler(new[] { @"\Microsoft\Windows\HelloFace\FODCleanupTask" }, ui).Run();
+                new ScheduledTasksDisabler([@"\Microsoft\Windows\HelloFace\FODCleanupTask"], ui).Run();
         }
         catch (Exception exc)
         {

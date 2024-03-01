@@ -5,10 +5,10 @@ namespace Win10BloatRemover.Operations;
 
 public class ErrorReportingDisabler : IOperation
 {
-    private static readonly string[] errorReportingServices = { "WerSvc", "wercplsupport" };
-    private static readonly string[] errorReportingScheduledTasks = {
+    private static readonly string[] errorReportingServices = ["WerSvc", "wercplsupport"];
+    private static readonly string[] errorReportingScheduledTasks = [
         @"\Microsoft\Windows\Windows Error Reporting\QueueReporting"
-    };
+    ];
 
     private readonly IUserInterface ui;
     private readonly ServiceRemover serviceRemover;

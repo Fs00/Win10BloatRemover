@@ -249,7 +249,7 @@ public class UwpAppGroupRemover : IOperation
         );
         Registry.SetValue(@"HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\DropTarget", "Clsid", PHOTO_VIEWER_CLSID);
 
-        string[] imageTypes = { "Paint.Picture", "giffile", "jpegfile", "pngfile" };
+        string[] imageTypes = ["Paint.Picture", "giffile", "jpegfile", "pngfile"];
         foreach (string type in imageTypes)
         {
             Registry.SetValue(
@@ -262,7 +262,7 @@ public class UwpAppGroupRemover : IOperation
 
     private void RemoveOneSyncServiceFeature()
     {
-        var featuresRemover = new FeaturesRemover(new[] { "OneCoreUAP.OneSync" }, ui);
+        var featuresRemover = new FeaturesRemover(["OneCoreUAP.OneSync"], ui);
         featuresRemover.Run();
         rebootFlag.UpdateIfNeeded(featuresRemover.IsRebootRecommended);
     }

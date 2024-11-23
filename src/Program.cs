@@ -7,7 +7,7 @@ namespace Win10BloatRemover;
 
 static class Program
 {
-    private const int MINIMUM_SUPPORTED_WINDOWS_BUILD = 19044;  // 21H2 build
+    private const int MINIMUM_SUPPORTED_WINDOWS_BUILD = 19045;  // 22H2 build
 
     private static void Main(string[] args)
     {

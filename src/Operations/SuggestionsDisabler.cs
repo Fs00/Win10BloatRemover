@@ -41,6 +41,9 @@ public class SuggestionsDisabler(IUserInterface ui) : IOperation
         // System -> Notifications & actions -> Suggest ways I can finish setting up my device...
         RegistryUtils.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement", "ScoobeSystemSettingEnabled", 0);
+        // Personalization -> Start -> Show account-related notifications
+        RegistryUtils.SetForCurrentAndDefaultUser(
+            @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "Start_AccountNotifications", 0);
 
         // Applies only to Education and Enterprise editions
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableSoftLanding", 1);

@@ -207,8 +207,8 @@ class SuggestionsDisablingEntry : MenuEntry
 {
     public override string FullName => "Disable suggestions and feedback requests";
     public override string GetExplanation() => """
-        Feedback notifications and requests, apps suggestions and Windows tips will be turned off by changing
-        Group Policies and system settings accordingly and by disabling some related scheduled tasks.
+        Feedback notifications and requests, apps suggestions, Windows and account-related tips will be turned off
+        by changing Group Policies and system settings accordingly and by disabling some related scheduled tasks.
 
         If you are not using an Enterprise or Education edition of Windows, suggestions will be disabled only for the
         currently logged in user and for new users created after running this procedure.

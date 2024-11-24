@@ -111,6 +111,7 @@ class AppConfiguration
 [JsonSourceGenerationOptions(
     AllowTrailingCommas = true,
     ReadCommentHandling = JsonCommentHandling.Skip,
+    RespectNullableAnnotations = true,
     WriteIndented = true,
     UseStringEnumConverter = true
 )]

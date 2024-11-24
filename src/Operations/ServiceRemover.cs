@@ -5,7 +5,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class ServiceRemovalOperation(string[] servicesToRemove, IUserInterface ui, ServiceRemover serviceRemover) : IOperation
+class ServiceRemovalOperation(string[] servicesToRemove, IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
     public bool IsRebootRecommended => serviceRemover.IsRebootRecommended;
 
@@ -26,7 +26,7 @@ public class ServiceRemovalOperation(string[] servicesToRemove, IUserInterface u
  *  Performs backup (export of registry keys) and removal of those services whose name starts with the given service names.
  *  This is made in order to include services that end with a random code.
  */
-public class ServiceRemover
+class ServiceRemover
 {
     private readonly DirectoryInfo backupDirectory;
     private readonly IUserInterface ui;

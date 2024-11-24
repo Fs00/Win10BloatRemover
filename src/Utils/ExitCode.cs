@@ -1,6 +1,6 @@
 ﻿namespace Win10BloatRemover.Utils;
 
-public readonly struct ExitCode(int code)
+readonly struct ExitCode(int code)
 {
     private readonly int code = code;
 

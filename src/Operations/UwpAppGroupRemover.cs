@@ -5,13 +5,13 @@ using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations;
 
-public enum UwpAppRemovalMode
+enum UwpAppRemovalMode
 {
     CurrentUser,
     AllUsers
 }
 
-public enum UwpAppGroup
+enum UwpAppGroup
 {
     AlarmsAndClock,
     Bing,               // Weather, News, Finance and Sports
@@ -38,7 +38,7 @@ public enum UwpAppGroup
     Zune                // Groove Music and Movies
 }
 
-public class UwpAppGroupRemover : IOperation
+class UwpAppGroupRemover : IOperation
 {
     private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new() {
         { UwpAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },

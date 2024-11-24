@@ -1,6 +1,6 @@
 ﻿namespace Win10BloatRemover.UI;
 
-public interface IMessagePrinter
+interface IMessagePrinter
 {
     void PrintMessage(string text);
     void PrintError(string text);
@@ -10,13 +10,13 @@ public interface IMessagePrinter
     void PrintEmptySpace();
 }
 
-public enum UserChoice
+enum UserChoice
 {
     Yes,
     No
 }
 
-public interface IUserInterface : IMessagePrinter
+interface IUserInterface : IMessagePrinter
 {
     UserChoice AskUserConsent(string text);
 

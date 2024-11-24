@@ -2,7 +2,7 @@
 
 namespace Win10BloatRemover.Operations;
 
-public class BrowserOpener(string url) : IOperation
+class BrowserOpener(string url) : IOperation
 {
     public void Run()
     {

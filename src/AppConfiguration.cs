@@ -6,7 +6,7 @@ using Win10BloatRemover.Operations;
 
 namespace Win10BloatRemover;
 
-public class AppConfiguration
+class AppConfiguration
 {
     public required string[] ServicesToRemove { get; init; }
     public required UwpAppGroup[] UWPAppsToRemove { get; init; }

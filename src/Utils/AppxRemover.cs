@@ -7,9 +7,9 @@ using Windows.Management.Deployment;
 
 namespace Win10BloatRemover.Utils;
 
-public class AppxRemover(IUserInterface ui)
+class AppxRemover(IUserInterface ui)
 {
-    public readonly record struct Result(int RemovedApps, int FailedRemovals);
+    internal readonly record struct Result(int RemovedApps, int FailedRemovals);
 
     private enum RemovalOutcome
     {

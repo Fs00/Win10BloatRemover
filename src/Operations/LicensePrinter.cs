@@ -3,7 +3,7 @@ using Win10BloatRemover.UI;
 
 namespace Win10BloatRemover.Operations;
 
-public class LicensePrinter(IUserInterface ui) : IOperation
+class LicensePrinter(IUserInterface ui) : IOperation
 {
     public void Run()
     {

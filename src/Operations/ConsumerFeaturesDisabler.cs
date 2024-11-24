@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class ConsumerFeaturesDisabler(IUserInterface ui) : IOperation
+class ConsumerFeaturesDisabler(IUserInterface ui) : IOperation
 {
     public bool IsRebootRecommended { get; private set; }
 

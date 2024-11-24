@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
+class DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
     private static readonly string[] defenderServices = [
         "wscsvc",

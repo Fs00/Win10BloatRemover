@@ -1,6 +1,6 @@
 ﻿namespace Win10BloatRemover.Operations;
 
-public interface IOperation
+interface IOperation
 {
     void Run();
     bool IsRebootRecommended => false;

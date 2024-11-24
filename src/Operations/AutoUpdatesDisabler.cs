@@ -4,7 +4,7 @@ using Win10BloatRemover.Utils;
 
 namespace Win10BloatRemover.Operations;
 
-public class AutoUpdatesDisabler(IUserInterface ui) : IOperation
+class AutoUpdatesDisabler(IUserInterface ui) : IOperation
 {
     public void Run()
     {

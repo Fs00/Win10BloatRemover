@@ -6,7 +6,7 @@ using Env = System.Environment;
 
 namespace Win10BloatRemover.Operations;
 
-public class OneDriveRemover(IUserInterface ui) : IOperation
+class OneDriveRemover(IUserInterface ui) : IOperation
 {
     public void Run()
     {

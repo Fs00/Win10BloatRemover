@@ -3,7 +3,7 @@ using Win10BloatRemover.UI;
 
 namespace Win10BloatRemover.Operations;
 
-public class ErrorReportingDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
+class ErrorReportingDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOperation
 {
     private static readonly string[] errorReportingServices = ["WerSvc", "wercplsupport"];
     private static readonly string[] errorReportingScheduledTasks = [

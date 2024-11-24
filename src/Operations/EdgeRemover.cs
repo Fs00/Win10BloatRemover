@@ -8,7 +8,7 @@ using Version = System.Version;
 
 namespace Win10BloatRemover.Operations;
 
-public class EdgeRemover(IUserInterface ui, AppxRemover appxRemover) : IOperation
+class EdgeRemover(IUserInterface ui, AppxRemover appxRemover) : IOperation
 {
     public void Run()
     {

@@ -96,6 +96,7 @@ class TelemetryDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOpe
     {
         ui.PrintHeading("Performing some registry edits to disable telemetry features...");
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry", 0);
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", "DisableOneSettingsDownloads", 1);
         using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))
         {
             key.SetValue("AITEnable", 0);   // Application Telemetry
@@ -105,6 +106,7 @@ class TelemetryDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOpe
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows", "CEIPEnable", 0);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener", "Start", 0);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\System", "AllowExperimentation", 0);
+        // Disable sending KMS client activation data to Microsoft automatically
         Registry.SetValue(
             @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform",
             "NoGenTicket", 1

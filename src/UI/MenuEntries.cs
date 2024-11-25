@@ -139,7 +139,7 @@ class TelemetryDisablingEntry : MenuEntry
     public override string GetExplanation() => """
         This procedure will disable scheduled tasks, services and features that are responsible for collecting and
         reporting data to Microsoft, including Compatibility Telemetry, Device Census, Customer Experience Improvement
-        Program and Compatibility Assistant.
+        Program, Edge diagnostic data collection and Compatibility Assistant.
         """;
 
     public override IOperation CreateNewOperation(IUserInterface ui) => new TelemetryDisabler(ui, new ServiceRemover(ui));

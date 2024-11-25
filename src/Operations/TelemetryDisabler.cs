@@ -97,6 +97,7 @@ class TelemetryDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOpe
         ui.PrintHeading("Performing some registry edits to disable telemetry features...");
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry", 0);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", "DisableOneSettingsDownloads", 1);
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "DiagnosticData", 0);
         using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat"))
         {
             key.SetValue("AITEnable", 0);   // Application Telemetry

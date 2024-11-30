@@ -74,6 +74,7 @@ class AppConfiguration
             UwpAppGroup.Mobile,
             UwpAppGroup.OneNote,
             UwpAppGroup.OfficeHub,
+            UwpAppGroup.Paint3D,
             UwpAppGroup.SolitaireCollection,
             UwpAppGroup.Skype,
             UwpAppGroup.Zune

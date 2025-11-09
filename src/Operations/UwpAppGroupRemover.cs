@@ -14,17 +14,17 @@ enum UwpAppRemovalMode
 enum UwpAppGroup
 {
     AlarmsAndClock,
-    Bing,               // Weather, News, Finance and Sports
+    Bing,
     Calculator,
     Camera,
     CommunicationsApps,
+    Copilot,
     Cortana,
     HelpAndFeedback,
     Maps,
     Messaging,
-    MixedReality,       // 3D Viewer, Print 3D and Mixed Reality Portal
-    Mobile,             // Your Phone and Mobile plans (aka OneConnect)
-    OfficeHub,
+    MixedReality,
+    Mobile,
     OneNote,
     Paint3D,
     Photos,
@@ -35,47 +35,47 @@ enum UwpAppGroup
     StickyNotes,
     Store,
     Xbox,
-    Zune                // Groove Music and Movies
+    Zune
 }
 
 class UwpAppGroupRemover : IOperation
 {
     private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new() {
-        { UwpAppGroup.AlarmsAndClock, new[] { "Microsoft.WindowsAlarms" } },
-        { UwpAppGroup.Bing, new[] {
+        { UwpAppGroup.AlarmsAndClock, ["Microsoft.WindowsAlarms"] },
+        { UwpAppGroup.Bing, [
             "Microsoft.BingNews",
             "Microsoft.BingWeather",
             "Microsoft.BingFinance",
             "Microsoft.BingSports"
-        } },
-        { UwpAppGroup.Calculator, new[] { "Microsoft.WindowsCalculator" } },
-        { UwpAppGroup.Camera, new[] { "Microsoft.WindowsCamera" } },
-        { UwpAppGroup.CommunicationsApps, new[] { "microsoft.windowscommunicationsapps", "Microsoft.People" } },
-        { UwpAppGroup.Cortana, new[] { "Microsoft.549981C3F5F10" } },
-        { UwpAppGroup.HelpAndFeedback, new[] {
+        ] },
+        { UwpAppGroup.Calculator, ["Microsoft.WindowsCalculator"] },
+        { UwpAppGroup.Camera, ["Microsoft.WindowsCamera"] },
+        { UwpAppGroup.CommunicationsApps, ["microsoft.windowscommunicationsapps", "Microsoft.People"] },
+        { UwpAppGroup.Copilot, ["Microsoft.Copilot", "Microsoft.MicrosoftOfficeHub"] },
+        { UwpAppGroup.Cortana, ["Microsoft.549981C3F5F10"] },
+        { UwpAppGroup.HelpAndFeedback, [
             "Microsoft.WindowsFeedbackHub",
             "Microsoft.GetHelp",
             "Microsoft.Getstarted"
-        } },
-        { UwpAppGroup.Maps, new[] { "Microsoft.WindowsMaps" } },
-        { UwpAppGroup.Messaging, new[] { "Microsoft.Messaging" } },
-        { UwpAppGroup.MixedReality, new[] {
+        ] },
+        { UwpAppGroup.Maps, ["Microsoft.WindowsMaps"] },
+        { UwpAppGroup.Messaging, ["Microsoft.Messaging"] },
+        { UwpAppGroup.MixedReality, [
             "Microsoft.Microsoft3DViewer",
             "Microsoft.Print3D",
             "Microsoft.MixedReality.Portal"
-        } },
-        { UwpAppGroup.Mobile, new[] { "Microsoft.YourPhone", "Microsoft.OneConnect" } },
-        { UwpAppGroup.OfficeHub, new[] { "Microsoft.MicrosoftOfficeHub" } },
-        { UwpAppGroup.OneNote, new[] { "Microsoft.Office.OneNote" } },
-        { UwpAppGroup.Paint3D, new[] { "Microsoft.MSPaint" } },
-        { UwpAppGroup.Photos, new[] { "Microsoft.Windows.Photos" } },
-        { UwpAppGroup.Skype, new[] { "Microsoft.SkypeApp" } },
-        { UwpAppGroup.SnipAndSketch, new[] { "Microsoft.ScreenSketch" } },
-        { UwpAppGroup.SolitaireCollection, new[] { "Microsoft.MicrosoftSolitaireCollection" } },
-        { UwpAppGroup.SoundRecorder, new[] { "Microsoft.WindowsSoundRecorder" } },
-        { UwpAppGroup.StickyNotes, new[] { "Microsoft.MicrosoftStickyNotes" } },
-        { UwpAppGroup.Store, new[] { "Microsoft.WindowsStore", "Microsoft.StorePurchaseApp" } },
-        { UwpAppGroup.Xbox, new[] {
+        ] },
+        { UwpAppGroup.Mobile, ["Microsoft.YourPhone", "Microsoft.OneConnect"] },
+        { UwpAppGroup.OneNote, ["Microsoft.Office.OneNote"] },
+        { UwpAppGroup.Paint3D, ["Microsoft.MSPaint"] },
+        { UwpAppGroup.Photos, ["Microsoft.Windows.Photos"] },
+        { UwpAppGroup.Skype, ["Microsoft.SkypeApp"] },
+        { UwpAppGroup.SnipAndSketch, ["Microsoft.ScreenSketch"] },
+        { UwpAppGroup.SolitaireCollection, ["Microsoft.MicrosoftSolitaireCollection"] },
+        { UwpAppGroup.SoundRecorder, ["Microsoft.WindowsSoundRecorder"] },
+        { UwpAppGroup.StickyNotes, ["Microsoft.MicrosoftStickyNotes"] },
+        { UwpAppGroup.Store, ["Microsoft.WindowsStore", "Microsoft.StorePurchaseApp"] },
+        { UwpAppGroup.Xbox, [
             "Microsoft.XboxGameCallableUI",
             "Microsoft.XboxSpeechToTextOverlay",
             "Microsoft.XboxApp",
@@ -83,8 +83,8 @@ class UwpAppGroupRemover : IOperation
             "Microsoft.XboxGamingOverlay",
             "Microsoft.XboxIdentityProvider",
             "Microsoft.Xbox.TCUI"
-        } },
-        { UwpAppGroup.Zune, new[] { "Microsoft.ZuneMusic", "Microsoft.ZuneVideo" } }
+        ] },
+        { UwpAppGroup.Zune, ["Microsoft.ZuneMusic", "Microsoft.ZuneVideo"] }
     };
 
     private readonly Dictionary<UwpAppGroup, Action> postUninstallOperationsForGroup;

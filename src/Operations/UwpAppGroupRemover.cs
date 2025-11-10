@@ -82,7 +82,9 @@ class UwpAppGroupRemover : IOperation
             "Microsoft.XboxGameOverlay",
             "Microsoft.XboxGamingOverlay",
             "Microsoft.XboxIdentityProvider",
-            "Microsoft.Xbox.TCUI"
+            "Microsoft.Xbox.TCUI",
+            "Microsoft.GamingApp",
+            "Microsoft.GamingServices"
         ] },
         { UwpAppGroup.Zune, ["Microsoft.ZuneMusic", "Microsoft.ZuneVideo"] }
     };

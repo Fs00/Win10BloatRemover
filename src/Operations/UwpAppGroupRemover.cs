@@ -65,7 +65,11 @@ class UwpAppGroupRemover : IOperation
             "Microsoft.Print3D",
             "Microsoft.MixedReality.Portal"
         ] },
-        { UwpAppGroup.Mobile, ["Microsoft.YourPhone", "Microsoft.OneConnect"] },
+        { UwpAppGroup.Mobile, [
+            "Microsoft.YourPhone",
+            "MicrosoftWindows.CrossDevice",
+            "Microsoft.OneConnect"
+        ] },
         { UwpAppGroup.OneNote, ["Microsoft.Office.OneNote"] },
         { UwpAppGroup.Paint3D, ["Microsoft.MSPaint"] },
         { UwpAppGroup.Photos, ["Microsoft.Windows.Photos"] },

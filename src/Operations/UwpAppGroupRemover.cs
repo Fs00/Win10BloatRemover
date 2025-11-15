@@ -45,7 +45,8 @@ class UwpAppGroupRemover : IOperation
             "Microsoft.BingNews",
             "Microsoft.BingWeather",
             "Microsoft.BingFinance",
-            "Microsoft.BingSports"
+            "Microsoft.BingSports",
+            "Microsoft.BingSearch"
         ] },
         { UwpAppGroup.Calculator, ["Microsoft.WindowsCalculator"] },
         { UwpAppGroup.Camera, ["Microsoft.WindowsCamera"] },

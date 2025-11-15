@@ -187,11 +187,12 @@ class ConsumerFeaturesDisablingEntry : MenuEntry
     public override string FullName => "Disable consumer features";
     public override string GetExplanation() => """
         This procedure will disable the following cloud-powered features aimed at the consumer market:
-          - Windows Spotlight (dynamic lock screen backgrounds)
+          - Windows Spotlight (dynamic backgrounds)
           - Spotlight experiences and recommendations in Microsoft Edge
           - News and Interests
           - Search highlights
-          - Bing search in Windows search bar
+          - Bing search in Windows search bar (for EU users on the latest cumulative update, this can also be accomplished
+            by uninstalling Bing apps via "Remove UWP apps")
           - Skype's Meet Now icon in the taskbar
           - automatic installation of suggested apps
           - cloud optimized content in the taskbar

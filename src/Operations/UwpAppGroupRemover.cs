@@ -13,15 +13,16 @@ enum UwpAppRemovalMode
 
 enum UwpAppGroup
 {
-    AlarmsAndClock,
     Bing,
     Calculator,
     Camera,
+    Clock,
     CommunicationsApps,
     Copilot,
     Cortana,
     HelpAndFeedback,
     Maps,
+    MediaPlayers,
     Messaging,
     MixedReality,
     Mobile,
@@ -34,14 +35,12 @@ enum UwpAppGroup
     SoundRecorder,
     StickyNotes,
     Store,
-    Xbox,
-    Zune
+    Xbox
 }
 
 class UwpAppGroupRemover : IOperation
 {
     private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new() {
-        { UwpAppGroup.AlarmsAndClock, ["Microsoft.WindowsAlarms"] },
         { UwpAppGroup.Bing, [
             "Microsoft.BingNews",
             "Microsoft.BingWeather",
@@ -50,6 +49,7 @@ class UwpAppGroupRemover : IOperation
         ] },
         { UwpAppGroup.Calculator, ["Microsoft.WindowsCalculator"] },
         { UwpAppGroup.Camera, ["Microsoft.WindowsCamera"] },
+        { UwpAppGroup.Clock, ["Microsoft.WindowsAlarms"] },
         { UwpAppGroup.CommunicationsApps, ["microsoft.windowscommunicationsapps", "Microsoft.People"] },
         { UwpAppGroup.Copilot, ["Microsoft.Copilot", "Microsoft.MicrosoftOfficeHub"] },
         { UwpAppGroup.Cortana, ["Microsoft.549981C3F5F10"] },
@@ -59,6 +59,7 @@ class UwpAppGroupRemover : IOperation
             "Microsoft.Getstarted"
         ] },
         { UwpAppGroup.Maps, ["Microsoft.WindowsMaps"] },
+        { UwpAppGroup.MediaPlayers, ["Microsoft.ZuneMusic", "Microsoft.ZuneVideo"] },
         { UwpAppGroup.Messaging, ["Microsoft.Messaging"] },
         { UwpAppGroup.MixedReality, [
             "Microsoft.Microsoft3DViewer",
@@ -89,8 +90,7 @@ class UwpAppGroupRemover : IOperation
             "Microsoft.Xbox.TCUI",
             "Microsoft.GamingApp",
             "Microsoft.GamingServices"
-        ] },
-        { UwpAppGroup.Zune, ["Microsoft.ZuneMusic", "Microsoft.ZuneVideo"] }
+        ] }
     };
 
     private readonly Dictionary<UwpAppGroup, Action> postUninstallOperationsForGroup;

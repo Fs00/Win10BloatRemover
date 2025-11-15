@@ -65,19 +65,19 @@ class AppConfiguration
         ],
         UWPAppsToRemove = [   
             UwpAppGroup.Bing,
-            UwpAppGroup.Cortana,
             UwpAppGroup.CommunicationsApps,
             UwpAppGroup.Copilot,
+            UwpAppGroup.Cortana,
             UwpAppGroup.HelpAndFeedback,
             UwpAppGroup.Maps,
+            UwpAppGroup.MediaPlayers,
             UwpAppGroup.Messaging,
             UwpAppGroup.MixedReality,
             UwpAppGroup.Mobile,
             UwpAppGroup.OneNote,
             UwpAppGroup.Paint3D,
             UwpAppGroup.SolitaireCollection,
-            UwpAppGroup.Skype,
-            UwpAppGroup.Zune
+            UwpAppGroup.Skype
         ],
         WindowsFeaturesToRemove = [
             "App.StepsRecorder",

@@ -10,11 +10,18 @@ class OneDriveRemover(IUserInterface ui) : IOperation
 {
     public void Run()
     {
+        KillOneDriveProcesses();
         DisableOneDrive();
-        OS.KillProcess("onedrive");
         RunOneDriveUninstaller();
         RemoveOneDriveLeftovers();
         DisableAutomaticSetupForNewUsers();
+    }
+
+    private void KillOneDriveProcesses()
+    {
+        ui.PrintMessage("Shutting down OneDrive processes...");
+        OS.KillProcess("onedrive");
+        OS.KillProcess("onedrive.sync.service");
     }
 
     private void DisableOneDrive()

@@ -51,7 +51,11 @@ class UwpAppGroupRemover : IOperation
         { UwpAppGroup.Calculator, ["Microsoft.WindowsCalculator"] },
         { UwpAppGroup.Camera, ["Microsoft.WindowsCamera"] },
         { UwpAppGroup.Clock, ["Microsoft.WindowsAlarms"] },
-        { UwpAppGroup.CommunicationsApps, ["microsoft.windowscommunicationsapps", "Microsoft.People"] },
+        { UwpAppGroup.CommunicationsApps, [
+            "microsoft.windowscommunicationsapps",
+            "Microsoft.People",
+            "Microsoft.OutlookForWindows"
+        ] },
         { UwpAppGroup.Copilot, ["Microsoft.Copilot", "Microsoft.MicrosoftOfficeHub"] },
         { UwpAppGroup.Cortana, ["Microsoft.549981C3F5F10"] },
         { UwpAppGroup.HelpAndFeedback, [
@@ -116,7 +120,10 @@ class UwpAppGroupRemover : IOperation
         this.serviceRemover = serviceRemover;
 
         postUninstallOperationsForGroup = new Dictionary<UwpAppGroup, Action> {
-            { UwpAppGroup.CommunicationsApps, RemoveOneSyncServiceFeature },
+            { UwpAppGroup.CommunicationsApps, () => {
+                RemoveOneSyncServiceFeature();
+                PreventAutomaticOutlookInstallation();
+            } },
             { UwpAppGroup.Cortana, HideCortanaFromTaskBar },
             { UwpAppGroup.Maps, RemoveMapsServicesAndTasks },
             { UwpAppGroup.Messaging, RemoveMessagingService },
@@ -272,6 +279,15 @@ class UwpAppGroupRemover : IOperation
         var featuresRemover = new FeaturesRemover(["OneCoreUAP.OneSync"], ui);
         featuresRemover.Run();
         rebootFlag.UpdateIfNeeded(featuresRemover.IsRebootRecommended);
+    }
+
+    private void PreventAutomaticOutlookInstallation()
+    {
+        ui.PrintMessage("Blocking automatic installation of the new Outlook app via registry edits...");
+        using RegistryKey key = RegistryUtils.LocalMachine64.CreateSubKey(
+            @"SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe"
+        );
+        key.SetValue("BlockedOobeUpdaters", """["MS_Outlook"]""");
     }
 
     private void DisableStoreFeaturesAndServices()

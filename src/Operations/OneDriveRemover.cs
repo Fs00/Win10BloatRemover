@@ -47,10 +47,18 @@ class OneDriveRemover(IUserInterface ui) : IOperation
 
     private string RetrieveOneDriveSetupPath()
     {
-        if (Env.Is64BitOperatingSystem)
-            return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe";
-        else
-            return $@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\System32\OneDriveSetup.exe";
+        FileInfo[] potentialOneDriveSetupLocations = [
+            new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe"),
+            // "Sysnative" is used to prevent automatic redirection from System32 to SysWOW64 folder
+            // See https://learn.microsoft.com/en-us/windows/win32/winprog64/file-system-redirector
+            new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\Sysnative\OneDriveSetup.exe"),
+            // The Sysnative alias apparently doesn't work on 32-bit Windows installations
+            new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\System32\OneDriveSetup.exe")
+        ];
+        var foundOneDriveSetup = potentialOneDriveSetupLocations.FirstOrDefault(file => file.Exists);
+        if (foundOneDriveSetup == null)
+            throw new Exception("OneDrive uninstaller was not found on the system.");
+        return foundOneDriveSetup.FullName;
     }
 
     private void RemoveOneDriveLeftovers()

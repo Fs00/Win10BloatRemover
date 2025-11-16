@@ -191,7 +191,7 @@ class UwpAppGroupRemover : IOperation
     private void RemoveMapsServicesAndTasks()
     {
         DisableScheduledTasks(@"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask");
-        RemoveServices("MapsBroker", "lfsvc");
+        RemoveServices("MapsBroker");
     }
 
     private void RemoveXboxServicesAndTasks()

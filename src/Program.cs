@@ -64,6 +64,7 @@ static class Program
         if (OS.IsWindows10() && OS.WindowsBuild >= MINIMUM_SUPPORTED_WINDOWS_BUILD)
             return;
 
+        Console.Clear();
         ConsoleHelpers.WriteLine("-- UNSUPPORTED WINDOWS VERSION --\n", ConsoleColor.DarkYellow);
         if (!OS.IsWindows10())
             Console.WriteLine("This program was designed to work only on Windows 10.");
@@ -95,13 +96,14 @@ static class Program
         }
         catch (AppConfigurationException exc)
         {
-            PrintConfigurationErrorMessage(exc);
+            DisplayConfigurationErrorMessage(exc);
             return AppConfiguration.Default;
         }
     }
 
-    private static void PrintConfigurationErrorMessage(AppConfigurationException exc)
+    private static void DisplayConfigurationErrorMessage(AppConfigurationException exc)
     {
+        Console.Clear();
         if (exc is AppConfigurationLoadException)
         {
             ConsoleHelpers.WriteLine($"An error occurred while loading settings file:\n{exc.Message}\n", ConsoleColor.Red);

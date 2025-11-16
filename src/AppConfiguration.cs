@@ -110,14 +110,16 @@ class AppConfiguration
 
 [JsonSerializable(typeof(AppConfiguration))]
 [JsonSourceGenerationOptions(
+    AllowDuplicateProperties = false,
     AllowTrailingCommas = true,
     ReadCommentHandling = JsonCommentHandling.Skip,
     RespectNullableAnnotations = true,
     WriteIndented = true,
+    UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
     UseStringEnumConverter = true
 )]
-internal partial class AppConfigurationSerializerContext : JsonSerializerContext {}
+internal partial class AppConfigurationSerializerContext : JsonSerializerContext;
 
-abstract class AppConfigurationException(string message) : Exception(message) {}
-class AppConfigurationLoadException(string message) : AppConfigurationException(message) {}
-class AppConfigurationWriteException(string message) : AppConfigurationException(message) {}
+abstract class AppConfigurationException(string message) : Exception(message);
+class AppConfigurationLoadException(string message) : AppConfigurationException(message);
+class AppConfigurationWriteException(string message) : AppConfigurationException(message);

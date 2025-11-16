@@ -3,9 +3,9 @@ on: [push, pull_request]
 
 jobs:
   build-release:
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Publish release build
       run: dotnet publish -c Release -p:PublishProfile=Standalone
     - name: Print published executable hash
@@ -13,7 +13,7 @@ jobs:
     - name: Copy Readme and License near published executable
       run: cp @('LICENSE', 'README.md') -Destination src/bin/Release/standalone
     - name: Upload release files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: Win10BloatRemover_${{ github.ref_name }}
         path: src/bin/Release/standalone/*

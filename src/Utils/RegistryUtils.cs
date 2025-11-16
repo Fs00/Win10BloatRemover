@@ -37,54 +37,57 @@ static class RegistryUtils
             key.SetValue(valueName, value);
     }
 
-    public static void DeleteSubKeyValue(this RegistryKey registryKey, string subkeyName, string valueName)
+    extension(RegistryKey registryKey)
     {
-        using RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, writable: true);
-        subKey?.DeleteValue(valueName, throwOnMissingValue: false);
-    }
+        public void DeleteSubKeyValue(string subkeyName, string valueName)
+        {
+            using RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, writable: true);
+            subKey?.DeleteValue(valueName, throwOnMissingValue: false);
+        }
 
-    public static RegistryKey OpenSubKeyWritable(this RegistryKey registryKey, string subkeyName, RegistryRights? rights = null)
-    {
-        RegistryKey? subKey;
-        if (rights == null)
-            subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree);
-        else
-            subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights.Value);
+        public RegistryKey OpenSubKeyWritable(string subkeyName, RegistryRights? rights = null)
+        {
+            RegistryKey? subKey;
+            if (rights == null)
+                subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree);
+            else
+                subKey = registryKey.OpenSubKey(subkeyName, RegistryKeyPermissionCheck.ReadWriteSubTree, rights.Value);
 
-        if (subKey == null)
-            throw new KeyNotFoundException($"Subkey {subkeyName} not found.");
+            if (subKey == null)
+                throw new KeyNotFoundException($"Subkey {subkeyName} not found.");
 
-        return subKey;
-    }
+            return subKey;
+        }
 
-    // It's up to the caller to obtain the needed token privileges (TakeOwnership) for this operation
-    public static void GrantFullControlOnSubKey(this RegistryKey registryKey, string subkeyName)
-    {
-        using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName,
-            RegistryRights.TakeOwnership | RegistryRights.ChangePermissions
-        );
-        RegistrySecurity accessRules = subKey.GetAccessControl();
-        SecurityIdentifier currentUser = RetrieveCurrentUserIdentifier();
-        accessRules.SetOwner(currentUser);
-        accessRules.ResetAccessRule(
-            new RegistryAccessRule(
-                currentUser,
-                RegistryRights.FullControl,
-                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                PropagationFlags.None,
-                AccessControlType.Allow
-            )
-        );
-        subKey.SetAccessControl(accessRules);
-    }
+        // Obtaining the needed token privileges (TakeOwnership) for this operation is up to the caller
+        public void GrantFullControlOnSubKey(string subkeyName)
+        {
+            using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName,
+                RegistryRights.TakeOwnership | RegistryRights.ChangePermissions
+            );
+            RegistrySecurity accessRules = subKey.GetAccessControl();
+            SecurityIdentifier currentUser = RetrieveCurrentUserIdentifier();
+            accessRules.SetOwner(currentUser);
+            accessRules.ResetAccessRule(
+                new RegistryAccessRule(
+                    currentUser,
+                    RegistryRights.FullControl,
+                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                    PropagationFlags.None,
+                    AccessControlType.Allow
+                )
+            );
+            subKey.SetAccessControl(accessRules);
+        }
 
-    // It's up to the caller to obtain the needed privileges (TakeOwnership) for this operation
-    public static void TakeOwnershipOnSubKey(this RegistryKey registryKey, string subkeyName)
-    {
-        using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName, RegistryRights.TakeOwnership);
-        RegistrySecurity accessRules = subKey.GetAccessControl();
-        accessRules.SetOwner(RetrieveCurrentUserIdentifier());
-        subKey.SetAccessControl(accessRules);
+        // Obtaining the needed privileges (TakeOwnership) for this operation is up to the caller
+        public void TakeOwnershipOnSubKey(string subkeyName)
+        {
+            using RegistryKey subKey = registryKey.OpenSubKeyWritable(subkeyName, RegistryRights.TakeOwnership);
+            RegistrySecurity accessRules = subKey.GetAccessControl();
+            accessRules.SetOwner(RetrieveCurrentUserIdentifier());
+            subKey.SetAccessControl(accessRules);
+        }
     }
 
     private static SecurityIdentifier RetrieveCurrentUserIdentifier() 

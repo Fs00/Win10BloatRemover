@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Win10BloatRemover.UI;
 using Win10BloatRemover.Utils;
@@ -8,6 +9,8 @@ namespace Win10BloatRemover;
 static class Program
 {
     private const int MINIMUM_SUPPORTED_WINDOWS_BUILD = 19045;  // 22H2 build
+
+    private static readonly RebootRecommendedFlag rebootFlag = new RebootRecommendedFlag();
 
     private static void Main(string[] args)
     {
@@ -19,17 +22,16 @@ static class Program
             Console.Title += " (unprivileged)";
 
         ShowWarningOnUnsupportedOS();
-        RegisterTerminationHandler();
 
+        using var registration = RegisterTerminationHandlers();
         var configuration = LoadConfigurationFromFileOrDefault();
-        var rebootFlag = new RebootRecommendedFlag();
-        var menu = new ConsoleMenu(CreateMenuEntries(configuration, rebootFlag), rebootFlag);
+        var menu = new ConsoleMenu(CreateMenuEntries(configuration), rebootFlag);
         menu.RunLoopUntilExitRequested();
     }
 
     private static bool IsTraceOutputEnabled(string[] args) => args.Contains("--show-trace-output");
 
-    private static MenuEntry[] CreateMenuEntries(AppConfiguration configuration, RebootRecommendedFlag rebootFlag)
+    private static MenuEntry[] CreateMenuEntries(AppConfiguration configuration)
     {
         return [
             new UWPAppRemovalEntry(configuration),
@@ -82,7 +84,7 @@ static class Program
 
         Console.WriteLine("\nPress enter to continue, or another key to quit.");
         if (Console.ReadKey().Key != ConsoleKey.Enter)
-            Environment.Exit(-1);
+            Environment.Exit(0);
     }
     
     private static AppConfiguration LoadConfigurationFromFileOrDefault()
@@ -112,16 +114,20 @@ static class Program
         Console.ReadKey();
     }
 
-    private static void RegisterTerminationHandler()
+    private static PosixSignalRegistration RegisterTerminationHandlers()
     {
         bool cancelKeyPressedOnce = false;
-        Console.CancelKeyPress += (sender, args) => {
-            if (!cancelKeyPressedOnce)
+        Console.CancelKeyPress += (_, args) => {
+            if (cancelKeyPressedOnce)
+                Environment.Exit(1); // ensures that ProcessExit events are executed
+            else
             {
                 ConsoleHelpers.WriteLine("Press Ctrl+C again to terminate the program.", ConsoleColor.Red);
                 cancelKeyPressedOnce = true;
                 args.Cancel = true;
             }
         };
+        // Fired when the user closes the console window (CTRL_CLOSE_EVENT)
+        return PosixSignalRegistration.Create(PosixSignal.SIGHUP, _ => Environment.Exit(1));
     }
 }

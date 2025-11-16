@@ -1,5 +1,4 @@
-﻿using System.Runtime.Loader;
-using System.Security.AccessControl;
+﻿using System.Security.AccessControl;
 using System.Security.Principal;
 using Microsoft.Win32;
 
@@ -21,7 +20,7 @@ static class RegistryUtils
         if (loadExitCode.IsNotSuccessful())
             throw new Exception("Unable to load Default user registry hive.");
 
-        AssemblyLoadContext.Default.Unloading += _ => UnloadDefaultUserHive();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => UnloadDefaultUserHive();
         return Registry.Users.OpenSubKeyWritable("_loaded_Default");
     }
 

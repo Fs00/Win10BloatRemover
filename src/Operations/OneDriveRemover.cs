@@ -28,7 +28,7 @@ class OneDriveRemover(IUserInterface ui) : IOperation
     {
         ui.PrintMessage("Disabling OneDrive via registry edits...");
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\OneDrive", "DisableFileSyncNGSC", 1);
-        using RegistryKey key = RegistryUtils.LocalMachine64.CreateSubKey(@"SOFTWARE\Microsoft\OneDrive");
+        using RegistryKey key = Registry.LocalMachine64.CreateSubKey(@"SOFTWARE\Microsoft\OneDrive");
         key.SetValue("PreventNetworkTrafficPreUserSignIn", 1);
     }
 
@@ -92,6 +92,6 @@ class OneDriveRemover(IUserInterface ui) : IOperation
     private void DisableAutomaticSetupForNewUsers()
     {
         ui.PrintMessage("Disabling automatic OneDrive setup for new users...");
-        RegistryUtils.DefaultUser.DeleteSubKeyValue(@"Software\Microsoft\Windows\CurrentVersion\Run", "OneDriveSetup");
+        Registry.DefaultUser.DeleteSubKeyValue(@"Software\Microsoft\Windows\CurrentVersion\Run", "OneDriveSetup");
     }
 }

@@ -185,7 +185,7 @@ class UwpAppGroupRemover : IOperation
     private void HideCortanaFromTaskBar()
     {
         ui.PrintMessage("Hiding Cortana from the taskbar of current and default user...");
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "ShowCortanaButton", 0);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "ShowCortanaButton", 0);
     }
 
     private void RemoveMapsServicesAndTasks()
@@ -229,7 +229,7 @@ class UwpAppGroupRemover : IOperation
     private void Remove3DObjectsFolder()
     {
         ui.PrintMessage("Removing 3D Objects folder...");
-        using RegistryKey key = RegistryUtils.LocalMachine64.OpenSubKeyWritable(
+        using RegistryKey key = Registry.LocalMachine64.OpenSubKeyWritable(
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace"
         );
         key.DeleteSubKeyTree("{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}", throwOnMissingSubKey: false);
@@ -284,7 +284,7 @@ class UwpAppGroupRemover : IOperation
     private void PreventAutomaticOutlookInstallation()
     {
         ui.PrintMessage("Blocking automatic installation of the new Outlook app via registry edits...");
-        using RegistryKey key = RegistryUtils.LocalMachine64.CreateSubKey(
+        using RegistryKey key = Registry.LocalMachine64.CreateSubKey(
             @"SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe"
         );
         key.SetValue("BlockedOobeUpdaters", """["MS_Outlook"]""");
@@ -295,7 +295,7 @@ class UwpAppGroupRemover : IOperation
         ui.PrintMessage("Disabling Microsoft Store features...");
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore", "RemoveWindowsStore", 1);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PushToInstall", "DisablePushToInstall", 1);
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
             "SilentInstalledAppsEnabled", 0
         );

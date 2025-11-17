@@ -36,7 +36,7 @@ class DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOper
         const int ENABLED_AUTOMATICALLY = 1;
         const int ENABLED_BY_USER = 5;
 
-        using var defenderFeaturesKey = RegistryUtils.LocalMachine64.OpenSubKey(@"SOFTWARE\Microsoft\Windows Defender\Features");
+        using var defenderFeaturesKey = Registry.LocalMachine64.OpenSubKey(@"SOFTWARE\Microsoft\Windows Defender\Features");
         var tamperProtectionSetting = (int?) defenderFeaturesKey?.GetValue("TamperProtection");
         if (tamperProtectionSetting is ENABLED_AUTOMATICALLY or ENABLED_BY_USER)
         {
@@ -85,18 +85,18 @@ class DefenderDisabler(IUserInterface ui, ServiceRemover serviceRemover) : IOper
 
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System", "EnableSmartScreen", 0);
         // Turn off SmartScreen for Microsoft Store apps
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost", "EnableWebContentEvaluation", 0);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost", "EnableWebContentEvaluation", 0);
         // Turn off SmartScreen for Microsoft Edge
-        RegistryUtils.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenEnabled", valueName: null, 0);
-        RegistryUtils.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenPuaEnabled", valueName: null, 0);
+        Registry.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenEnabled", valueName: null, 0);
+        Registry.SetForCurrentAndDefaultUser(@"Software\Microsoft\Edge\SmartScreenPuaEnabled", valueName: null, 0);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter", "EnabledV9", 0);
 
-        RegistryUtils.LocalMachine64.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");
-        RegistryUtils.LocalMachine64.DeleteSubKeyValue(
+        Registry.LocalMachine64.DeleteSubKeyValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth");
+        Registry.LocalMachine64.DeleteSubKeyValue(
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "SecurityHealth"
         );
 
-        using RegistryKey notificationSettings = RegistryUtils.LocalMachine64.CreateSubKey(
+        using RegistryKey notificationSettings = Registry.LocalMachine64.CreateSubKey(
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance"
         );
         notificationSettings.SetValue("Enabled", 0);

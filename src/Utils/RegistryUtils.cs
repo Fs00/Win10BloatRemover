@@ -7,11 +7,24 @@ namespace Win10BloatRemover.Utils;
 static class RegistryUtils
 {
     private const string DEFAULT_USER_HIVE_PATH = @"HKEY_USERS\_loaded_Default";
-    private static RegistryKey? defaultUserKey;
-    public static RegistryKey DefaultUser => defaultUserKey ??= LoadDefaultUserHive();
+    private static RegistryKey? defaultUserHiveKey;
+    private static RegistryKey? localMachine64BitView;
 
-    public static readonly RegistryKey LocalMachine64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+    extension(Registry)
+    {
+        public static RegistryKey LocalMachine64 =>
+            localMachine64BitView ??= RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
 
+        public static RegistryKey DefaultUser => defaultUserHiveKey ??= LoadDefaultUserHive();
+
+        public static void SetForCurrentAndDefaultUser(string keyPath, string? valueName, object value)
+        {
+            Registry.SetValue($@"HKEY_CURRENT_USER\{keyPath}", valueName, value);
+            using (RegistryKey key = Registry.DefaultUser.CreateSubKey(keyPath))
+                key.SetValue(valueName, value);
+        }
+    }
+    
     private static RegistryKey LoadDefaultUserHive()
     {
         var loadExitCode = OS.RunProcessBlocking(
@@ -26,15 +39,8 @@ static class RegistryUtils
 
     private static void UnloadDefaultUserHive()
     {
-        defaultUserKey?.Close();
+        defaultUserHiveKey?.Close();
         OS.RunProcessBlocking(OS.SystemExecutablePath("reg"), $@"unload ""{DEFAULT_USER_HIVE_PATH}""");
-    }
-
-    public static void SetForCurrentAndDefaultUser(string keyPath, string? valueName, object value)
-    {
-        Registry.SetValue($@"HKEY_CURRENT_USER\{keyPath}", valueName, value);
-        using (RegistryKey key = DefaultUser.CreateSubKey(keyPath))
-            key.SetValue(valueName, value);
     }
 
     extension(RegistryKey registryKey)

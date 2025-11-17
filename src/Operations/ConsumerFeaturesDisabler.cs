@@ -22,13 +22,13 @@ class ConsumerFeaturesDisabler(IUserInterface ui) : IOperation
     {
         // These two policies apply only to Education and Enterprise editions
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent", "DisableWindowsConsumerFeatures", 1);
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Policies\Microsoft\Windows\CloudContent", "DisableWindowsSpotlightFeatures", 1);
         // The following applies only to Pro, Education and Enterprise editions
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Policies\Microsoft\Windows\CloudContent", "DisableTailoredExperiencesWithDiagnosticData", 1);
         // This is needed to disable Spotlight on Windows 10 Home and Pro
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "RotatingLockScreenEnabled", 0);
         // Disable customized background images and text, suggestions, notifications, and tips in Microsoft Edge
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "SpotlightExperiencesAndRecommendationsEnabled", 0);
@@ -36,16 +36,16 @@ class ConsumerFeaturesDisabler(IUserInterface ui) : IOperation
 
     private void DisableAutomaticAppsInstallation()
     {
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "ContentDeliveryAllowed", 0);
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SilentInstalledAppsEnabled", 0);
     }
 
     private void DisableTaskbarFeatures()
     {
         // Meet Now icon
-        RegistryUtils.SetForCurrentAndDefaultUser(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", "HideSCAMeetNow", 1);
+        Registry.SetForCurrentAndDefaultUser(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", "HideSCAMeetNow", 1);
         // News and Interests
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds", "EnableFeeds", 0);
         // Search Highlights
@@ -61,6 +61,6 @@ class ConsumerFeaturesDisabler(IUserInterface ui) : IOperation
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search", "DisableWebSearch", 1);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search", "ConnectedSearchUseWeb", 0);
         // This is required to disable Bing search on Home and Pro editions
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Policies\Microsoft\Windows\Explorer", "DisableSearchBoxSuggestions", 1);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Policies\Microsoft\Windows\Explorer", "DisableSearchBoxSuggestions", 1);
     }
 }

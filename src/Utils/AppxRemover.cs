@@ -178,7 +178,7 @@ class AppxRemover(IUserInterface ui)
 
         private void MakeSystemAppRemovable(Package package)
         {
-            using var appxStoreKey = RegistryUtils.LocalMachine64.OpenSubKeyWritable(
+            using var appxStoreKey = Registry.LocalMachine64.OpenSubKeyWritable(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
             );
             AddEndOfLifeKeysForPackage(package.Id.FullName, appxStoreKey);

@@ -17,32 +17,32 @@ class SuggestionsDisabler(IUserInterface ui) : IOperation
         ui.PrintHeading("Disabling suggestions via Registry edits...");
 
         // System -> Notifications & actions -> Show the Windows welcome experience...
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-310093Enabled", 0);
         // System -> Notifications & actions -> Get tips, tricks, and suggestions as you use Windows
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-338389Enabled", 0);
         // Personalization -> Start -> Show suggestions occasionally in Start
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-338388Enabled", 0);
         // Removes fun facts for Spotlight images from lock screen
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-338387Enabled", 0);
         // Personalization -> Lock screen -> Get fun facts, tips, tricks and more on your lock screen
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "RotatingLockScreenOverlayEnabled", 0);
         // Privacy -> General -> Show suggested content in Settings app
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-338393Enabled", 0);
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-353694Enabled", 0);
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-353696Enabled", 0);
         // System -> Notifications & actions -> Suggest ways I can finish setting up my device...
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement", "ScoobeSystemSettingEnabled", 0);
         // Personalization -> Start -> Show account-related notifications
-        RegistryUtils.SetForCurrentAndDefaultUser(
+        Registry.SetForCurrentAndDefaultUser(
             @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "Start_AccountNotifications", 0);
 
         // Applies only to Education and Enterprise editions
@@ -60,7 +60,7 @@ class SuggestionsDisabler(IUserInterface ui) : IOperation
         Registry.SetValue(
             @"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection",
             "DoNotShowFeedbackNotifications", 1);
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Siuf\Rules", "NumberOfSIUFInPeriod", 0);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Siuf\Rules", "NumberOfSIUFInPeriod", 0);
 
         new ScheduledTasksDisabler([
             @"\Microsoft\Windows\Feedback\Siuf\DmClient",

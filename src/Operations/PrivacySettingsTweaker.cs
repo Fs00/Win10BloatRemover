@@ -33,12 +33,12 @@ class PrivacySettingsTweaker(IUserInterface ui) : IOperation
 
         // Privacy -> General
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo", "DisabledByGroupPolicy", 1);
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "Start_TrackProgs", 0);
-        RegistryUtils.SetForCurrentAndDefaultUser(@"Control Panel\International\User Profile", "HttpAcceptLanguageOptOut", 1);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "Start_TrackProgs", 0);
+        Registry.SetForCurrentAndDefaultUser(@"Control Panel\International\User Profile", "HttpAcceptLanguageOptOut", 1);
 
         // Privacy -> Inking and typing personalization (and related policies)
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Personalization\Settings", "AcceptedPrivacyPolicy", 0);
-        RegistryUtils.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore", "HarvestContacts", 0);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\Personalization\Settings", "AcceptedPrivacyPolicy", 0);
+        Registry.SetForCurrentAndDefaultUser(@"SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore", "HarvestContacts", 0);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\InputPersonalization", "RestrictImplicitInkCollection", 1);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\InputPersonalization", "RestrictImplicitTextCollection", 1);
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\TabletPC", "PreventHandwritingDataSharing", 1);
@@ -72,7 +72,7 @@ class PrivacySettingsTweaker(IUserInterface ui) : IOperation
     {
         foreach (string permission in appPermissionsToDeny)
         {
-            using var permissionKey = RegistryUtils.LocalMachine64.CreateSubKey(
+            using var permissionKey = Registry.LocalMachine64.CreateSubKey(
                 $@"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\{permission}"
             );
             permissionKey.SetValue("Value", "Deny");

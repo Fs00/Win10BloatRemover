@@ -26,22 +26,14 @@ class ServiceRemovalOperation(string[] servicesToRemove, IUserInterface ui, Serv
  *  Performs backup (export of registry keys) and removal of those services whose name starts with the given service names.
  *  This is made in order to include services that end with a random code.
  */
-class ServiceRemover
+class ServiceRemover(IUserInterface ui)
 {
-    private readonly DirectoryInfo backupDirectory;
-    private readonly IUserInterface ui;
+    private readonly DirectoryInfo backupDirectory =
+        new DirectoryInfo(Path.Join(AppContext.BaseDirectory, "removedServicesBackup"));
 
     private const int SC_EXIT_CODE_MARKED_FOR_DELETION = 1072;
 
     public bool IsRebootRecommended { get; private set; }
-
-    public ServiceRemover(IUserInterface ui) : this(ui, DateTime.Now) {}
-    public ServiceRemover(IUserInterface ui, DateTime now)
-    {
-        this.ui = ui;
-        string backupDirectoryPath = Path.Join(AppContext.BaseDirectory, $"servicesBackup_{now:yyyy-MM-dd_HH-mm-ss}");
-        backupDirectory = new DirectoryInfo(backupDirectoryPath);
-    }
 
     public void BackupAndRemove(params string[] servicesToRemove)
     {
@@ -85,7 +77,7 @@ class ServiceRemover
         EnsureBackupDirectoryExists();
         var regExportExitCode = OS.RunProcessBlocking(
             OS.SystemExecutablePath("reg"),
-            $@"export ""HKLM\SYSTEM\CurrentControlSet\Services\{service}"" ""{backupDirectory.FullName}\{service}.reg"""
+            $@"export ""HKLM\SYSTEM\CurrentControlSet\Services\{service}"" ""{backupDirectory.FullName}\{service}.reg"" /y"
         );
         if (regExportExitCode.IsSuccessful())
             ui.PrintMessage($"Service {service} backed up.");

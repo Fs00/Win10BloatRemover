@@ -222,6 +222,7 @@ class UwpAppGroupRemover : IOperation
 
     private void RemoveMixedRealityAppsLeftovers()
     {
+        RemoveServices("MixedRealityOpenXRSvc", "perceptionsimulation", "spectrum", "SharedRealitySvc", "VacSvc");
         Remove3DObjectsFolder();
         Remove3DPrintContextMenuEntries();
     }

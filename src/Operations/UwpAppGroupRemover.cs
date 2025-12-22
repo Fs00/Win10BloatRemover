@@ -121,7 +121,7 @@ class UwpAppGroupRemover : IOperation
 
         postUninstallOperationsForGroup = new Dictionary<UwpAppGroup, Action> {
             { UwpAppGroup.CommunicationsApps, () => {
-                RemoveOneSyncServiceFeature();
+                RemoveCommunicationsAppsServices();
                 PreventAutomaticOutlookInstallation();
             } },
             { UwpAppGroup.Cortana, HideCortanaFromTaskBar },
@@ -274,11 +274,10 @@ class UwpAppGroupRemover : IOperation
         }
     }
 
-    private void RemoveOneSyncServiceFeature()
+    private void RemoveCommunicationsAppsServices()
     {
-        var featuresRemover = new FeaturesRemover(["OneCoreUAP.OneSync"], ui);
-        featuresRemover.Run();
-        rebootFlag.UpdateIfNeeded(featuresRemover.IsRebootRecommended);
+        RemoveServices("PimIndexMaintenanceSvc");
+        RemoveFeatures("OneCoreUAP.OneSync");
     }
 
     private void PreventAutomaticOutlookInstallation()
@@ -313,5 +312,12 @@ class UwpAppGroupRemover : IOperation
     {
         serviceRemover.BackupAndRemove(services);
         rebootFlag.UpdateIfNeeded(serviceRemover.IsRebootRecommended);
+    }
+    
+    private void RemoveFeatures(params string[] features)
+    {
+        var featuresRemover = new FeaturesRemover(features, ui);
+        featuresRemover.Run();
+        rebootFlag.UpdateIfNeeded(featuresRemover.IsRebootRecommended);
     }
 }

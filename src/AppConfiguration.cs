@@ -71,13 +71,13 @@ class AppConfiguration
             UwpAppGroup.HelpAndFeedback,
             UwpAppGroup.Maps,
             UwpAppGroup.MediaPlayers,
-            UwpAppGroup.Messaging,
             UwpAppGroup.MixedReality,
             UwpAppGroup.Mobile,
             UwpAppGroup.OneNote,
             UwpAppGroup.Paint3D,
-            UwpAppGroup.SolitaireCollection,
-            UwpAppGroup.Skype
+            UwpAppGroup.PhoneLink,
+            UwpAppGroup.Skype,
+            UwpAppGroup.SolitaireCollection
         ],
         WindowsFeaturesToRemove = [
             "App.StepsRecorder",

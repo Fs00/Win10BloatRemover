@@ -23,11 +23,11 @@ enum UwpAppGroup
     HelpAndFeedback,
     Maps,
     MediaPlayers,
-    Messaging,
     MixedReality,
     Mobile,
     OneNote,
     Paint3D,
+    PhoneLink,
     Photos,
     Skype,
     SnipAndSketch,
@@ -65,19 +65,15 @@ class UwpAppGroupRemover : IOperation
         ] },
         { UwpAppGroup.Maps, ["Microsoft.WindowsMaps"] },
         { UwpAppGroup.MediaPlayers, ["Microsoft.ZuneMusic", "Microsoft.ZuneVideo"] },
-        { UwpAppGroup.Messaging, ["Microsoft.Messaging"] },
         { UwpAppGroup.MixedReality, [
             "Microsoft.Microsoft3DViewer",
             "Microsoft.Print3D",
             "Microsoft.MixedReality.Portal"
         ] },
-        { UwpAppGroup.Mobile, [
-            "Microsoft.YourPhone",
-            "MicrosoftWindows.CrossDevice",
-            "Microsoft.OneConnect"
-        ] },
+        { UwpAppGroup.Mobile, ["Microsoft.Messaging", "Microsoft.OneConnect"] },
         { UwpAppGroup.OneNote, ["Microsoft.Office.OneNote"] },
         { UwpAppGroup.Paint3D, ["Microsoft.MSPaint"] },
+        { UwpAppGroup.PhoneLink, ["Microsoft.YourPhone", "MicrosoftWindows.CrossDevice"] },
         { UwpAppGroup.Photos, ["Microsoft.Windows.Photos"] },
         { UwpAppGroup.Skype, ["Microsoft.SkypeApp"] },
         { UwpAppGroup.SnipAndSketch, ["Microsoft.ScreenSketch"] },
@@ -126,12 +122,12 @@ class UwpAppGroupRemover : IOperation
             } },
             { UwpAppGroup.Cortana, HideCortanaFromTaskBar },
             { UwpAppGroup.Maps, RemoveMapsServicesAndTasks },
-            { UwpAppGroup.Messaging, RemoveMessagingService },
+            { UwpAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
+            { UwpAppGroup.Mobile, RemoveMessagingService },
             { UwpAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
             { UwpAppGroup.Photos, RestoreWindowsPhotoViewer },
-            { UwpAppGroup.MixedReality, RemoveMixedRealityAppsLeftovers },
-            { UwpAppGroup.Xbox, RemoveXboxServicesAndTasks },
-            { UwpAppGroup.Store, DisableStoreFeaturesAndServices }
+            { UwpAppGroup.Store, DisableStoreFeaturesAndServices },
+            { UwpAppGroup.Xbox, RemoveXboxServicesAndTasks }
         };
     }
 

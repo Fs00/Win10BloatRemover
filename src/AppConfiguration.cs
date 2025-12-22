@@ -60,8 +60,10 @@ class AppConfiguration
     public static readonly AppConfiguration Default = new() {
         ServicesToRemove = [
             "dmwappushservice",
+            "DmEnrollmentSvc",
             "RetailDemo",
-            "TroubleshootingSvc"
+            "TroubleshootingSvc",
+            "wisvc"
         ],
         UWPAppsToRemove = [   
             UwpAppGroup.Bing,

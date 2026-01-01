@@ -127,7 +127,7 @@ class UwpAppGroupRemover : IOperation
             { UwpAppGroup.Paint3D, RemovePaint3DContextMenuEntries },
             { UwpAppGroup.Photos, RestoreWindowsPhotoViewer },
             { UwpAppGroup.Store, DisableStoreFeaturesAndServices },
-            { UwpAppGroup.Xbox, RemoveXboxServicesAndTasks }
+            { UwpAppGroup.Xbox, DisableXboxFeaturesAndServices }
         };
     }
 
@@ -188,16 +188,6 @@ class UwpAppGroupRemover : IOperation
     {
         DisableScheduledTasks(@"\Microsoft\Windows\Maps\MapsUpdateTask", @"\Microsoft\Windows\Maps\MapsToastTask");
         RemoveServices("MapsBroker");
-    }
-
-    private void RemoveXboxServicesAndTasks()
-    {
-        DisableScheduledTasks(@"Microsoft\XblGameSave\XblGameSaveTask");
-        RemoveServices("XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc");
-
-        ui.PrintMessage("Disabling Xbox Game Bar...");
-        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
-        rebootFlag.SetRecommended();
     }
 
     private void RemoveMessagingService()
@@ -298,6 +288,29 @@ class UwpAppGroupRemover : IOperation
         rebootFlag.SetRecommended();
 
         RemoveServices("PushToInstall");
+    }
+    
+    private void DisableXboxFeaturesAndServices()
+    {
+        DisableScheduledTasks(@"Microsoft\XblGameSave\XblGameSaveTask");
+        RemoveServices("XblAuthManager", "XblGameSave", "XboxNetApiSvc", "XboxGipSvc", "BcastDVRUserService");
+
+        ui.PrintMessage("Disabling Xbox Game Bar...");
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0);
+        rebootFlag.SetRecommended();
+        
+        HideGameBarSettings();
+    }
+
+    private void HideGameBarSettings()
+    {
+        using var explorerPoliciesKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer");
+        // We don't want to overwrite the settings visibility policy in case the user has already set it for their own purposes
+        if (explorerPoliciesKey.HasValue("SettingsPageVisibility"))
+            return;
+
+        ui.PrintMessage("Hiding Game Bar and capture settings in the Settings app...");
+        explorerPoliciesKey.SetValue("SettingsPageVisibility", "hide:gaming-gamebar;gaming-gamedvr");
     }
 
     private void DisableScheduledTasks(params string[] scheduledTasks)

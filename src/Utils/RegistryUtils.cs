@@ -45,6 +45,8 @@ static class RegistryUtils
 
     extension(RegistryKey registryKey)
     {
+        public bool HasValue(string valueName) => registryKey.GetValue(valueName) != null;
+
         public void DeleteSubKeyValue(string subkeyName, string valueName)
         {
             using RegistryKey? subKey = registryKey.OpenSubKey(subkeyName, writable: true);

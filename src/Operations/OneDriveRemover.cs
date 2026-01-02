@@ -10,18 +10,10 @@ class OneDriveRemover(IUserInterface ui) : IOperation
 {
     public void Run()
     {
-        KillOneDriveProcesses();
         DisableOneDrive();
-        RunOneDriveUninstaller();
+        UninstallOneDriveForCurrentUser();
         RemoveOneDriveLeftovers();
         DisableAutomaticSetupForNewUsers();
-    }
-
-    private void KillOneDriveProcesses()
-    {
-        ui.PrintMessage("Shutting down OneDrive processes...");
-        OS.KillProcess("onedrive");
-        OS.KillProcess("onedrive.sync.service");
     }
 
     private void DisableOneDrive()
@@ -32,33 +24,39 @@ class OneDriveRemover(IUserInterface ui) : IOperation
         key.SetValue("PreventNetworkTrafficPreUserSignIn", 1);
     }
 
-    private void RunOneDriveUninstaller()
+    private void UninstallOneDriveForCurrentUser()
     {
         ui.PrintMessage("Executing OneDrive uninstaller...");
-        string setupPath = RetrieveOneDriveSetupPath();
-        var uninstallationExitCode = OS.RunProcessBlockingWithOutput(setupPath, "/uninstall", ui);
-        if (uninstallationExitCode.IsNotSuccessful())
+        string? uninstallCommand = RetrieveOneDriveUninstallCommand();
+        if (uninstallCommand == null)
         {
-            ui.PrintError("Uninstallation failed due to an unknown error.");
-            ui.ThrowIfUserDenies("Do you still want to continue the process by removing all leftover OneDrive " +
-                                 "files (including its application files for the current user) and registry keys?");
+            ui.PrintNotice("OneDrive does not appear to be installed for the current user.");
+            ui.ThrowIfUserDenies("Do you still want to proceed and remove any leftover OneDrive files and registry keys?");
+            return;
+        }
+        
+        OS.ExecuteWindowsPromptCommand(uninstallCommand, ui);
+        // We cannot rely on the exit code of the OneDrive uninstaller to determine if the uninstallation was completed
+        // successfully, as it always exits with a non-zero status regardless of the outcome.
+        bool isOneDriveStillInstalled = RetrieveOneDriveUninstallCommand() != null;
+        if (isOneDriveStillInstalled)
+        {
+            ui.PrintError("It seems that OneDrive is still installed despite our attempt to remove it.\n" +
+                          "Try again, and if the error persists, you might want to take a look at the\n" +
+                          @"OneDrive setup logs in %LOCALAPPDATA%\Microsoft\OneDrive\setup\logs.");
+            ui.PrintEmptySpace();
+            throw new Exception("OneDrive uninstallation did not complete successfully.");
         }
     }
 
-    private string RetrieveOneDriveSetupPath()
+    private string? RetrieveOneDriveUninstallCommand()
     {
-        FileInfo[] potentialOneDriveSetupLocations = [
-            new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\SysWOW64\OneDriveSetup.exe"),
-            // "Sysnative" is used to prevent automatic redirection from System32 to SysWOW64 folder
-            // See https://learn.microsoft.com/en-us/windows/win32/winprog64/file-system-redirector
-            new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\Sysnative\OneDriveSetup.exe"),
-            // The Sysnative alias apparently doesn't work on 32-bit Windows installations
-            new FileInfo($@"{Env.GetFolderPath(Env.SpecialFolder.Windows)}\System32\OneDriveSetup.exe")
-        ];
-        var foundOneDriveSetup = potentialOneDriveSetupLocations.FirstOrDefault(file => file.Exists);
-        if (foundOneDriveSetup == null)
-            throw new Exception("OneDrive uninstaller was not found on the system.");
-        return foundOneDriveSetup.FullName;
+        using var oneDriveUninstallKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OneDriveSetup.exe");
+        if (oneDriveUninstallKey == null)
+            return null;
+        
+        ui.PrintMessage($"Detected OneDrive version {oneDriveUninstallKey.GetValue("DisplayVersion")}.");
+        return (string?) oneDriveUninstallKey.GetValue("UninstallString");
     }
 
     private void RemoveOneDriveLeftovers()
@@ -84,7 +82,7 @@ class OneDriveRemover(IUserInterface ui) : IOperation
     private void RemoveResidualRegistryKeys()
     {
         using RegistryKey classesRoot = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry64);
-        using RegistryKey key = classesRoot.OpenSubKeyWritable(@"CLSID");
+        using RegistryKey key = classesRoot.OpenSubKeyWritable("CLSID");
         key.DeleteSubKeyTree("{018D5C66-4533-4307-9B53-224DE2ED1FE6}", throwOnMissingSubKey: false);
     }
 

@@ -73,7 +73,7 @@ class OneDriveRemovalEntry : MenuEntry
     public override string FullName => "Remove OneDrive";
     public override string GetExplanation() => """
         OneDrive will be disabled using Group Policies and then uninstalled for the current user.
-        Furthermore, it will be prevented from being installed when a new user logs in for the first time.
+        Furthermore, it will be prevented from being installed automatically when a user logs in for the first time.
         """;
 
     public override IOperation CreateNewOperation(IUserInterface ui) => new OneDriveRemover(ui);

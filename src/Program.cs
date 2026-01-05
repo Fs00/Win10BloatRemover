@@ -35,7 +35,6 @@ static class Program
     {
         return [
             new UWPAppRemovalEntry(configuration),
-            new EdgeRemovalEntry(),
             new OneDriveRemovalEntry(),
             new ServicesRemovalEntry(configuration),
             new WindowsFeaturesRemovalEntry(configuration),

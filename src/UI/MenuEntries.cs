@@ -53,21 +53,6 @@ class DefenderDisablingEntry : MenuEntry
     public override IOperation CreateNewOperation(IUserInterface ui) => new DefenderDisabler(ui, new ServiceRemover(ui));
 }
 
-class EdgeRemovalEntry : MenuEntry
-{
-    public override string FullName => "Remove Microsoft Edge";
-    public override string GetExplanation() => """
-        Both Edge Chromium and the legacy Edge browser will be uninstalled from the system.
-        Be aware that Windows cumulative updates might reinstall Edge Chromium automatically.
-        Make sure that Edge Chromium is not updating itself before proceeding.
-
-        Note that Edge WebView2 runtime will NOT be removed if it's installed, as it may be required
-        by other programs installed on this PC.
-        """;
-
-    public override IOperation CreateNewOperation(IUserInterface ui) => new EdgeRemover(ui, new AppxRemover(ui));
-}
-
 class OneDriveRemovalEntry : MenuEntry
 {
     public override string FullName => "Remove OneDrive";

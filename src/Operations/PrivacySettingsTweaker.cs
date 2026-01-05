@@ -6,24 +6,17 @@ namespace Win10BloatRemover.Operations;
 
 class PrivacySettingsTweaker(IUserInterface ui) : IOperation
 {
-    private static readonly string[] appPermissionsToDeny = [
-        "location",
-        "documentsLibrary",
-        "userDataTasks",
-        "appDiagnostics",
-        "userAccountInformation"
-    ];
-
     public void Run()
     {
         ui.PrintMessage("Writing values into the Registry...");
-        AdjustPrivacySettings();
+        AdjustWindowsPrivacySettings();
+        AdjustEdgeSettings();
         DisableSensitiveDataSynchronization();
         DenySensitivePermissionsToApps();
         DenyLocationAccessToSearch();
     }
 
-    private void AdjustPrivacySettings()
+    private void AdjustWindowsPrivacySettings()
     {
         // Account -> Sign-in options -> Privacy
         Registry.SetValue(
@@ -50,9 +43,18 @@ class PrivacySettingsTweaker(IUserInterface ui) : IOperation
 
         // Privacy -> Speech
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\InputPersonalization", "AllowInputPersonalization", 0);
+    }
 
-        // Microsoft Edge settings -> Privacy, search and services -> Personalize your web experience
+    private void AdjustEdgeSettings()
+    {
+        // Privacy, search and services -> Personalize your web experience
         Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "PersonalizationReportingEnabled", 0);
+        // Privacy, search and services -> Search and connected experiences -> Suggest similar pages when a webpage can't be found
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "AlternateErrorPagesEnabled", 0);
+        // Privacy, search and services -> Search and connected experiences -> Use a web service to help resolve navigation errors
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "ResolveNavigationErrorsUseWebService", 0);
+        // Privacy, search and services -> Search and connected experiences -> Save time and money with Shopping in Microsoft Edge
+        Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "EdgeShoppingAssistantEnabled", 0);
     }
 
     private void DisableSensitiveDataSynchronization()
@@ -70,7 +72,8 @@ class PrivacySettingsTweaker(IUserInterface ui) : IOperation
 
     private void DenySensitivePermissionsToApps()
     {
-        foreach (string permission in appPermissionsToDeny)
+        string[] permissionsToDeny = ["location", "documentsLibrary", "userDataTasks", "appDiagnostics", "userAccountInformation"];
+        foreach (string permission in permissionsToDeny)
         {
             using var permissionKey = Registry.LocalMachine64.CreateSubKey(
                 $@"SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\{permission}"

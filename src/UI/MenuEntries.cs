@@ -102,8 +102,8 @@ class PrivacySettingsTweakEntry : MenuEntry
         These changes consist essentially of:
           - adjusting various options under Privacy section of Settings app (disable advertising ID, app launch tracking etc.)
           - preventing input data (inking/typing information, speech) from being sent to Microsoft to improve their services
-          - preventing Edge from sending browsing history, favorites and other data to Microsoft in order to personalize ads,
-            news and other services for your Microsoft account
+          - adjusting Edge privacy settings to prevent browsing history, shopping activity, mistyped websites, favorites
+            and other data from being sent to Microsoft
           - denying access to sensitive data (location, documents, activities, account details, diagnostic info) to
             all UWP apps by default
           - denying location access to Windows search

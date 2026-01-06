@@ -63,6 +63,7 @@ class AppConfiguration
             "DmEnrollmentSvc",
             "RetailDemo",
             "TroubleshootingSvc",
+            "UCPD",
             "wisvc"
         ],
         UWPAppsToRemove = [   
@@ -91,6 +92,7 @@ class AppConfiguration
         ],
         ScheduledTasksToDisable = [
             @"\Microsoft\Windows\ApplicationData\DsSvcCleanup",
+            @"\Microsoft\Windows\AppxDeploymentClient\UCPD velocity",
             @"\Microsoft\Windows\CloudExperienceHost\CreateObjectTask",
             @"\Microsoft\Windows\Clip\License Validation",
             @"\Microsoft\Windows\DiskFootprint\Diagnostics",

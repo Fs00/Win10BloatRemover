@@ -1,0 +1,7 @@
+﻿AdjustTokenPrivileges
+GetCurrentProcess
+OpenProcessToken
+LookupPrivilegeValue
+FindWindow
+PostMessage
+WIN32_ERROR

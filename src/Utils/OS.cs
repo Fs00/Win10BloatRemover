@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
+using Windows.Win32;
 using Microsoft.Win32;
 using Win10BloatRemover.UI;
 
@@ -50,10 +50,10 @@ static class OS
     {
         // This is the same as doing Ctrl+Shift+Right click on the system tray -> Exit Explorer
         // Solution found at https://stackoverflow.com/a/5705965
-        IntPtr trayWindow = FindWindow("Shell_TrayWnd", null);
+        var trayWindow = WinAPI.FindWindow("Shell_TrayWnd");
         if (trayWindow != IntPtr.Zero)
         {
-            PostMessage(trayWindow, 0x5B4, IntPtr.Zero, IntPtr.Zero);
+            WinAPI.PostMessage(trayWindow, 0x5B4, 0, 0);
             Thread.Sleep(TimeSpan.FromSeconds(2)); // wait for the process to gracefully exit
         }
         // If the Explorer option "Launch folder windows in a separate process" is enabled, that separate process
@@ -152,12 +152,4 @@ static class OS
         var windowsVersion = Environment.OSVersion.Version;
         return windowsVersion.Major == 10 && windowsVersion.Build < 21996;
     }
-
-    [DllImport("user32.dll", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern IntPtr FindWindow(string? className, string? windowName);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern bool PostMessage(IntPtr windowHandle, uint message, IntPtr wParam, IntPtr lParam);
 }

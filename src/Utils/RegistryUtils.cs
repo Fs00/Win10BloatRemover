@@ -1,21 +1,27 @@
 ﻿using System.Security.AccessControl;
 using System.Security.Principal;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.System.Registry;
 using Microsoft.Win32;
 
 namespace Win10BloatRemover.Utils;
 
 static class RegistryUtils
 {
-    private const string DEFAULT_USER_HIVE_PATH = @"HKEY_USERS\_loaded_Default";
-    private static RegistryKey? defaultUserHiveKey;
     private static RegistryKey? localMachine64BitView;
+    private static readonly Lazy<RegistryKey> defaultUserHiveKey = new(() => {
+        var hiveRegistryKey = LoadDefaultUserHive();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => hiveRegistryKey.Close();
+        return hiveRegistryKey;
+    });
 
     extension(Registry)
     {
         public static RegistryKey LocalMachine64 =>
             localMachine64BitView ??= RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
 
-        public static RegistryKey DefaultUser => defaultUserHiveKey ??= LoadDefaultUserHive();
+        public static RegistryKey DefaultUser => defaultUserHiveKey.Value;
 
         public static void SetForCurrentAndDefaultUser(string keyPath, string? valueName, object value)
         {
@@ -27,20 +33,12 @@ static class RegistryUtils
     
     private static RegistryKey LoadDefaultUserHive()
     {
-        var loadExitCode = OS.RunProcessBlocking(
-            OS.SystemExecutablePath("reg"), $@"load ""{DEFAULT_USER_HIVE_PATH}"" ""C:\Users\Default\NTUSER.DAT"""
-        );
-        if (loadExitCode.IsNotSuccessful())
-            throw new Exception("Unable to load Default user registry hive.");
+        const string DEFAULT_USER_HIVE_PATH = @"C:\Users\Default\NTUSER.DAT";
+        var result = WinAPI.RegLoadAppKey(DEFAULT_USER_HIVE_PATH, out var registryHandle, (uint) REG_SAM_FLAGS.KEY_ALL_ACCESS, 0);
+        if (result != WIN32_ERROR.ERROR_SUCCESS)
+            throw new Exception($"Unable to load Default user registry hive ({result})");
 
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => UnloadDefaultUserHive();
-        return Registry.Users.OpenSubKeyWritable("_loaded_Default");
-    }
-
-    private static void UnloadDefaultUserHive()
-    {
-        defaultUserHiveKey?.Close();
-        OS.RunProcessBlocking(OS.SystemExecutablePath("reg"), $@"unload ""{DEFAULT_USER_HIVE_PATH}""");
+        return RegistryKey.FromHandle(registryHandle);
     }
 
     extension(RegistryKey registryKey)

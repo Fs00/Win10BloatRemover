@@ -4,4 +4,6 @@ OpenProcessToken
 LookupPrivilegeValue
 FindWindow
 PostMessage
+RegLoadAppKey
+REG_SAM_FLAGS
 WIN32_ERROR

@@ -38,7 +38,7 @@ enum UwpAppGroup
     Xbox
 }
 
-class UwpAppGroupRemover : IOperation
+class UwpAppsRemover : IOperation
 {
     private static readonly Dictionary<UwpAppGroup, string[]> appNamesForGroup = new() {
         { UwpAppGroup.Bing, [
@@ -95,7 +95,8 @@ class UwpAppGroupRemover : IOperation
     };
 
     private readonly Dictionary<UwpAppGroup, Action> postUninstallOperationsForGroup;
-    private readonly UwpAppGroup[] appsToRemove;
+    private readonly UwpAppGroup[] appGroupsToRemove;
+    private readonly string[] appPackagesToRemove;
     private readonly UwpAppRemovalMode removalMode;
     private readonly IUserInterface ui;
     private readonly AppxRemover appxRemover;
@@ -104,10 +105,11 @@ class UwpAppGroupRemover : IOperation
     private readonly RebootRecommendedFlag rebootFlag = new RebootRecommendedFlag();
     public bool IsRebootRecommended => rebootFlag.IsRebootRecommended;
 
-    public UwpAppGroupRemover(UwpAppGroup[] appsToRemove, UwpAppRemovalMode removalMode, IUserInterface ui,
-                              AppxRemover appxRemover, ServiceRemover serviceRemover)
+    public UwpAppsRemover(UwpAppGroup[] appGroupsToRemove, string[] appPackagesToRemove, UwpAppRemovalMode removalMode,
+                          IUserInterface ui, AppxRemover appxRemover, ServiceRemover serviceRemover)
     {
-        this.appsToRemove = appsToRemove;
+        this.appGroupsToRemove = appGroupsToRemove;
+        this.appPackagesToRemove = appPackagesToRemove;
         this.removalMode = removalMode;
         this.ui = ui;
         this.appxRemover = appxRemover;
@@ -131,8 +133,11 @@ class UwpAppGroupRemover : IOperation
 
     public void Run()
     {
-        foreach (UwpAppGroup appGroup in appsToRemove)
+        foreach (UwpAppGroup appGroup in appGroupsToRemove)
             UninstallAppsOfGroup(appGroup);
+
+        if (appPackagesToRemove.Length > 0)
+            UninstallAppPackages();
     }
 
     private void UninstallAppsOfGroup(UwpAppGroup appGroup)
@@ -146,6 +151,15 @@ class UwpAppGroupRemover : IOperation
 
         if (removalMode == UwpAppRemovalMode.AllUsers && failedRemovals == 0)
             TryPerformPostUninstallOperations(appGroup);
+    }
+
+    private void UninstallAppPackages()
+    {
+        ui.PrintHeading("Removing additional app packages...");
+        if (removalMode == UwpAppRemovalMode.CurrentUser)
+            appxRemover.RemoveAppsForCurrentUser(appPackagesToRemove);
+        else
+            appxRemover.RemoveAppsForAllUsers(appPackagesToRemove);
     }
 
     private void TryPerformPostUninstallOperations(UwpAppGroup appGroup)

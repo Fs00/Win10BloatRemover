@@ -26,12 +26,21 @@ class UWPAppRemovalEntry(AppConfiguration configuration) : MenuEntry
             explanation += "\n\nServices, components and scheduled tasks used specifically by those apps will also " +
                            "be disabled or removed,\ntogether with any leftover data.";
 
+        if (configuration.ExtraUWPPackagesToRemove.Length > 0)
+        {
+            explanation += $"\n\nAdditionally, the following UWP app packages will be removed for {impactedUsers}:\n";
+            explanation += ConsoleHelpers.BuildIndentedList(configuration.ExtraUWPPackagesToRemove);
+            if (configuration.UWPAppsRemovalMode == UwpAppRemovalMode.AllUsers)
+                explanation += "\n\nIf some of the above packages belong to system apps, it is recommended to create a system restore point\n" +
+                               "before proceeding, since there will be no way to reinstall them.";
+        }
+
         return explanation;
     }
 
     public override IOperation CreateNewOperation(IUserInterface ui)
-        => new UwpAppGroupRemover(configuration.UWPAppsToRemove, configuration.UWPAppsRemovalMode,
-                                  ui, new AppxRemover(ui), new ServiceRemover(ui));
+        => new UwpAppsRemover(configuration.UWPAppsToRemove, configuration.ExtraUWPPackagesToRemove,
+                              configuration.UWPAppsRemovalMode, ui, new AppxRemover(ui), new ServiceRemover(ui));
 }
 
 class DefenderDisablingEntry : MenuEntry

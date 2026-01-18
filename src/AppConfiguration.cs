@@ -8,9 +8,15 @@ namespace Win10BloatRemover;
 
 class AppConfiguration
 {
-    public required string[] ServicesToRemove { get; init; }
-    public required UwpAppGroup[] UWPAppsToRemove { get; init; }
     public required UwpAppRemovalMode UWPAppsRemovalMode { get; init; }
+    public required UwpAppGroup[] UWPAppsToRemove { get; init; }
+    public string[] ExtraUWPPackagesToRemove
+    {
+        get;
+        init => field = value ?? []; // when the property is missing in the config file, the serializer attempts to initialize it to null
+    } = [];
+
+    public required string[] ServicesToRemove { get; init; }
     public required string[] ScheduledTasksToDisable { get; init; }
     public required string[] WindowsFeaturesToRemove { get; init; }
 
@@ -58,14 +64,7 @@ class AppConfiguration
     }
 
     public static readonly AppConfiguration Default = new() {
-        ServicesToRemove = [
-            "dmwappushservice",
-            "DmEnrollmentSvc",
-            "RetailDemo",
-            "TroubleshootingSvc",
-            "UCPD",
-            "wisvc"
-        ],
+        UWPAppsRemovalMode = UwpAppRemovalMode.AllUsers,
         UWPAppsToRemove = [   
             UwpAppGroup.Bing,
             UwpAppGroup.CommunicationsApps,
@@ -81,6 +80,14 @@ class AppConfiguration
             UwpAppGroup.PhoneLink,
             UwpAppGroup.Skype,
             UwpAppGroup.SolitaireCollection
+        ],
+        ServicesToRemove = [
+            "dmwappushservice",
+            "DmEnrollmentSvc",
+            "RetailDemo",
+            "TroubleshootingSvc",
+            "UCPD",
+            "wisvc"
         ],
         WindowsFeaturesToRemove = [
             "App.StepsRecorder",
@@ -108,8 +115,7 @@ class AppConfiguration
             @"\Microsoft\Windows\Subscription\LicenseAcquisition",
             @"\Microsoft\Windows\Diagnosis\Scheduled",
             @"\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner"
-        ],
-        UWPAppsRemovalMode = UwpAppRemovalMode.AllUsers
+        ]
     };
 }
 

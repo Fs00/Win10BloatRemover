@@ -64,7 +64,7 @@ static class Program
             return;
 
         Console.Clear();
-        ConsoleHelpers.WriteLine("-- UNSUPPORTED WINDOWS VERSION --\n", ConsoleColor.DarkYellow);
+        Console.WriteLineColored("-- UNSUPPORTED WINDOWS VERSION --\n", ConsoleColor.DarkYellow);
         if (!OS.IsWindows10())
             Console.WriteLine("This program was designed to work only on Windows 10.");
         else
@@ -74,7 +74,7 @@ static class Program
                 "You should update your system or download an older version of the program which is compatible with this\n" +
                 $"Windows 10 version ({OS.GetWindowsVersionName()}) at the following page:"
             );
-            ConsoleHelpers.WriteLine("  https://github.com/Fs00/Win10BloatRemover/releases/", ConsoleColor.Cyan);
+            Console.WriteLineColored("  https://github.com/Fs00/Win10BloatRemover/releases/", ConsoleColor.Cyan);
         }
 
         Console.WriteLine(
@@ -105,11 +105,11 @@ static class Program
         Console.Clear();
         if (exc is AppConfigurationLoadException)
         {
-            ConsoleHelpers.WriteLine($"An error occurred while loading settings file:\n{exc.Message}\n", ConsoleColor.Red);
+            Console.WriteLineColored($"An error occurred while loading settings file:\n{exc.Message}\n", ConsoleColor.Red);
             Console.WriteLine("Default settings have been loaded instead.\n");
         }
         else if (exc is AppConfigurationWriteException)
-            ConsoleHelpers.WriteLine($"Default settings file could not be created: {exc.Message}\n", ConsoleColor.DarkYellow);
+            Console.WriteLineColored($"Default settings file could not be created: {exc.Message}\n", ConsoleColor.DarkYellow);
 
         Console.WriteLine("Press a key to continue to the main menu.");
         Console.ReadKey();
@@ -123,7 +123,7 @@ static class Program
                 Environment.Exit(1); // ensures that ProcessExit events are executed
             else
             {
-                ConsoleHelpers.WriteLine("Press Ctrl+C again to terminate the program.", ConsoleColor.Red);
+                Console.WriteLineColored("Press Ctrl+C again to terminate the program.", ConsoleColor.Red);
                 cancelKeyPressedOnce = true;
                 args.Cancel = true;
             }

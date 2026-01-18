@@ -19,10 +19,9 @@ class UWPAppRemovalEntry(AppConfiguration configuration) : MenuEntry
         string impactedUsers = configuration.UWPAppsRemovalMode == UwpAppRemovalMode.CurrentUser
             ? "the current user"
             : "all present and future users";
-        string explanation = $"The following groups of UWP apps will be removed for {impactedUsers}:";
-        foreach (UwpAppGroup app in configuration.UWPAppsToRemove)
-            explanation += $"\n  {app}";
-
+        
+        string explanation = $"The following groups of UWP apps will be removed for {impactedUsers}:\n";
+        explanation += ConsoleHelpers.BuildIndentedList(configuration.UWPAppsToRemove);
         if (configuration.UWPAppsRemovalMode == UwpAppRemovalMode.AllUsers)
             explanation += "\n\nServices, components and scheduled tasks used specifically by those apps will also " +
                            "be disabled or removed,\ntogether with any leftover data.";
@@ -67,13 +66,10 @@ class OneDriveRemovalEntry : MenuEntry
 class ServicesRemovalEntry(AppConfiguration configuration) : MenuEntry
 {
     public override string FullName => "Remove miscellaneous services";
-    public override string GetExplanation()
-    {
-        string explanation = "All services whose name starts with the following names will be removed:\n";
-        foreach (string service in configuration.ServicesToRemove)
-            explanation += $"  {service}\n";
-        return explanation + "\nServices will be backed up in the same folder as this program executable.";
-    }
+    public override string GetExplanation() =>
+        "All services whose name starts with the following names will be removed:\n" +
+        ConsoleHelpers.BuildIndentedList(configuration.ServicesToRemove) +
+        "\n\nServices will be backed up in the same folder as this program executable.";
 
     public override IOperation CreateNewOperation(IUserInterface ui)
         => new ServiceRemovalOperation(configuration.ServicesToRemove, ui, new ServiceRemover(ui));
@@ -82,13 +78,9 @@ class ServicesRemovalEntry(AppConfiguration configuration) : MenuEntry
 class WindowsFeaturesRemovalEntry(AppConfiguration configuration) : MenuEntry
 {
     public override string FullName => "Remove Windows features";
-    public override string GetExplanation()
-    {
-        string explanation = "The following features on demand will be removed:";
-        foreach (string feature in configuration.WindowsFeaturesToRemove)
-            explanation += $"\n  {feature}";
-        return explanation;
-    }
+    public override string GetExplanation() =>
+        "The following features on demand will be removed:\n" +
+        ConsoleHelpers.BuildIndentedList(configuration.WindowsFeaturesToRemove);
 
     public override IOperation CreateNewOperation(IUserInterface ui)
         => new FeaturesRemover(configuration.WindowsFeaturesToRemove, ui);
@@ -144,13 +136,9 @@ class AutoUpdatesDisablingEntry : MenuEntry
 class ScheduledTasksDisablingEntry(AppConfiguration configuration) : MenuEntry
 {
     public override string FullName => "Disable miscellaneous scheduled tasks";
-    public override string GetExplanation()
-    {
-        string explanation = "The following scheduled tasks will be disabled:";
-        foreach (string task in configuration.ScheduledTasksToDisable)
-            explanation += $"\n  {task}";
-        return explanation;
-    }
+    public override string GetExplanation() =>
+        "The following scheduled tasks will be disabled:\n" +
+        ConsoleHelpers.BuildIndentedList(configuration.ScheduledTasksToDisable);
 
     public override IOperation CreateNewOperation(IUserInterface ui)
         => new ScheduledTasksDisabler(configuration.ScheduledTasksToDisable, ui);

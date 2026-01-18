@@ -39,10 +39,10 @@ class ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
 
     private void PrintMenuEntries()
     {
-        ConsoleHelpers.WriteLine("-- MENU --", ConsoleColor.Green);
+        Console.WriteLineColored("-- MENU --", ConsoleColor.Green);
         for (int i = 0; i < entries.Length; i++)
         {
-            ConsoleHelpers.Write($"{FirstMenuEntryNumber + i}: ", ConsoleColor.Green);
+            Console.WriteColored($"{FirstMenuEntryNumber + i}: ", ConsoleColor.Green);
             Console.WriteLine(entries[i].FullName);
         }
         Console.WriteLine();
@@ -57,7 +57,7 @@ class ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
             Console.Write("Choose an operation: ");
             chosenEntry = GetEntryCorrespondingToUserInput(Console.ReadLine());
             if (chosenEntry == null)
-                ConsoleHelpers.WriteLine("Incorrect input. Must be a valid menu entry number.", ConsoleColor.Red);
+                Console.WriteLineColored("Incorrect input. Must be a valid menu entry number.", ConsoleColor.Red);
             else
                 isUserInputCorrect = true;
         }
@@ -78,7 +78,7 @@ class ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
 
     private void PrintTitleAndExplanation(MenuEntry entry)
     {
-        ConsoleHelpers.WriteLine($"-- {entry.FullName} --", ConsoleColor.Green);
+        Console.WriteLineColored($"-- {entry.FullName} --", ConsoleColor.Green);
         Console.WriteLine(entry.GetExplanation());
     }
 
@@ -97,7 +97,7 @@ class ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
             operation.Run();
             if (operation.IsRebootRecommended)
             {
-                ConsoleHelpers.WriteLine("\nA system reboot is recommended.", ConsoleColor.Cyan);
+                Console.WriteLineColored("\nA system reboot is recommended.", ConsoleColor.Cyan);
                 rebootFlag.SetRecommended();
             }
 
@@ -111,12 +111,12 @@ class ConsoleMenu(MenuEntry[] entries, RebootRecommendedFlag rebootFlag)
         }
         catch (Exception exc)
         {
-            ConsoleHelpers.WriteLine($"Operation failed: {exc.Message}", ConsoleColor.Red);
+            Console.WriteLineColored($"Operation failed: {exc.Message}", ConsoleColor.Red);
             Trace.WriteLine(exc.StackTrace);
             Console.WriteLine();
         }
 
-        ConsoleHelpers.FlushStandardInput();
+        Console.FlushStandardInput();
         Console.WriteLine("Press a key to return to the main menu");
         Console.ReadKey();
     }

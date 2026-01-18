@@ -4,7 +4,7 @@ namespace Win10BloatRemover.Utils;
 
 class DismClient : IDisposable
 {
-    private readonly Lazy<DismSession> dismSession = new Lazy<DismSession>(() => {
+    private readonly Lazy<DismSession> dismSession = new(() => {
         DismApi.Initialize(DismLogLevel.LogErrorsWarningsInfo);
         return DismApi.OpenOnlineSessionEx(new DismSessionOptions { ThrowExceptionOnRebootRequired = false });
     });

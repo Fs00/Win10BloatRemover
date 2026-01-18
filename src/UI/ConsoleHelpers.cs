@@ -2,23 +2,31 @@
 
 static class ConsoleHelpers
 {
-    public static void Write(string? text, ConsoleColor color)
+    extension(Console)
     {
-        Console.ForegroundColor = color;
-        Console.Write(text);
-        Console.ResetColor();
+        public static void WriteColored(string? text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(text);
+            Console.ResetColor();
+        }
+
+        public static void WriteLineColored(string? text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
+
+        public static void FlushStandardInput()
+        {
+            while (Console.KeyAvailable)
+                Console.ReadKey(intercept: true);
+        }
     }
 
-    public static void WriteLine(string? text, ConsoleColor color)
+    public static string BuildIndentedList<T>(IEnumerable<T> items)
     {
-        Console.ForegroundColor = color;
-        Console.WriteLine(text);
-        Console.ResetColor();
-    }
-
-    public static void FlushStandardInput()
-    {
-        while (Console.KeyAvailable)
-            Console.ReadKey(intercept: true);
+        return string.Join("\n", items.Select(item => $"    {item}"));
     }
 }

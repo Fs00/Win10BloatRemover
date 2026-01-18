@@ -39,7 +39,7 @@ class ConsoleUserInterface : IUserInterface
         if (color == null)
             Console.WriteLine(text);
         else
-            ConsoleHelpers.WriteLine(text, color.Value);
+            Console.WriteLineColored(text, color.Value);
         writtenMessages++;
     }
 }

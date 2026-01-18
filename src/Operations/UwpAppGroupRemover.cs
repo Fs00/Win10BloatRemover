@@ -101,8 +101,6 @@ class UwpAppGroupRemover : IOperation
     private readonly AppxRemover appxRemover;
     private readonly ServiceRemover serviceRemover;
 
-    private int totalRemovedApps = 0;
-
     private readonly RebootRecommendedFlag rebootFlag = new RebootRecommendedFlag();
     public bool IsRebootRecommended => rebootFlag.IsRebootRecommended;
 
@@ -135,9 +133,6 @@ class UwpAppGroupRemover : IOperation
     {
         foreach (UwpAppGroup appGroup in appsToRemove)
             UninstallAppsOfGroup(appGroup);
-
-        if (totalRemovedApps > 0)
-            RestartExplorer();
     }
 
     private void UninstallAppsOfGroup(UwpAppGroup appGroup)
@@ -145,21 +140,12 @@ class UwpAppGroupRemover : IOperation
         string[] appsInGroup = appNamesForGroup[appGroup];
         ui.PrintHeading($"Removing {appGroup} {(appsInGroup.Length == 1 ? "app" : "apps")}...");
 
-        (int removedApps, int failedRemovals) = removalMode == UwpAppRemovalMode.CurrentUser
+        (_, int failedRemovals) = removalMode == UwpAppRemovalMode.CurrentUser
             ? appxRemover.RemoveAppsForCurrentUser(appsInGroup)
             : appxRemover.RemoveAppsForAllUsers(appsInGroup);
 
-        totalRemovedApps += removedApps;
-
         if (removalMode == UwpAppRemovalMode.AllUsers && failedRemovals == 0)
             TryPerformPostUninstallOperations(appGroup);
-    }
-
-    private void RestartExplorer()
-    {
-        ui.PrintHeading("Restarting Explorer to avoid stale app entries in Start menu...");
-        OS.CloseExplorer();
-        OS.StartExplorer();
     }
 
     private void TryPerformPostUninstallOperations(UwpAppGroup appGroup)

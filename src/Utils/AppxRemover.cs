@@ -7,9 +7,9 @@ using Windows.Management.Deployment;
 
 namespace Win10BloatRemover.Utils;
 
-class AppxRemover(IUserInterface ui)
+class AppxRemover(IMessagePrinter printer)
 {
-    internal readonly record struct Result(int RemovedApps, int FailedRemovals);
+    internal readonly record struct Result(int SuccessfulRemovals, int FailedRemovals);
 
     private enum RemovalOutcome
     {
@@ -20,37 +20,34 @@ class AppxRemover(IUserInterface ui)
 
     public Result RemoveAppsForCurrentUser(params string[] appNames)
     {
-        return PerformAppsRemoval(appNames, new CurrentUserRemovalMethod(ui));
+        return PerformAppsRemoval(appNames, new CurrentUserRemovalMethod(printer));
     }
 
     public Result RemoveAppsForAllUsers(params string[] appNames)
     {
         using var dismClient = new DismClient();
-        return PerformAppsRemoval(appNames, new AllUsersRemovalMethod(ui, dismClient));
+        return PerformAppsRemoval(appNames, new AllUsersRemovalMethod(printer, dismClient));
     }
 
     private Result PerformAppsRemoval(string[] appNames, RemovalMethod removalMethod)
     {
-        int removedApps = 0, failedRemovals = 0;
+        int successfulRemovals = 0, failedRemovals = 0;
         foreach (string appName in appNames)
         {
             RemovalOutcome outcome = removalMethod.RemovePackagesForApp(appName);
             if (outcome == RemovalOutcome.Success)
-                removedApps++;
+                successfulRemovals++;
             else if (outcome == RemovalOutcome.Failure)
                 failedRemovals++;
         }
-        return new Result(removedApps, failedRemovals);
+        return new Result(successfulRemovals, failedRemovals);
     }
 
-    private static bool IsSystemApp(Package package)
-    {
-        return package.SignatureKind == PackageSignatureKind.System;
-    }
+    private static bool IsSystemApp(Package package) => package.SignatureKind == PackageSignatureKind.System;
 
-    private abstract class RemovalMethod(IUserInterface ui)
+    private abstract class RemovalMethod(IMessagePrinter printer)
     {
-        protected readonly IUserInterface ui = ui;
+        protected readonly IMessagePrinter printer = printer;
         protected readonly PackageManager packageManager = new PackageManager();
 
         public virtual RemovalOutcome RemovePackagesForApp(string appName)
@@ -60,11 +57,11 @@ class AppxRemover(IUserInterface ui)
             var appPackages = GetAppPackages(appName);
             if (appPackages.Length == 0)
             {
-                ui.PrintMessage($"App {appName} is not installed.");
+                printer.PrintMessage($"App {appName} is not installed.");
                 return RemovalOutcome.NotInstalled;
             }
 
-            ui.PrintMessage($"Uninstalling app {appName}...");
+            printer.PrintMessage($"Uninstalling app {appName}...");
             foreach (var package in appPackages)
             {
                 var outcome = RemoveAppPackage(package);
@@ -96,14 +93,14 @@ class AppxRemover(IUserInterface ui)
             if (!string.IsNullOrEmpty(result.ErrorText))
                 errorMessage += $"\n{result.ErrorText}";
 
-            ui.PrintError(errorMessage);
+            printer.PrintError(errorMessage);
         }
 
         protected abstract Package[] GetAppPackages(string appName);
         protected abstract RemovalOutcome RemoveAppPackage(Package package);
     }
 
-    private class CurrentUserRemovalMethod(IUserInterface ui) : RemovalMethod(ui)
+    private class CurrentUserRemovalMethod(IMessagePrinter printer) : RemovalMethod(printer)
     {
         protected override Package[] GetAppPackages(string appName)
         {
@@ -119,7 +116,7 @@ class AppxRemover(IUserInterface ui)
             {
                 // Even though removing a system app for a single user is technically possible, we disallow that
                 // since cumulative updates would reinstall the app anyway, unless we prevent its reinstallation for all users
-                ui.PrintNotice("Uninstallation skipped. This is a system app, and therefore can only be removed for all users.");
+                printer.PrintNotice("Uninstallation skipped. This is a system app, and therefore can only be removed for all users.");
                 return RemovalOutcome.Failure;
             }
 
@@ -127,7 +124,7 @@ class AppxRemover(IUserInterface ui)
         }
     }
 
-    private class AllUsersRemovalMethod(IUserInterface ui, DismClient dismClient) : RemovalMethod(ui)
+    private class AllUsersRemovalMethod(IMessagePrinter printer, DismClient dismClient) : RemovalMethod(printer)
     {
         public override RemovalOutcome RemovePackagesForApp(string appName)
         {
@@ -146,7 +143,7 @@ class AppxRemover(IUserInterface ui)
             if (provisionedPackage == null)
                 return RemovalOutcome.NotInstalled;
 
-            ui.PrintMessage($"Removing provisioned package for app {appName}...");
+            printer.PrintMessage($"Removing provisioned package for app {appName}...");
             try
             {
                 dismClient.RemoveAppxProvisionedPackage(provisionedPackage.PackageName);
@@ -154,7 +151,7 @@ class AppxRemover(IUserInterface ui)
             }
             catch (Exception exc)
             {
-                ui.PrintError($"Could not remove provisioned package {provisionedPackage.PackageName}: {exc.Message} (0x{exc.HResult:X8})");
+                printer.PrintError($"Could not remove provisioned package {provisionedPackage.PackageName}: {exc.Message} (0x{exc.HResult:X8})");
                 return RemovalOutcome.Failure;
             }
         }

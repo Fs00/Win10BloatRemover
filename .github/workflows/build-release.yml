@@ -7,14 +7,14 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Publish release build
-      run: dotnet publish -c Release -p:PublishProfile=Standalone
+      run: dotnet publish
     - name: Print published executable hash
-      run: (Get-FileHash src/bin/Release/standalone/Win10BloatRemover.exe).Hash
+      run: (Get-FileHash src/bin/Release/publish/Win10BloatRemover.exe).Hash
     - name: Copy Readme and License near published executable
-      run: cp @('LICENSE', 'README.md') -Destination src/bin/Release/standalone
+      run: cp @('LICENSE', 'README.md') -Destination src/bin/Release/publish
     - name: Upload release files
       uses: actions/upload-artifact@v5
       with:
         name: Win10BloatRemover_${{ github.ref_name }}
-        path: src/bin/Release/standalone/*
+        path: src/bin/Release/publish/*
         if-no-files-found: error
